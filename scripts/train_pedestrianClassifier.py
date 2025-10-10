@@ -1,3 +1,9 @@
+# 将上级目录加入 sys.path， 防止命令行运行时找不到包
+import os, sys
+curPath = os.path.abspath(os.path.dirname(__file__))
+root_path = os.path.split(curPath)[0]
+sys.path.append(root_path)
+
 import argparse
 
 from experiments.pedestrian_classification import Ped_Classifier
@@ -16,12 +22,12 @@ def get_args():
     # train
     parser.add_argument('-base_lr', type=float, default=0.001)
     parser.add_argument('--isTrain', action='store_true', default=True)
-    parser.add_argument('--min_train_epoch', type=int, default=1)
+    parser.add_argument('--min_train_epoch', type=int, default=30)
     parser.add_argument('--max_train_epoch', type=int, default=100)
 
     parser.add_argument('--top_k', type=int, default=2)
     parser.add_argument('--patience', type=int, default=10)
-    parser.add_argument('--warmup_epochs', type=int, default=2)
+    parser.add_argument('--warmup_epochs', type=int, default=5)
 
     parser.add_argument('--monitored_metric', type=str, default='loss')
 
