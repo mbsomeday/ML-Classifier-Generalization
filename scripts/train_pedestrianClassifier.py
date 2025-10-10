@@ -39,7 +39,6 @@ def get_args():
 
 
 args = get_args()
-print(args)
 
 seed_list = [90, 8, 13, 20, 73]
 

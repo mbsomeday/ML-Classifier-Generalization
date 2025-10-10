@@ -181,8 +181,7 @@ class Ped_Classifier():
             org_dict['nonPed_acc_num'] += ((ped_labels[nonPed_idx] == pred[nonPed_idx]) * 1).sum()
             org_dict['ped_acc_num'] += ((ped_labels[ped_idx] == pred[ped_idx]) * 1).sum()
 
-            if batch_idx == 5:
-                break
+
 
         train_epoch_info = self.handle_pred_info(org_pred=org_dict, info_type='Train')
 
@@ -219,8 +218,7 @@ class Ped_Classifier():
                 ped_idx = (ped_labels == 1)
                 ped_acc_num += ((ped_labels[ped_idx] == preds[ped_idx]) * 1).sum()
 
-                if batch_idx == 5:
-                    break
+
 
         val_accuracy = val_correct_num / len(self.val_dataset)
         val_bc = balanced_accuracy_score(y_true, y_pred)
@@ -319,8 +317,7 @@ class Ped_Classifier():
         print('Total Val Samples:', len(self.val_dataset))
 
         for EPOCH in range(self.opts.max_train_epoch):
-            if EPOCH == 3:
-                break
+
             print('=' * 30 + ' begin EPOCH ' + str(EPOCH + 1) + '=' * 30)
             train_epoch_info = self.train_one_epoch()
             val_epoch_info = self.val_on_epoch_end()
