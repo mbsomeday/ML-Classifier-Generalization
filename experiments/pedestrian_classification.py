@@ -25,7 +25,7 @@ class Ped_Classifier():
                 print(f'Runing on {torch.cuda.get_device_name(0)} GPU')
 
         self.opts = opts
-        self.ped_model = get_obj_from_str(self.opts.ped_model_obj)(num_class=2).to(DEVICE)
+        self.ped_model = get_obj_from_str(self.opts.ped_model_obj)(num_classes=2).to(DEVICE)
 
         if self.opts.isTrain:
             self.training_setup()
