@@ -65,8 +65,6 @@ class Ped_Classifier():
         self.optimizer = torch.optim.RMSprop(self.ped_model.parameters(), lr=self.opts.base_lr, weight_decay=1e-5, eps=0.001)
         self.loss_fn = torch.nn.CrossEntropyLoss()
 
-        # self.best_val_bc = -np.inf  # 监控balanced accuracy
-        self.best_val_loss = np.inf # 监控loss
         self.ped_model = self.init_model(self.ped_model)
 
         # ********** callbacks **********
