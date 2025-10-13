@@ -161,6 +161,13 @@ NEXUS = {
 
 }
 
+deucalion = {
+    'Stage6_org': {
+        'D3': r'/data/jcampos/jiawei_data/datasets/stage6BDD100K',
+    },
+}
+
+
 cwd = os.getcwd()
 
 print('-' * 50)
@@ -177,5 +184,8 @@ elif 'veracruz' in cwd:
 elif 'jiawei_data' in cwd:
     print(f'Run on Nexus Server -- working dir: {cwd}')
     PATHS = NEXUS
+elif 'deu' in cwd:
+    print(f'Run on deucalion -- working dir: {cwd}')
+    PATHS = deucalion
 else:
     raise Exception('运行平台未知，需配置路径!')
