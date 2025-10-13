@@ -179,8 +179,6 @@ class Ped_Classifier():
             org_dict['nonPed_acc_num'] += ((ped_labels[nonPed_idx] == pred[nonPed_idx]) * 1).sum()
             org_dict['ped_acc_num'] += ((ped_labels[ped_idx] == pred[ped_idx]) * 1).sum()
 
-
-
         train_epoch_info = self.handle_pred_info(org_pred=org_dict, info_type='Train')
 
         return train_epoch_info
@@ -194,8 +192,6 @@ class Ped_Classifier():
         ped_acc_num = 0
         val_correct_num = 0
         val_loss = 0
-
-        # self.val_nonPed_num, self.val_ped_num = self.val_dataset.get_ped_cls_num()
 
         with torch.no_grad():
             for batch_idx, data in enumerate(tqdm(self.val_loader)):
@@ -215,8 +211,6 @@ class Ped_Classifier():
                 nonPed_acc_num += (ped_labels[nonPed_idx] == preds[nonPed_idx]).sum()
                 ped_idx = (ped_labels == 1)
                 ped_acc_num += ((ped_labels[ped_idx] == preds[ped_idx]) * 1).sum()
-
-
 
         val_accuracy = val_correct_num / len(self.val_dataset)
         val_bc = balanced_accuracy_score(y_true, y_pred)
@@ -244,7 +238,7 @@ class Ped_Classifier():
             f.write('ds_name, test_ba, tnr, tpr, tn, fp, fn, tp\n')
 
         for ds_name in self.opts.ds_name_list:
-            test_dataset = my_dataset(ds_name_list=[ds_name], path_key=self.opts.data_key, txt_name_list=['test.txt'])
+            test_dataset = my_dataset(ds_name_list=[ds_name], path_key=self.opts.data_key, txt_name='test.txt')
             test_loader = DataLoader(test_dataset, batch_size=self.opts.batch_size, shuffle=False)
 
             y_true = []
