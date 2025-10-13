@@ -45,6 +45,7 @@ seed_list = [20, 73]
 
 
 for cur_seed in seed_list:
+    print(f'cur_seed:{cur_seed}')
     args.rand_seed = cur_seed
 
     ped_model = Ped_Classifier(args)
