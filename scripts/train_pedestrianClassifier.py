@@ -40,8 +40,7 @@ def get_args():
 
 args = get_args()
 
-# seed_list = [90, 8, 13, 20, 73]
-seed_list = [20, 73]
+seed_list = [90, 8, 13, 20, 73]
 
 
 for cur_seed in seed_list:
