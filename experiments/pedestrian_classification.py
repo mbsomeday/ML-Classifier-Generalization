@@ -22,7 +22,7 @@ class Ped_Classifier():
             if torch.cuda.device_count() > 1:
                 raise RuntimeError('More than one GPU')
             else:
-                print(f'Runing on {torch.cuda.get_device_name(0)} GPU')
+                print(f'Running on {torch.cuda.get_device_name(0)} GPU')
 
         self.opts = opts
         self.ped_model = get_obj_from_str(self.opts.ped_model_obj)(num_classes=2).to(DEVICE)
