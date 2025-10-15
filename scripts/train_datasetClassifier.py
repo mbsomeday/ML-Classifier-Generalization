@@ -24,7 +24,7 @@ def get_opts():
     parser.add_argument('--val_batch_size', default=4)
 
     # test
-    parser.add_argument('--ds_weights_path', type=str, default='D:\my_phd\on_git\PerceptionBaseline\experiments\dsCls_D3_0\dsCls_D3_0-01-1.00000.pth')
+    parser.add_argument('--ds_weights_path', type=str, default=None)
     parser.add_argument('--test_txt_name', default='test.txt')
     parser.add_argument('--test_batch_size', default=2)
 
