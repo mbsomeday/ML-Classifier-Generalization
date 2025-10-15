@@ -38,7 +38,7 @@ def testPedestrian_args():
     parser.add_argument('--batch_size', type=int, default=4)
 
     # test
-    parser.add_argument('--ped_weights_path', type=int, default=None)
+    parser.add_argument('--ped_weights_path', type=str, default=None)
 
     args = parser.parse_args()
 
