@@ -31,7 +31,6 @@ def get_args():
 
     parser.add_argument('--monitored_metric', type=str, default='loss')
 
-    parser.add_argument('--rand_seed', type=int, default=13)
 
     args = parser.parse_args()
 

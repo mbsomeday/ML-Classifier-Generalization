@@ -38,7 +38,7 @@ def testPedestrian_args():
     parser.add_argument('--batch_size', type=int, default=4)
 
     # test
-    parser.add_argument('--ped_weights_path', type=str, default=None)
+    parser.add_argument('--ped_weights_path', type=str, default=r'C:\Users\wangj\Desktop\Paper Repository\Domain Adaptation\D1_models\efficientnet_b0_D1_Baseline_8\efficientnet_b0_D1_Baseline_8-42-3.4667.pth')
 
     parser.add_argument('--isTrain', action='store_true')
 
