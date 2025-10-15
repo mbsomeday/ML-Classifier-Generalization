@@ -40,6 +40,8 @@ def testPedestrian_args():
     # test
     parser.add_argument('--ped_weights_path', type=str, default=None)
 
+    parser.add_argument('--isTrain', action='store_true')
+
     args = parser.parse_args()
 
     return args
