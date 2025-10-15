@@ -163,6 +163,8 @@ NEXUS = {
 
 deucalion = {
     'Stage6_org': {
+        'D1': r'/projects/F202407660IACDCF2/jiawei_deu_data/datasets/ECP',
+        'D2': r'/projects/F202407660IACDCF2/jiawei_deu_data/datasets/CityPersons',
         'D3': r'/projects/F202407660IACDCF2/jiawei_deu_data/datasets/BDD100K',
     },
 }
