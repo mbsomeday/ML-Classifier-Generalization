@@ -163,7 +163,7 @@ NEXUS = {
 
 deucalion = {
     'Stage6_org': {
-        'D3': r'/home/jiawei/datasets/BDD100K',
+        'D3': r'/projects/F202407660IACDCF2/jiawei_data/datasets/BDD100K',
     },
 }
 
@@ -184,7 +184,7 @@ elif 'veracruz' in cwd:
 elif 'jiawei_data' in cwd:
     print(f'Run on Nexus Server -- working dir: {cwd}')
     PATHS = NEXUS
-elif 'deu' in cwd:
+elif 'F202407660IACDCF2' in cwd:
     print(f'Run on deucalion -- working dir: {cwd}')
     PATHS = deucalion
 else:
