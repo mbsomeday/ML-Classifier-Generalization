@@ -42,7 +42,7 @@ class HPSelection():
         # 固定的hyperparamters
         self.warmup_epochs = 3
         self.min_epochs = 10
-        self.max_epochs = 30
+        self.max_epochs = 100
         self.mini_train_num = 500    # 500
         self.mini_val_num = 500      # 500
         self.mini_test_num = 500
