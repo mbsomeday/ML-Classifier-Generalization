@@ -145,7 +145,7 @@ class HPSelection():
             test_cm = confusion_matrix(y_true, y_pred)
             tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
 
-            print(f'Test loss: {test_loss:.4f"}, test balanced acc: {balanced_accuracy:.4f"}')
+            print(f'Test loss: {test_loss:.4f}, test balanced acc: {balanced_accuracy:.4f}')
             print(f'test_cm:\n{test_cm}')
 
             with open(self.opts.test_txt, 'a') as f:
