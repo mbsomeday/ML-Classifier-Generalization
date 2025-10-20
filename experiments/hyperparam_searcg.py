@@ -149,7 +149,7 @@ class HPSelection():
             print(f'test_cm:\n{test_cm}')
 
             with open(self.opts.test_txt, 'a') as f:
-                msg = f'modle_weights: {self.opts.model_weights}\nds_name: {self.opts.ds_name_list[0]}\nTest loss: {test_loss:4f}\ntest balanced acc: {balanced_accuracy:.4f}\ntn, fp, fn, tp: {tn}, {fp}, {fn}, {tp}\n'
+                msg = f'modle_weights: {self.opts.model_weights}\nds_name: {self.opts.ds_name_list[0]}\nTest loss: {test_loss:.4f}\ntest balanced acc: {balanced_accuracy:.4f}\ntn, fp, fn, tp: {tn}, {fp}, {fn}, {tp}\n'
                 f.write(msg)
 
     def train_one_epoch(self, epoch):
