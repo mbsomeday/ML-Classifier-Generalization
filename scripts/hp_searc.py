@@ -35,7 +35,6 @@ def get_args():
 
 
 args = get_args()
-args.isTrain = True
 hp = HPSelection(args)
 hp.hp_search()
 

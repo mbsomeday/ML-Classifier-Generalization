@@ -176,12 +176,12 @@ class HPSelection():
 
 
     def hp_search(self):
-        for idx, comb_info in enumerate(self.all_combinations):
+        for comb_idx, comb_info in enumerate(self.all_combinations):
 
             self.batch_size, self.base_lr, optimizer_type, scheduler_type = comb_info
             comb = [str(self.batch_size), str(self.base_lr), optimizer_type, scheduler_type]
             comb_name = '_'.join(comb)
-            cur_txt_path = os.path.join(self.txt_dir, str(idx+1)+'.txt')
+            cur_txt_path = os.path.join(self.txt_dir, str(comb_idx+1)+'.txt')
             with open(cur_txt_path, 'a') as f:
                 f.write('Combination: ' + comb_name + '\n')
 
