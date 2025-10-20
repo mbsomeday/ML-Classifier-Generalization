@@ -116,10 +116,9 @@ class EarlyStopping():
         checkpoint = {
             'epoch': self.cur_epoch,
             'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict(),
-            'best_val_bc': self.monitored_metric_value,
-            'lr': scheduler.get_last_lr() if scheduler is not None else 0,
-            'scheduler_state_dict': scheduler.state_dict() if scheduler is not None else '',
+            # 'optimizer_state_dict': optimizer.state_dict(),
+            # 'best_monitored_val': self.monitored_metric_value,
+            # 'lr': scheduler.get_last_lr() if scheduler is not None else 0,
         }
 
         save_path = os.path.join(ckpt_dir, save_name)
