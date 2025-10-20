@@ -195,7 +195,7 @@ class HPSelection():
             with open(cur_txt_path, 'a') as f:
                 f.write('Combination: ' + comb_name + '\n')
 
-            print('=' * 30 + ' HP Comb ' + comb_name + '=' * 30)
+            print('=' * 30 + f' HP Comb: {comb_name} ({comb_idx+1}/{len(self.all_combinations)})' + '=' * 30)
 
             self.mini_trainloader = DataLoader(self.mini_trainset, batch_size=self.batch_size, shuffle=True)
 
