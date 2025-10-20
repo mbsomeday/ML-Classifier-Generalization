@@ -27,8 +27,9 @@ class HPSelection():
             'batch_size': [48, 64, 128],
             'base_lr': [1e-3, 5e-4],
             'optimizer': ['Adam', 'SGD'],
-            'scheduler': ['COS']
-            }
+            # 'scheduler': ['COS', 'EXP']
+            'scheduler': ['EXP']
+        }
         self.all_combinations = list(itertools.product(
             hp_dict['batch_size'],
             hp_dict['base_lr'],
@@ -49,7 +50,6 @@ class HPSelection():
 
         self.ped_model = models.efficientnet_b0(weights=None, num_classes=2).to(DEVICE)
         self.loss_fn = torch.nn.CrossEntropyLoss()
-
 
         if self.opts.isTrain:
             self.train_setup()
