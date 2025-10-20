@@ -47,6 +47,9 @@ class HPSelection():
         self.mini_test_num = 1000
         self.patience = 5
 
+        self.ped_model = models.efficientnet_b0(weights=None, num_classes=2).to(DEVICE)
+
+
         if self.opts.isTrain:
             self.train_setup()
 
@@ -61,7 +64,6 @@ class HPSelection():
         self.mini_valloader = DataLoader(self.mini_valset, batch_size=64, shuffle=False)
         print(f'MiniValset samples: {len(self.mini_valset)}')
 
-        self.ped_model = models.efficientnet_b0(weights=None, num_classes=2).to(DEVICE)
         self.loss_fn = torch.nn.CrossEntropyLoss()
 
         # # callbacks
