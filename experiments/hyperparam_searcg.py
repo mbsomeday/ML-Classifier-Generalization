@@ -46,6 +46,7 @@ class HPSelection():
         self.mini_train_num = 500    # 500
         self.mini_val_num = 500      # 500
         self.mini_test_num = 500
+        self.patience = 5
 
         if self.opts.isTrain:
             self.train_setup()
@@ -64,14 +65,14 @@ class HPSelection():
         self.ped_model = models.efficientnet_b0(weights=None, num_classes=2).to(DEVICE)
         self.loss_fn = torch.nn.CrossEntropyLoss()
 
-        # callbacks
-        self.callback_save_dir = self.opts.ped_model_obj.rsplit('.')[-1] + '_' + ''.join(self.opts.ds_name_list) + '_Baseline' + '_' + str(self.opts.rand_seed)
-        self.callback_save_path = os.path.join(self.opts.hp_dir, self.callback_save_dir)
-        print(f'Callback_save_dir:{self.callback_save_path}')
-        if not os.path.exists(self.callback_save_path):
-            os.makedirs(self.callback_save_path)
+        # # callbacks
+        # self.callback_save_dir = self.opts.ped_model_obj.rsplit('.')[-1] + '_' + ''.join(self.opts.ds_name_list) + '_Baseline' + '_' + str(self.opts.rand_seed)
+        # self.callback_save_path = os.path.join(self.opts.hp_dir, self.callback_save_dir)
+        # print(f'Callback_save_dir:{self.callback_save_path}')
+        # if not os.path.exists(self.callback_save_path):
+        #     os.makedirs(self.callback_save_path)
+        # self.early_stopping = EarlyStopping(callback_path=self.callback_save_path, patience=self.patience)
 
-        self.early_stopping = EarlyStopping(callback_path=self.callback_save_path, patience=5)
         self.txt_dir = os.path.join(self.opts.hp_dir, 'hp_txt')
         os.makedirs(self.txt_dir, exist_ok=True)
 
@@ -181,11 +182,19 @@ class HPSelection():
             comb = [str(self.batch_size), str(self.base_lr), optimizer_type, scheduler_type]
             comb_name = '_'.join(comb)
             cur_txt_path = os.path.join(self.txt_dir, str(idx+1)+'.txt')
-            print(f'comb_name:{comb_name}, cur_txt_path:{cur_txt_path}')
             with open(cur_txt_path, 'a') as f:
                 f.write('Combination: ' + comb_name + '\n')
 
             self.mini_trainloader = DataLoader(self.mini_trainset, batch_size=self.batch_size, shuffle=True)
+
+            callback_save_path = os.path.join(self.opts.hp_dir, comb_name)
+            if not os.path.exists(callback_save_path):
+                os.makedirs(callback_save_path)
+
+            self.early_stopping = EarlyStopping(callback_path=callback_save_path, patience=5)
+
+            print(f'comb_name:{comb_name}, cur_txt_path:{cur_txt_path}, callback_save_dir:{callback_save_path}')
+
 
             if optimizer_type == 'Adam':
                 self.optimizer = Adam(params=self.ped_model.parameters(), lr=self.base_lr, betas=(0.9, 0.999), eps=1e-8, weight_decay=0)
@@ -218,6 +227,7 @@ class HPSelection():
                     if self.early_stopping.early_stop:
                         print(f'Early Stopping!')
                         break
+
 
     def write_to_txt(self, epoch, txt_path, train_info, val_info):
         train_msg = 'Train: ' + self.get_print_msg(info_dict=train_info)
