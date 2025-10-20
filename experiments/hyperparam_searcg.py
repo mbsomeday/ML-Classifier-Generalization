@@ -178,12 +178,15 @@ class HPSelection():
 
     def hp_search(self):
         for idx, comb_info in enumerate(self.all_combinations):
+
             self.batch_size, self.base_lr, optimizer_type, scheduler_type = comb_info
             comb = [str(self.batch_size), str(self.base_lr), optimizer_type, scheduler_type]
             comb_name = '_'.join(comb)
             cur_txt_path = os.path.join(self.txt_dir, str(idx+1)+'.txt')
             with open(cur_txt_path, 'a') as f:
                 f.write('Combination: ' + comb_name + '\n')
+
+            print('=' * 30 + ' HP Comb ' + comb_name + '=' * 30)
 
             self.mini_trainloader = DataLoader(self.mini_trainset, batch_size=self.batch_size, shuffle=True)
 
@@ -194,7 +197,6 @@ class HPSelection():
             self.early_stopping = EarlyStopping(callback_path=callback_save_path, patience=5)
 
             print(f'comb_name:{comb_name}, cur_txt_path:{cur_txt_path}, callback_save_dir:{callback_save_path}')
-
 
             if optimizer_type == 'Adam':
                 self.optimizer = Adam(params=self.ped_model.parameters(), lr=self.base_lr, betas=(0.9, 0.999), eps=1e-8, weight_decay=0)
@@ -207,7 +209,6 @@ class HPSelection():
                 self.scheduler = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=0.95)
 
             for EPOCH in range(self.max_epochs):
-                print('=' * 30 + ' begin EPOCH ' + str(EPOCH + 1) + '=' * 30)
                 train_info = self.train_one_epoch(EPOCH+1)
                 val_info = self.val_on_epoch_end(EPOCH+1)
 
