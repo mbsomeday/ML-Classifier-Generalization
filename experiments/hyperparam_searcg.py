@@ -71,7 +71,7 @@ class HPSelection():
         if not os.path.exists(self.callback_save_path):
             os.makedirs(self.callback_save_path)
 
-        self.early_stopping = EarlyStopping(callback_path=self.callback_save_path, patience=self.warmup_epochs)
+        self.early_stopping = EarlyStopping(callback_path=self.callback_save_path, patience=5)
         self.txt_dir = os.path.join(self.opts.hp_dir, 'hp_txt')
         os.makedirs(self.txt_dir, exist_ok=True)
 
