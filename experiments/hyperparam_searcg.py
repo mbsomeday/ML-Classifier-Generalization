@@ -65,21 +65,20 @@ class HPSelection():
         self.loss_fn = torch.nn.CrossEntropyLoss()
 
         # callbacks
-        self.hp_dir = r'D:\my_phd\on_git\ML-Classifier-Generalization\HPcomb'
         self.callback_save_dir = self.opts.ped_model_obj.rsplit('.')[-1] + '_' + ''.join(self.opts.ds_name_list) + '_Baseline' + '_' + str(self.opts.rand_seed)
-        self.callback_save_path = os.path.join(self.hp_dir, self.callback_save_dir)
+        self.callback_save_path = os.path.join(self.opts.hp_dir, self.callback_save_dir)
         print(f'Callback_save_dir:{self.callback_save_path}')
         if not os.path.exists(self.callback_save_path):
             os.makedirs(self.callback_save_path)
 
         self.early_stopping = EarlyStopping(callback_path=self.callback_save_path, patience=self.warmup_epochs)
-        self.txt_dir = os.path.join(self.hp_dir, 'hp_txt')
+        self.txt_dir = os.path.join(self.opts.hp_dir, 'hp_txt')
         os.makedirs(self.txt_dir, exist_ok=True)
 
         print('共有的超参数组合数：', len(self.all_combinations))
 
 
-    def val_on_epoch_end(self):
+    def val_on_epoch_end(self, epoch):
 
         val_info = {
             'loss': 0.0
@@ -89,7 +88,7 @@ class HPSelection():
         y_true = []
         y_pred = []
         with torch.no_grad():
-            for batch_idx, data in enumerate(tqdm(self.mini_valloader, desc='val')):
+            for batch_idx, data in enumerate(tqdm(self.mini_valloader, desc=f'Epoch {epoch} val')):
                 images = data['image'].to(DEVICE)
                 ped_labels = data['ped_label'].to(DEVICE)
 
@@ -143,7 +142,7 @@ class HPSelection():
             balanced_accuracy = balanced_accuracy_score(y_true=y_true, y_pred=y_pred)
             print(f'Test loss: {test_loss}, test balanced acc: {balanced_accuracy}')
 
-    def train_one_epoch(self):
+    def train_one_epoch(self, epoch):
         train_info = {
             'loss': 0.0,
         }
@@ -152,7 +151,7 @@ class HPSelection():
 
         y_true = []
         y_pred = []
-        for batch_idx, data in enumerate(tqdm(self.mini_trainloader, desc='train')):
+        for batch_idx, data in enumerate(tqdm(self.mini_trainloader, desc=f'Epoch {epoch} train')):
             images = data['image'].to(DEVICE)
             ped_labels = data['ped_label'].to(DEVICE)
 
@@ -200,8 +199,8 @@ class HPSelection():
 
             for EPOCH in range(self.max_epochs):
                 print('=' * 30 + ' begin EPOCH ' + str(EPOCH + 1) + '=' * 30)
-                train_info = self.train_one_epoch()
-                val_info = self.val_on_epoch_end()
+                train_info = self.train_one_epoch(EPOCH+1)
+                val_info = self.val_on_epoch_end(EPOCH+1)
 
                 # lr schedule
                 if EPOCH <= self.warmup_epochs:
