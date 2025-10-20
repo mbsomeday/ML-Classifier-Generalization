@@ -24,8 +24,7 @@ class HPSelection():
         super().__init__()
 
         hp_dict = {
-            # 'batch_size': [48, 64, 128],
-            'batch_size': [2, 4],
+            'batch_size': [48, 64, 128],
             'base_lr': [1e-3, 5e-4],
             'optimizer': ['Adam', 'SGD'],
             'scheduler': ['COS']
@@ -43,9 +42,9 @@ class HPSelection():
         self.warmup_epochs = 3
         self.min_epochs = 10
         self.max_epochs = 100
-        self.mini_train_num = 500    # 500
-        self.mini_val_num = 500      # 500
-        self.mini_test_num = 500
+        self.mini_train_num = 1000    # 500
+        self.mini_val_num = 1000      # 500
+        self.mini_test_num = 1000
         self.patience = 5
 
         if self.opts.isTrain:
