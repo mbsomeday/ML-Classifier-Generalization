@@ -27,7 +27,7 @@ def get_args():
     parser.add_argument('--model_weights', type=str, default=None)
 
     parser.add_argument('--rand_seed', type=int, default=82)
-    parser.add_argument('--isTrain', action='store_true', default=True)
+    parser.add_argument('--isTrain', action='store_true')
 
     args = parser.parse_args()
 
@@ -38,8 +38,10 @@ args = get_args()
 hp = HPSelection(args)
 
 if args.isTrain:
+    print(f'Current mode: Train')
     hp.hp_search()
 else:
+    print(f'Current mode: Test')
     hp.test()
 
 
