@@ -43,9 +43,9 @@ class HPSelection():
         self.warmup_epochs = 3
         self.min_epochs = 10
         self.max_epochs = 30
-        self.mini_train_num = 10    # 500
-        self.mini_val_num = 10      # 500
-        self.mini_test_num = 10
+        self.mini_train_num = 500    # 500
+        self.mini_val_num = 500      # 500
+        self.mini_test_num = 500
 
         if self.opts.isTrain:
             self.train_setup()
