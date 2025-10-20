@@ -42,8 +42,8 @@ class HPSelection():
         self.warmup_epochs = 3
         self.min_epochs = 10
         self.max_epochs = 100
-        self.mini_train_num = 1000    # 500
-        self.mini_val_num = 1000      # 500
+        self.mini_train_num = 1000
+        self.mini_val_num = 1000
         self.mini_test_num = 1000
         self.patience = 5
 
@@ -142,7 +142,15 @@ class HPSelection():
                 test_loss += loss_value.item()
 
             balanced_accuracy = balanced_accuracy_score(y_true=y_true, y_pred=y_pred)
-            print(f'Test loss: {test_loss}, test balanced acc: {balanced_accuracy}')
+            test_cm = confusion_matrix(y_true, y_pred)
+            tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+
+            print(f'Test loss: {test_loss:.4f"}, test balanced acc: {balanced_accuracy:.4f"}')
+            print(f'test_cm:\n{test_cm}')
+
+            with open(self.opts.test_txt, 'a') as f:
+                msg = f'modle_weights: {self.opts.model_weights}\nds_name: {self.opts.ds_name_list[0]}\nTest loss: {test_loss:4f}\ntest balanced acc: {balanced_accuracy:.4f}\ntn, fp, fn, tp: {tn}, {fp}, {fn}, {tp}\n'
+                f.write(msg)
 
     def train_one_epoch(self, epoch):
         train_info = {

@@ -24,7 +24,8 @@ def get_args():
     parser.add_argument('--hp_dir', type=str, default='D:\my_phd\on_git\ML-Classifier-Generalization\HPcomb')
 
     # test
-    parser.add_argument('--model_weights', type=str, default=None)
+    parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Results\48_0.001_Adam_COS\48_0.001_Adam_COS-13-5.4197.pth')
+    parser.add_argument('--test_txt', type=str, default=r'D:\my_phd\Results\res.txt')
 
     parser.add_argument('--rand_seed', type=int, default=82)
     parser.add_argument('--isTrain', action='store_true')
