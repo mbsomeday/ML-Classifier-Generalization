@@ -27,8 +27,7 @@ class HPSelection():
             'batch_size': [48, 64, 128],
             'base_lr': [1e-3, 5e-4],
             'optimizer': ['Adam', 'SGD'],
-            # 'scheduler': ['COS', 'EXP']
-            'scheduler': ['EXP']
+            'scheduler': ['COS', 'EXP']
         }
         self.all_combinations = list(itertools.product(
             hp_dict['batch_size'],
@@ -42,7 +41,8 @@ class HPSelection():
         # 固定的hyperparamters
         self.warmup_epochs = 3
         self.min_epochs = 10
-        self.max_epochs = 100
+        self.max_epochs = 50
+        # self.max_epochs = 100
         self.mini_train_num = 1000
         self.mini_val_num = 1000
         self.mini_test_num = 1000
@@ -53,6 +53,7 @@ class HPSelection():
 
         if self.opts.isTrain:
             self.train_setup()
+        print('共有的超参数组合数：', len(self.all_combinations))
 
 
     def train_setup(self):
@@ -77,7 +78,6 @@ class HPSelection():
         self.txt_dir = os.path.join(self.opts.hp_dir, 'hp_txt')
         os.makedirs(self.txt_dir, exist_ok=True)
 
-        print('共有的超参数组合数：', len(self.all_combinations))
 
 
     def val_on_epoch_end(self, epoch):
@@ -230,7 +230,7 @@ class HPSelection():
                 self.write_to_txt(EPOCH, txt_path=cur_txt_path, train_info=train_info, val_info=val_info)
 
                 # 当训练次数超过最低epoch时，其中early_stop策略
-                if (EPOCH + 1) > self.opts.min_train_epoch:
+                if (EPOCH + 1) > self.min_train_epoch:
 
                     self.early_stopping(EPOCH + 1, self.ped_model, self.optimizer, val_info, scheduler=None)
 
@@ -346,8 +346,30 @@ if __name__ == '__main__':
     # aa = HPSelection(opts)
     # aa.hp_search()
 
-    txt_path = r'D:\my_phd\on_git\ML-Classifier-Generalization\HPcomb\hp_txt\1.txt'
-    analyze_info(txt_path)
+
+    trainingInfo_dir = r'D:\my_phd\Results\HP_Search\hp_txt'
+    file_list = os.listdir(trainingInfo_dir)
+    for cur_file in file_list:
+        file_path = os.path.join(trainingInfo_dir, cur_file)
+        with open(file_path, 'r') as f:
+            data = f.readlines()
+
+            comb_name = data[0].strip().split(' ')[1]
+
+            s = '48 0.001 Adam COS'
+            if comb_name == s.replace(' ', '_'):
+                print(comb_name)
+                analyze_info(file_path)
+
+                break
+
+
+
+
+
+
+    # txt_path = r'D:\my_phd\on_git\ML-Classifier-Generalization\HPcomb\hp_txt\1.txt'
+    # analyze_info(txt_path)
 
 
 

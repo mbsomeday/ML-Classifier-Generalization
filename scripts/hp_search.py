@@ -6,7 +6,7 @@ sys.path.append(root_path)
 
 import argparse
 
-from experiments.hyperparam_searcg import HPSelection
+from experiments.hyperparam_search import HPSelection
 
 
 def get_args():
@@ -20,7 +20,8 @@ def get_args():
     parser.add_argument('--train_txt', type=str, default='train.txt')
 
     # train
-    parser.add_argument('--min_train_epoch', type=int, default=3)
+    # parser.add_argument('--min_train_epoch', type=int, default=3)
+    parser.add_argument('--min_train_epoch', type=int, default=10)
     parser.add_argument('--hp_dir', type=str, default='D:\my_phd\on_git\ML-Classifier-Generalization\HPcomb')
 
     # test
@@ -38,12 +39,12 @@ def get_args():
 args = get_args()
 hp = HPSelection(args)
 
-if args.isTrain:
-    print(f'Current mode: Train')
-    hp.hp_search()
-else:
-    print(f'Current mode: Test')
-    hp.test()
+# if args.isTrain:
+#     print(f'Current mode: Train')
+#     hp.hp_search()
+# else:
+#     print(f'Current mode: Test')
+#     hp.test()
 
 
 
