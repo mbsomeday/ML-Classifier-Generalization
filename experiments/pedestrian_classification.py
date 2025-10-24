@@ -238,9 +238,9 @@ class Ped_Classifier():
             f.write(f'Testing modle: {self.opts.ped_weights_path}.\n')
             f.write('ds_name, test_ba, tnr, tpr, tn, fp, fn, tp\n')
 
-        for ds_name in self.opts.ds_name_list:
+        for ds_name in self.opts.test_ds_list:
             test_dataset = my_dataset(ds_name_list=[ds_name], path_key=self.opts.data_key, txt_name='test.txt')
-            test_loader = DataLoader(test_dataset, batch_size=self.opts.batch_size, shuffle=False)
+            test_loader = DataLoader(test_dataset, batch_size=128, shuffle=False)
 
             y_true = []
             y_pred = []

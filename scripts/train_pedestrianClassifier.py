@@ -28,8 +28,11 @@ def get_args():
     parser.add_argument('--top_k', type=int, default=1)
     parser.add_argument('--patience', type=int, default=10)
     parser.add_argument('--warmup_epochs', type=int, default=5)
-
     parser.add_argument('--monitored_metric', type=str, default='loss')
+
+    # test
+    parser.add_argument('--ped_weights_path', type=str, default=None)
+    parser.add_argument('--test_ds_list', nargs='+', default=None)
 
     parser.add_argument('--rand_seed', type=int, default=13)
 
