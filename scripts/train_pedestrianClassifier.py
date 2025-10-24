@@ -39,12 +39,29 @@ def get_args():
 
 
 args = get_args()
+ped_model = Ped_Classifier(args)
 
-seed_list = [90, 8, 13, 20, 73]
+if args.isTrain:
+    seed_list = [90, 8, 13, 20, 73]
+    for cur_seed in seed_list:
+        args.rand_seed = cur_seed
+        ped_model.train()
+else:
+    ped_model.test()
 
 
-for cur_seed in seed_list:
-    args.rand_seed = cur_seed
 
-    ped_model = Ped_Classifier(args)
-    ped_model.train()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
