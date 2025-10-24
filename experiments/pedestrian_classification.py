@@ -62,7 +62,8 @@ class Ped_Classifier():
         self.val_nonPed_num, self.val_ped_num = self.val_dataset.get_ped_cls_num()
 
         # ********** loss & scheduler **********
-        self.optimizer = torch.optim.RMSprop(self.ped_model.parameters(), lr=self.opts.base_lr, weight_decay=1e-5, eps=0.001)
+        self.optimizer = torch.optim.SGD(self.ped_model.parameters(), lr=self.opts.base_lr, momentum=0.9, weight_decay=0.0001)
+        self.scheduler = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=0.95)
         self.loss_fn = torch.nn.CrossEntropyLoss()
 
         self.ped_model = self.init_model(self.ped_model)
@@ -313,6 +314,12 @@ class Ped_Classifier():
             print('=' * 30 + ' begin EPOCH ' + str(EPOCH + 1) + '=' * 30)
             train_epoch_info = self.train_one_epoch()
             val_epoch_info = self.val_on_epoch_end()
+
+            # lr schedule
+            if (EPOCH+1) <= self.opts.warmup_epochs:
+                self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * (EPOCH+1) / self.opts.warmup_epochs
+            else:
+                self.scheduler.step()
 
             # ------------------------ 调用callbacks ------------------------
             self.epoch_logger(epoch=EPOCH + 1, training_info=train_epoch_info, val_info=val_epoch_info)

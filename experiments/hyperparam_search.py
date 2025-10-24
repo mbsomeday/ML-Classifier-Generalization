@@ -42,7 +42,6 @@ class HPSelection():
         self.warmup_epochs = 3
         self.min_epochs = 10
         self.max_epochs = 50
-        # self.max_epochs = 100
         self.mini_train_num = 1000
         self.mini_val_num = 1000
         self.mini_test_num = 1000
@@ -230,7 +229,7 @@ class HPSelection():
                 self.write_to_txt(EPOCH, txt_path=cur_txt_path, train_info=train_info, val_info=val_info)
 
                 # 当训练次数超过最低epoch时，其中early_stop策略
-                if (EPOCH + 1) > self.min_train_epoch:
+                if (EPOCH + 1) > self.min_epochs:
 
                     self.early_stopping(EPOCH + 1, self.ped_model, self.optimizer, val_info, scheduler=None)
 
@@ -273,12 +272,6 @@ def analyze_info(txt_path):
         balanced acc - epoch
     图中标注：收敛时的epoch，最佳balanced acc on val
     '''
-
-    epochs = []
-    train_losses = []
-    train_ba = []
-    val_losses = []
-    val_ba = []
 
     with open(txt_path, 'r') as f:
         data = f.read()
