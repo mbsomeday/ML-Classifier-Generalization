@@ -297,7 +297,6 @@ class Ped_Classifier():
 
 
 
-
     def train(self):
         print('-' * 20 + 'Training Info' + '-' * 20)
         print('Total training Samples:', len(self.train_dataset))
@@ -315,12 +314,8 @@ class Ped_Classifier():
             # ------------------------ 调用callbacks ------------------------
             self.epoch_logger(epoch=EPOCH + 1, training_info=train_epoch_info, val_info=val_epoch_info)
 
-            # # 每个epoch end调整learning rate
-            # self.update_learning_rate(EPOCH)
-
             # ------------------------ 学习率调整 ------------------------
             self.update_learning_rate(EPOCH+1)
-
 
             # 当训练次数超过最低epoch时，其中early_stop策略
             if (EPOCH + 1) > self.opts.min_train_epoch:
