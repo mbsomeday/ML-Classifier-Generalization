@@ -34,7 +34,7 @@ def get_args():
     parser.add_argument('--ped_weights_path', type=str, default=None)
     parser.add_argument('--test_ds_list', nargs='+', default=None)
 
-    parser.add_argument('--rand_seed', type=int, default=13)
+    parser.add_argument('--seed_list', nargs='+', help='random seed for experimenting multiple times', default=['13'])
 
     args = parser.parse_args()
 
@@ -45,8 +45,7 @@ args = get_args()
 ped_model = Ped_Classifier(args)
 
 if args.isTrain:
-    seed_list = [90, 8, 13, 20, 73]
-    for cur_seed in seed_list:
+    for cur_seed in args.seed_list:
         args.rand_seed = cur_seed
         ped_model.train()
 else:
