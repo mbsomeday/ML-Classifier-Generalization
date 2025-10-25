@@ -43,7 +43,7 @@ class Ped_Classifier():
 
         # ********** 创建 callback save dir **********
         # callback文件夹的模板为 model_{D1}_Baseline_{seed}
-        self.callback_save_dir = self.opts.ped_model_obj.rsplit('.')[-1] + '_' + ''.join(self.opts.ds_name_list) + '_Baseline' + '_' + str(self.opts.rand_seed)
+        self.callback_save_dir = self.opts.ped_model_obj.rsplit('.')[-1].replace('_', '') + '_' + ''.join(self.opts.ds_name_list) + '_Baseline' + '_' + str(self.opts.rand_seed)
         self.callback_save_path = os.path.join(os.getcwd(), self.callback_save_dir)
         print(f'Callback_save_dir:{self.callback_save_path}')
         if not os.path.exists(self.callback_save_path):
