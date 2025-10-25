@@ -287,14 +287,15 @@ class Ped_Classifier():
     def update_learning_rate(self, epoch):
         old_lr = self.optimizer.param_groups[0]['lr']
 
-        # warm-up阶段
-        if epoch <= self.opts.warmup_epochs:  # warm-up阶段
+        if epoch <= self.opts.warmup_epochs:
             self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * epoch / self.opts.warmup_epochs
         else:
-            self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * 0.963 ** (epoch / 3)  # gamma=0.963, lr decay epochs=3
+            self.scheduler.step()
 
         lr = self.optimizer.param_groups[0]['lr']
         print('learning rate %.7f -> %.7f' % (old_lr, lr))
+
+
 
 
     def train(self):
@@ -318,10 +319,8 @@ class Ped_Classifier():
             # self.update_learning_rate(EPOCH)
 
             # ------------------------ 学习率调整 ------------------------
-            if (EPOCH+1) <= self.opts.warmup_epochs:
-                self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * (EPOCH+1) / self.opts.warmup_epochs
-            else:
-                self.scheduler.step()
+            self.update_learning_rate(EPOCH+1)
+
 
             # 当训练次数超过最低epoch时，其中early_stop策略
             if (EPOCH + 1) > self.opts.min_train_epoch:
