@@ -82,8 +82,8 @@ class HPSelection():
         old_lr = self.optimizer.param_groups[0]['lr']
 
         # warm-up阶段
-        if epoch <= self.opts.warmup_epochs:  # warm-up阶段
-            self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * epoch / self.opts.warmup_epochs
+        if epoch <= self.warmup_epochs:  # warm-up阶段
+            self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * epoch / self.warmup_epochs
         else:
             self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * 0.963 ** (epoch / 3)  # gamma=0.963, lr decay epochs=3
 
