@@ -44,7 +44,6 @@ def get_args():
 
 
 args = get_args()
-args.isTrain = True
 ped_model = Ped_Classifier(args)
 
 if args.isTrain:
