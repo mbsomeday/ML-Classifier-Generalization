@@ -12,9 +12,6 @@ from training.callbacks import EarlyStopping, Model_Logger
 
 
 class Ped_Classifier():
-    '''
-        该类是在train的过程中对org image进行cam operation，
-    '''
     def __init__(self, opts):
 
         # 确保在服务器运行时只用一个GPU
@@ -83,7 +80,7 @@ class Ped_Classifier():
 
     def print_args(self):
         '''
-            参数打印 并 保存到txt文件中
+            参数打印并保存到txt文件中
         '''
         print('-' * 40 + ' Args ' + '-' * 40)
 
@@ -152,7 +149,6 @@ class Ped_Classifier():
     def train_one_epoch(self):
         self.ped_model.train()
 
-        # y_true = []
         org_dict = self.inif_pred_info()
 
         for batch_idx, data in enumerate(tqdm(self.train_loader)):
@@ -311,22 +307,21 @@ class Ped_Classifier():
 
         for EPOCH in range(self.opts.max_train_epoch):
 
-            print('=' * 30 + ' begin EPOCH ' + str(EPOCH + 1) + '=' * 30)
+            print('=' * 30 + ' Begin EPOCH ' + str(EPOCH + 1) + '=' * 30)
             train_epoch_info = self.train_one_epoch()
             val_epoch_info = self.val_on_epoch_end()
-
-            # lr schedule
-            if (EPOCH+1) <= self.opts.warmup_epochs:
-                self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * (EPOCH+1) / self.opts.warmup_epochs
-            else:
-                self.scheduler.step()
 
             # ------------------------ 调用callbacks ------------------------
             self.epoch_logger(epoch=EPOCH + 1, training_info=train_epoch_info, val_info=val_epoch_info)
 
-            # ------------------------ 调用callbacks ------------------------
-            # 每个epoch end调整learning rate
-            self.update_learning_rate(EPOCH)
+            # # 每个epoch end调整learning rate
+            # self.update_learning_rate(EPOCH)
+
+            # ------------------------ 学习率调整 ------------------------
+            if (EPOCH+1) <= self.opts.warmup_epochs:
+                self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * (EPOCH+1) / self.opts.warmup_epochs
+            else:
+                self.scheduler.step()
 
             # 当训练次数超过最低epoch时，其中early_stop策略
             if (EPOCH + 1) > self.opts.min_train_epoch:
