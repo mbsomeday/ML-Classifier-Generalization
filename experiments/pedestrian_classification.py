@@ -60,7 +60,7 @@ class Ped_Classifier():
 
         # ********** loss & scheduler **********
         self.optimizer = torch.optim.SGD(self.ped_model.parameters(), lr=self.opts.base_lr, momentum=0.9, weight_decay=0.0001)
-        self.scheduler = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=0.95)
+        self.scheduler = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=0.963)
         self.loss_fn = torch.nn.CrossEntropyLoss()
 
         self.ped_model = self.init_model(self.ped_model)
