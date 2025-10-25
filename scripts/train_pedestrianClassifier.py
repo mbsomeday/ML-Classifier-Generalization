@@ -20,7 +20,7 @@ def get_args():
     parser.add_argument('--train_txt', type=str, default='augmentation_train.txt')
 
     # train
-    parser.add_argument('-base_lr', type=float, default=0.01)
+    parser.add_argument('--base_lr', type=float, default=0.01)
     parser.add_argument('--isTrain', action='store_true')
     parser.add_argument('--min_train_epoch', type=int, default=15)
     parser.add_argument('--max_train_epoch', type=int, default=50)
