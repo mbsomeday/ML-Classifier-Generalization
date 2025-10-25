@@ -213,7 +213,7 @@ class HPSelection():
             if not os.path.exists(callback_save_path):
                 os.makedirs(callback_save_path)
 
-            self.early_stopping = EarlyStopping(callback_path=callback_save_path, patience=5)
+            self.early_stopping = EarlyStopping(callback_path=callback_save_path, patience=5, top_k=1)
 
             print(f'comb_name:{comb_name}, cur_txt_path:{cur_txt_path}, callback_save_dir:{callback_save_path}')
 
