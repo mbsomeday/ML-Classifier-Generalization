@@ -83,9 +83,9 @@ class HPSelection():
 
         # warm-up阶段
         if epoch <= self.warmup_epochs:  # warm-up阶段
-            self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * epoch / self.warmup_epochs
+            self.optimizer.param_groups[0]['lr'] = self.base_lr * epoch / self.warmup_epochs
         else:
-            self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * 0.963 ** (epoch / 3)  # gamma=0.963, lr decay epochs=3
+            self.optimizer.param_groups[0]['lr'] = self.base_lr * 0.963 ** (epoch / 3)  # gamma=0.963, lr decay epochs=3
 
         lr = self.optimizer.param_groups[0]['lr']
         print('learning rate %.7f -> %.7f' % (old_lr, lr))
