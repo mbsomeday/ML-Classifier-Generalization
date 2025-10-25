@@ -54,6 +54,20 @@ class HPSelection():
             self.train_setup()
         print('共有的超参数组合数：', len(self.all_combinations))
 
+    def init_model(self, model):
+        '''
+            对模型权重进行初始化，保障多次训练结果变动不会变化太大
+            适用 kaiming init，suitable for ReLU
+            初始化种类参考： https://blog.csdn.net/shanglianlm/article/details/85165523
+        '''
+        for m in model.modules():
+            if isinstance(m, (nn.Conv2d, nn.Linear)):
+                # nn.init.kaiming_normal_(m.weight, mode='fan_in', nonlinearity='relu')  # 或 kaiming_uniform_
+                nn.init.orthogonal_(m.weight)     # 正交初始化
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+
+        return model
 
     def train_setup(self):
         get_trainset = my_dataset(ds_name_list=self.opts.ds_name_list, path_key='Stage6_org', txt_name='train.txt')
@@ -115,6 +129,8 @@ class HPSelection():
 
             balanced_accuracy = balanced_accuracy_score(y_true=y_true, y_pred=y_pred)
             val_info['balanced_accuracy'] = balanced_accuracy
+
+        print(f"Val loss:{val_info['loss']:.4f}, balanced_accuracy:Train loss:{val_info['balanced_accuracy']:.4f}")
 
         return val_info
 
@@ -191,13 +207,13 @@ class HPSelection():
 
         balanced_accuracy = balanced_accuracy_score(y_true=y_true, y_pred=y_pred)
         train_info.update({'balanced_accuracy': balanced_accuracy})
+        print(f"Train loss:{train_info['loss']:.4f}, balanced_accuracy:Train loss:{train_info['balanced_accuracy']:.4f}")
 
         return train_info
 
 
     def hp_search(self):
         for comb_idx, comb_info in enumerate(self.all_combinations):
-
             self.batch_size, self.base_lr, optimizer_type = comb_info
             comb = [str(self.batch_size), str(self.base_lr), optimizer_type]
             comb_name = '_'.join(comb)
@@ -213,8 +229,9 @@ class HPSelection():
             if not os.path.exists(callback_save_path):
                 os.makedirs(callback_save_path)
 
+            # 每个hp组合组重置的信息
+            self.ped_model = self.init_model(model=self.ped_model)
             self.early_stopping = EarlyStopping(callback_path=callback_save_path, patience=5, top_k=1)
-
             print(f'comb_name:{comb_name}, cur_txt_path:{cur_txt_path}, callback_save_dir:{callback_save_path}')
 
             if optimizer_type == 'Adam':
