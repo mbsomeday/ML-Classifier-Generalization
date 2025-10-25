@@ -25,14 +25,14 @@ class HPSelection():
 
         hp_dict = {
             'batch_size': [48, 64, 128],
-            'base_lr': [1e-3, 5e-4],
+            'base_lr': [0.1, 0.01, 0.001],
             'optimizer': ['Adam', 'SGD'],
-            'scheduler': ['COS', 'EXP']
+            # 'scheduler': ['COS', 'EXP']
         }
         self.all_combinations = list(itertools.product(
             hp_dict['batch_size'],
             hp_dict['base_lr'],
-            hp_dict['optimizer'],
+            # hp_dict['optimizer'],
             hp_dict['scheduler']
         ))
 
@@ -78,6 +78,17 @@ class HPSelection():
         os.makedirs(self.txt_dir, exist_ok=True)
 
 
+    def update_learning_rate(self, epoch):
+        old_lr = self.optimizer.param_groups[0]['lr']
+
+        # warm-up阶段
+        if epoch <= self.opts.warmup_epochs:  # warm-up阶段
+            self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * epoch / self.opts.warmup_epochs
+        else:
+            self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * 0.963 ** (epoch / 3)  # gamma=0.963, lr decay epochs=3
+
+        lr = self.optimizer.param_groups[0]['lr']
+        print('learning rate %.7f -> %.7f' % (old_lr, lr))
 
     def val_on_epoch_end(self, epoch):
 
@@ -211,20 +222,22 @@ class HPSelection():
             elif optimizer_type == 'SGD':
                 self.optimizer = SGD(self.ped_model.parameters(), lr=self.base_lr, momentum=0.9, weight_decay=0.0001)
 
-            if scheduler_type == 'COS':
-                self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, T_max=self.max_epochs-self.warmup_epochs)
-            elif scheduler_type == 'EXP':
-                self.scheduler = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=0.95)
+            # if scheduler_type == 'COS':
+            #     self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, T_max=self.max_epochs-self.warmup_epochs)
+            # elif scheduler_type == 'EXP':
+            #     self.scheduler = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=0.95)
 
             for EPOCH in range(self.max_epochs):
                 train_info = self.train_one_epoch(EPOCH+1)
                 val_info = self.val_on_epoch_end(EPOCH+1)
 
-                # lr schedule
-                if EPOCH <= self.warmup_epochs:
-                    self.optimizer.param_groups[0]['lr'] = self.base_lr * EPOCH / self.warmup_epochs
-                else:
-                    self.scheduler.step()
+                self.update_learning_rate(epoch=EPOCH+1)
+
+                # # lr schedule
+                # if EPOCH <= self.warmup_epochs:
+                #     self.optimizer.param_groups[0]['lr'] = self.base_lr * EPOCH / self.warmup_epochs
+                # else:
+                #     self.scheduler.step()
 
                 self.write_to_txt(EPOCH, txt_path=cur_txt_path, train_info=train_info, val_info=val_info)
 
