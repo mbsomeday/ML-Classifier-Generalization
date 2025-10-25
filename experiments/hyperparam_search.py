@@ -32,8 +32,8 @@ class HPSelection():
         self.all_combinations = list(itertools.product(
             hp_dict['batch_size'],
             hp_dict['base_lr'],
-            # hp_dict['optimizer'],
-            hp_dict['scheduler']
+            hp_dict['optimizer'],
+            # hp_dict['scheduler']
         ))
 
         self.opts = opts
