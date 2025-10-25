@@ -130,8 +130,6 @@ class HPSelection():
             balanced_accuracy = balanced_accuracy_score(y_true=y_true, y_pred=y_pred)
             val_info['balanced_accuracy'] = balanced_accuracy
 
-        print(f"Val loss:{val_info['loss']:.4f}, balanced_accuracy:Train loss:{val_info['balanced_accuracy']:.4f}")
-
         return val_info
 
     def test(self):
@@ -207,7 +205,6 @@ class HPSelection():
 
         balanced_accuracy = balanced_accuracy_score(y_true=y_true, y_pred=y_pred)
         train_info.update({'balanced_accuracy': balanced_accuracy})
-        print(f"Train loss:{train_info['loss']:.4f}, balanced_accuracy:Train loss:{train_info['balanced_accuracy']:.4f}")
 
         return train_info
 
@@ -247,6 +244,9 @@ class HPSelection():
             for EPOCH in range(self.max_epochs):
                 train_info = self.train_one_epoch(EPOCH+1)
                 val_info = self.val_on_epoch_end(EPOCH+1)
+
+                print(f"Train loss:{train_info['loss']:.4f}, balanced_accuracy:{train_info['balanced_accuracy']:.4f}")
+                print(f"Val loss:{val_info['loss']:.4f}, balanced_accuracy:{val_info['balanced_accuracy']:.4f}")
 
                 self.update_learning_rate(epoch=EPOCH+1)
 
