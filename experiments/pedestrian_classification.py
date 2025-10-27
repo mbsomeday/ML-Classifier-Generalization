@@ -300,7 +300,8 @@ class Ped_Classifier():
         if epoch <= self.opts.warmup_epochs:
             self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * epoch / self.opts.warmup_epochs
         else:
-            self.scheduler.step()
+            if (epoch - self.opts.warmup_epochs) % 3 == 0:
+                self.scheduler.step()
 
         lr = self.optimizer.param_groups[0]['lr']
         print('learning rate %.7f -> %.7f' % (old_lr, lr))
