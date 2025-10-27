@@ -1,4 +1,4 @@
-import torch, os
+import torch, os, random
 import numpy as np
 from torch.utils.data import DataLoader
 from torch import nn
@@ -40,6 +40,16 @@ class Ped_Classifier():
         '''
             初始化训练的各种参数
         '''
+
+
+        torch.manual_seed(self.opts.rand_seed)
+        np.random.seed(self.opts.rand_seed)
+        random.seed(self.opts.rand_seed)
+        if DEVICE == 'gpu':
+            torch.cuda.manual_seed(self.opts.rand_seed)
+            # 确保CuDNN的确定性行为
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
 
         # ********** 创建 callback save dir **********
         # callback文件夹的模板为 model_{D1}_Baseline_{seed}

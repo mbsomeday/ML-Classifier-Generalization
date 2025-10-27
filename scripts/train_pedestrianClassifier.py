@@ -47,8 +47,10 @@ if args.isTrain:
     # 生成程度为n的seed_list
     seed_list = random.sample(range(0, 100), args.seed_num)
     for cur_seed in seed_list:
-        ped_model = Ped_Classifier(args)
+        # 先调节seed再创建ped实例
         args.rand_seed = cur_seed
+
+        ped_model = Ped_Classifier(args)
         ped_model.train()
 else:
     ped_model = Ped_Classifier(args)
