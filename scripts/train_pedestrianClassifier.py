@@ -14,7 +14,7 @@ def get_args():
 
     # model & data
     parser.add_argument('--ped_model_obj', type=str, default='torchvision.models.efficientnet_b0')
-    parser.add_argument('--ds_name_list', nargs='+', default=['D1'])
+    parser.add_argument('--ds_name_list', nargs='+', default=['D1'], help='the list means training on all of these datasets')
     parser.add_argument('--data_key', type=str, default='Stage6_org')
     parser.add_argument('--batch_size', type=int, default=48)
     parser.add_argument('--train_txt', type=str, default='augmentation_train.txt')
@@ -36,14 +36,12 @@ def get_args():
     parser.add_argument('--ped_weights_path', type=str, default=None)
     parser.add_argument('--test_ds_list', nargs='+', default=None)
 
-
     args = parser.parse_args()
 
     return args
 
 
 args = get_args()
-
 
 if args.isTrain:
     # 生成程度为n的seed_list
