@@ -68,10 +68,15 @@ class Ped_Classifier():
         self.train_nonPed_num, self.train_ped_num = self.train_dataset.get_ped_cls_num()
         self.val_nonPed_num, self.val_ped_num = self.val_dataset.get_ped_cls_num()
 
+        # # ********** loss & scheduler **********
+        # self.optimizer = torch.optim.SGD(self.ped_model.parameters(), lr=self.opts.base_lr, momentum=0.9, weight_decay=0.0001)
+        # self.scheduler = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=0.963)
+        # self.loss_fn = torch.nn.CrossEntropyLoss()
+
         # ********** loss & scheduler **********
-        self.optimizer = torch.optim.SGD(self.ped_model.parameters(), lr=self.opts.base_lr, momentum=0.9, weight_decay=0.0001)
-        self.scheduler = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=0.963)
+        self.optimizer = torch.optim.RMSprop(self.ped_model.parameters(), lr=self.opts.base_lr, weight_decay=1e-5, eps=0.001)
         self.loss_fn = torch.nn.CrossEntropyLoss()
+
 
         self.ped_model = self.init_model(self.ped_model)
 
@@ -294,17 +299,28 @@ class Ped_Classifier():
                 f.write(f'{ds_name}, {test_bc:.6f}, {test_nonPed_acc:.4f}, {test_ped_acc:.4f}, {tn}, {fp}, {fn}, {tp}\n')
 
 
+    # def update_learning_rate(self, epoch):
+    #     old_lr = self.optimizer.param_groups[0]['lr']
+    #
+    #     if epoch <= self.opts.warmup_epochs:
+    #         self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * epoch / self.opts.warmup_epochs
+    #     else:
+    #         self.scheduler.step()
+    #
+    #     lr = self.optimizer.param_groups[0]['lr']
+    #     print('learning rate %.7f -> %.7f' % (old_lr, lr))
+
     def update_learning_rate(self, epoch):
         old_lr = self.optimizer.param_groups[0]['lr']
 
-        if epoch <= self.opts.warmup_epochs:
+        # warm-up阶段
+        if epoch <= self.opts.warmup_epochs:  # warm-up阶段
             self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * epoch / self.opts.warmup_epochs
         else:
-            self.scheduler.step()
+            self.optimizer.param_groups[0]['lr'] = self.opts.base_lr * 0.963 ** (epoch / 3)  # gamma=0.963, lr decay epochs=3
 
         lr = self.optimizer.param_groups[0]['lr']
         print('learning rate %.7f -> %.7f' % (old_lr, lr))
-
 
 
     def train(self):
