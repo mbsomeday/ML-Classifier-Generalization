@@ -4,7 +4,7 @@ curPath = os.path.abspath(os.path.dirname(__file__))
 root_path = os.path.split(curPath)[0]
 sys.path.append(root_path)
 
-import argparse
+import argparse, random
 
 from experiments.pedestrian_classification import Ped_Classifier
 
@@ -24,8 +24,8 @@ def get_args():
     parser.add_argument('--isTrain', action='store_true')
     parser.add_argument('--min_train_epoch', type=int, default=15)
     parser.add_argument('--max_train_epoch', type=int, default=50)
-    parser.add_argument('--seed_list', nargs='+', help='random seed for experimenting multiple times', default=['13'])
-
+    parser.add_argument('--seed_num', type=int, default=1)
+    parser.add_argument('--rand_seed', type=int, default=13)
 
     parser.add_argument('--top_k', type=int, default=1)
     parser.add_argument('--patience', type=int, default=10)
@@ -36,7 +36,6 @@ def get_args():
     parser.add_argument('--ped_weights_path', type=str, default=None)
     parser.add_argument('--test_ds_list', nargs='+', default=None)
 
-    parser.add_argument('--rand_seed', type=int, default=13)
 
     args = parser.parse_args()
 
@@ -47,7 +46,9 @@ args = get_args()
 ped_model = Ped_Classifier(args)
 
 if args.isTrain:
-    for cur_seed in args.seed_list:
+    # 生成程度为n的seed_list
+    seed_list = random.sample(range(0, 100), args.seed_num)
+    for cur_seed in seed_list:
         args.rand_seed = cur_seed
         ped_model.train()
 else:
