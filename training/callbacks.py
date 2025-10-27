@@ -49,7 +49,6 @@ class EarlyStopping():
         improved_flag = True
         self.cur_epoch = epoch
         cur_lr = optimizer.param_groups[0]['lr']
-        print(f'Current lr: {cur_lr}')
 
         if self.monitored_metric in ['accuracy', 'balanced_accuracy']:
             if val_epoch_info[self.monitored_metric] < self.monitored_metric_value + self.delta:       # 表现没有提升的情况
