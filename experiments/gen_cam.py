@@ -108,7 +108,7 @@ for data_dict in tqdm(train_loader):
 
     # 保存原始图片
     save_path = os.path.join(save_dir, cls_name, img_name)
-    save_image_tensor(image[0], save_path)
+    save_image_tensor(image, save_path)
 
 
     # 循环所有的trans
