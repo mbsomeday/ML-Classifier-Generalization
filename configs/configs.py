@@ -33,7 +33,7 @@ def testPedestrian_args():
 
     # model & data
     parser.add_argument('--ped_model_obj', type=str, default='torchvision.models.efficientnet_b0')
-    parser.add_argument('--ds_name_list', nargs='+', default=['D1'])
+    parser.add_argument('--test_ds_list', nargs='+', default=['D1'])
     parser.add_argument('--data_key', type=str, default='Stage6_org')
     parser.add_argument('--batch_size', type=int, default=4)
 
