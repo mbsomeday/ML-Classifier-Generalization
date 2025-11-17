@@ -71,6 +71,11 @@ LOCAL = {
 }
 
 KAGGLE = {
+    'Stage6_CAM': {
+        'D1': r'/kaggle/input/stage6-dataset-citypersons/Stage6_citypersons_camComb',
+
+    },
+
     'Stage6_org': {
         # # 3000
         # 'D1': r'/kaggle/input/stage6-datasets-organize/ECP3000',
