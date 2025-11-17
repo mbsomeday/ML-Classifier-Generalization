@@ -96,7 +96,7 @@ for data_dict in tqdm(train_loader):
     plt_mask = plt_mask[np.newaxis, :]
 
     # 保存转换过的图片
-    trans_idx = random.randint(0, len(trans_list))
+    trans_idx = random.randint(0, len(trans_list)-1)
     # 保存的名字
     new_image_name = os.path.splitext(img_name)[0] + '_' + trans_name_list[trans_idx] + os.path.splitext(img_name)[-1]
     save_path = os.path.join(save_dir, cls_name, new_image_name)
