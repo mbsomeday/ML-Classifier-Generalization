@@ -70,8 +70,8 @@ color_trans = transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.
 sharp_trans = transforms.RandomAdjustSharpness(sharpness_factor=5)
 qeualize_trans = transforms.RandomEqualize()
 
-trans_list = [gaussion_trans, gray_trans, color_trans, sharp_trans]
-trans_name_list = ['gaussian', 'gray', 'color', 'sharp']
+trans_list = [gaussion_trans, gray_trans, color_trans, sharp_trans, qeualize_trans]
+trans_name_list = ['gaussian', 'gray', 'color', 'sharp', 'qeualize']
 cur_trans = gaussion_trans
 
 for data_dict in tqdm(train_loader):
@@ -95,15 +95,32 @@ for data_dict in tqdm(train_loader):
     plt_mask = cam_mask * 1.0
     plt_mask = plt_mask[np.newaxis, :]
 
-    for trans_idx in range(len(trans_list)):
-        # 保存的名字
-        new_image_name = os.path.splitext(img_name)[0] + '_' + trans_name_list[trans_idx] + os.path.splitext(img_name)[-1]
-        save_path = os.path.join(save_dir, cls_name, new_image_name)
-        # 进行的图片变换
-        cur_trans = trans_list[trans_idx]
-        aug_image = cur_trans(plt_transformer(image[0]))
-        comb_image = transforms.ToTensor()(aug_image) * (1 - plt_mask) + image[0] * plt_mask
-        save_image_tensor(comb_image.unsqueeze(0), save_path)
+    # 保存转换过的图片
+    trans_idx = random.randint(0, len(trans_list))
+    # 保存的名字
+    new_image_name = os.path.splitext(img_name)[0] + '_' + trans_name_list[trans_idx] + os.path.splitext(img_name)[-1]
+    save_path = os.path.join(save_dir, cls_name, new_image_name)
+    # 进行的图片变换
+    cur_trans = trans_list[trans_idx]
+    aug_image = cur_trans(plt_transformer(image[0]))
+    comb_image = transforms.ToTensor()(aug_image) * (1 - plt_mask) + image[0] * plt_mask
+    save_image_tensor(comb_image.unsqueeze(0), save_path)
+
+    # 保存原始图片
+    save_path = os.path.join(save_dir, cls_name, img_name)
+    save_image_tensor(image[0], save_path)
+
+
+    # 循环所有的trans
+    # for trans_idx in range(len(trans_list)):
+    #     # 保存的名字
+    #     new_image_name = os.path.splitext(img_name)[0] + '_' + trans_name_list[trans_idx] + os.path.splitext(img_name)[-1]
+    #     save_path = os.path.join(save_dir, cls_name, new_image_name)
+    #     # 进行的图片变换
+    #     cur_trans = trans_list[trans_idx]
+    #     aug_image = cur_trans(plt_transformer(image[0]))
+    #     comb_image = transforms.ToTensor()(aug_image) * (1 - plt_mask) + image[0] * plt_mask
+    #     save_image_tensor(comb_image.unsqueeze(0), save_path)
 
 
     # aug_image = cur_trans(plt_transformer(image[0]))
