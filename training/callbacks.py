@@ -156,7 +156,7 @@ class Model_Logger():
         '''
 
         if 'loss' in key:
-            return '{:.8f}'
+            return '{:.4f}'
         if 'accuracy' in key or 'bc' in key:
             return '{:.4f}'
         else:

@@ -41,7 +41,6 @@ class Ped_Classifier():
             初始化训练的各种参数
         '''
 
-
         torch.manual_seed(self.opts.rand_seed)
         np.random.seed(self.opts.rand_seed)
         random.seed(self.opts.rand_seed)
