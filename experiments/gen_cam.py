@@ -20,6 +20,7 @@ def get_args():
 
     parser.add_argument('--save_dir', type=str)
     parser.add_argument('--ds_name_list', nargs='+', default=['D1'])
+    parser.add_argument('--model_weights', type=str)
 
     args = parser.parse_args()
 
@@ -32,13 +33,14 @@ torch.manual_seed(13)
 batch_size = 1
 save_dir = args.save_dir
 ds_name_list = args.ds_name_list
+model_weights = args.model_weights
 
 # save_dir = r'D:\my_phd\on_git\ML-Classifier-Generalization\aa_test'
 # ds_name_list = ['D1']
 
 # 加载模型和数据等
 ped_model = efficientnet_b0(num_classes=2, weights=None)
-model_weights = r'/kaggle/input/stage6-weights-baseline/efficientNetB0_D1_3_Baseline-18-4.63655.pth'
+# model_weights = r'/kaggle/input/stage6-weights-baseline/efficientNetB0_D1_3_Baseline-18-4.63655.pth'
 # model_weights = r'D:\my_phd\Model_Weights\Stage6\new_dataset\baselines\D1\efficientNetB0_D1_3_Baseline-18-4.63655.pth'
 ped_model = load_model(ped_model, model_weights)
 ped_model.eval()
