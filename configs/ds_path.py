@@ -72,7 +72,7 @@ LOCAL = {
 
 KAGGLE = {
     'Stage6_CAM': {
-        'D1': r'/kaggle/input/stage6-dataset-citypersons/Stage6_citypersons_camComb',
+        'D1': r'/kaggle/input/stage6-dataset-ecp/stage6_ecp_camComb',
 
     },
 
