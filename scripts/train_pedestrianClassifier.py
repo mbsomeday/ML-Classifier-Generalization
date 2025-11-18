@@ -5,6 +5,7 @@ root_path = os.path.split(curPath)[0]
 sys.path.append(root_path)
 
 import argparse, random
+from datetime import datetime
 
 from experiments.pedestrian_classification import Ped_Classifier
 
@@ -42,6 +43,10 @@ def get_args():
 
 
 args = get_args()
+
+currentDateAndTime = datetime.now()
+currentTime = currentDateAndTime.strftime("%H:%M:%S")
+print("The current time is", currentTime)
 
 if args.isTrain:
     # 生成程度为n的seed_list

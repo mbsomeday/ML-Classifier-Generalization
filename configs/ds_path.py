@@ -72,7 +72,7 @@ LOCAL = {
 
 KAGGLE = {
     'Stage6_CAM': {
-        'D1': r'/kaggle/input/stage6-dataset-ecp/stage6_ecp_camComb',
+        'D1': r'/kaggle/input/M1_ecp_oppoMask',
 
     },
 
