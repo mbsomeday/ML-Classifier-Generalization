@@ -100,7 +100,7 @@ for data_dict in tqdm(train_loader):
     image = data_dict['image'].to(DEVICE)
     image_path = data_dict['img_path'][0]
     img_name = data_dict['img_name'][0]
-    ped_label = data_dict['ped_label']
+    ped_label = data_dict['ped_label'].to(DEVICE)
     # print(f'img_name:{img_name}， ped_label:{ped_label}')
 
     cls_name = image_path.split(os.sep)[-2]
