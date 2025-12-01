@@ -23,7 +23,7 @@ import numpy as np
 from art.attacks.evasion import FastGradientMethod
 from art.estimators.classification import PyTorchClassifier
 
-from utils.utils import load_model, save_image_tensor
+from utils.utils import load_model, save_image_tensor, DEVICE
 from data.dataset import my_dataset
 
 
@@ -54,7 +54,7 @@ perturb_dir = args.perturb_dir
 # 加载模型和数据等
 ped_model = efficientnet_b0(num_classes=2, weights=None)
 ped_model = load_model(ped_model, model_weights)
-ped_model.eval()
+ped_model.eval().to(DEVICE)
 
 # for name, _ in ped_model.named_modules():
 #     print(f'name: {name}')
@@ -97,7 +97,7 @@ cur_trans = gaussion_trans
 for data_dict in tqdm(train_loader):
     # print(data_dict.keys())
 
-    image = data_dict['image']
+    image = data_dict['image'].to(DEVICE)
     image_path = data_dict['img_path'][0]
     img_name = data_dict['img_name'][0]
     ped_label = data_dict['ped_label']
