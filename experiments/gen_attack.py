@@ -73,8 +73,8 @@ for data_dict in tqdm(train_loader):
     img_name = data_dict['img_name'][0]
     image_np = image.numpy()        # nparray [1, 3, 224, 224]
 
-    img_path = data_dict['img_path'][0]
-    img_label = img_path.split('\\')[-2]
+    img_label = int(data_dict['ped_label'][0])
+    label = 'nonPedestrian' if img_label == 0 else 'pedestrian'
 
     # print(f'img_name:{img_name}')
 
@@ -85,7 +85,7 @@ for data_dict in tqdm(train_loader):
     # print(f'adv_tensor:{adv_tensor.shape}')
 
     # 保存attack图片
-    save_path = os.path.join(save_dir, img_label, img_name)
+    save_path = os.path.join(save_dir, label, img_name)
     save_image_tensor(adv_tensor, save_path)
 
     # # 展示图片
@@ -98,7 +98,7 @@ for data_dict in tqdm(train_loader):
 
 
 
-    break
+    # break
 
 
 # x_test_adv = attack.generate(x=x_test)
