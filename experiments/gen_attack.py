@@ -34,6 +34,7 @@ def get_args():
     parser.add_argument('--save_dir', type=str, default=r'D:\my_phd\on_git\ML-Classifier-Generalization\aa_test\attack')
     parser.add_argument('--ds_name_list', nargs='+', default=['D1'])
     parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\baselines\D1\efficientNetB0_D1_3_Baseline-18-4.63655.pth')
+    parser.add_argument('--txt_name', type=str, default='train.txt')
 
     args = parser.parse_args()
 
@@ -42,6 +43,7 @@ def get_args():
 
 args = get_args()
 save_dir = args.save_dir
+txt_name = args.txt_name
 model_weights = args.model_weights
 ds_name_list = args.ds_name_list
 batch_size = 1
@@ -62,7 +64,7 @@ classifier = PyTorchClassifier(
     nb_classes=2,
 )
 
-train_dataset = my_dataset(ds_name_list=ds_name_list, path_key='Stage6_org', txt_name='augmentation_train.txt')
+train_dataset = my_dataset(ds_name_list=ds_name_list, path_key='Stage6_org', txt_name=txt_name)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
 attack = FastGradientMethod(estimator=classifier, eps=0.01)
