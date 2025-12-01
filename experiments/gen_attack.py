@@ -62,7 +62,7 @@ classifier = PyTorchClassifier(
     nb_classes=2,
 )
 
-train_dataset = my_dataset(ds_name_list=ds_name_list, path_key='Stage6_org', txt_name='train.txt')
+train_dataset = my_dataset(ds_name_list=ds_name_list, path_key='Stage6_org', txt_name='augmentation_train.txt')
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
 attack = FastGradientMethod(estimator=classifier, eps=0.05)
