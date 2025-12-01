@@ -101,11 +101,11 @@ for data_dict in tqdm(train_loader):
     image_path = data_dict['img_path'][0]
     img_name = data_dict['img_name'][0]
     ped_label = data_dict['ped_label']
-    print(f'img_name:{img_name}， ped_label:{ped_label}')
+    # print(f'img_name:{img_name}， ped_label:{ped_label}')
 
     cls_name = image_path.split(os.sep)[-2]
 
-    print(f'cls_name:{cls_name}')
+    # print(f'cls_name:{cls_name}')
     ped_out = ped_model(image)
     cam = cur_extractor(ped_out.squeeze(0).argmax().item(), ped_out)
 
@@ -121,8 +121,8 @@ for data_dict in tqdm(train_loader):
     (cam_min, cam_max) = (comb_layercam.min(), comb_layercam.max())
     norm_cam = (comb_layercam - cam_min) / (((cam_max - cam_min) + 1e-08)).data
 
-    print(f'vis_heatmaps: {type(vis_heatmaps)}, {vis_heatmaps.shape}')
-    print(f'comb_layercam: {comb_layercam.shape}')
+    # print(f'vis_heatmaps: {type(vis_heatmaps)}, {vis_heatmaps.shape}')
+    # print(f'comb_layercam: {comb_layercam.shape}')
 
     plt_cam = plt_transformer(norm_cam[0])
 
