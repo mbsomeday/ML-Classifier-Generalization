@@ -115,7 +115,6 @@ class read_from_dir(Dataset):
         ])
         cls_dir = os.listdir(self.base_dir)
         for cls in cls_dir:
-            cur_label = '1' if cls == 'pedestrian' else '0'
             if cls == 'pedestrian':
                 cur_label = 1
             elif cls == 'nonPedestrian':
