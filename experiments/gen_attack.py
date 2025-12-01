@@ -65,7 +65,7 @@ classifier = PyTorchClassifier(
 train_dataset = my_dataset(ds_name_list=ds_name_list, path_key='Stage6_org', txt_name='augmentation_train.txt')
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
-attack = FastGradientMethod(estimator=classifier, eps=0.05)
+attack = FastGradientMethod(estimator=classifier, eps=0.01)
 plt_transforms = transforms.ToPILImage()
 
 for data_dict in tqdm(train_loader):
@@ -82,7 +82,6 @@ for data_dict in tqdm(train_loader):
 
     adv_img = x_test_adv[0].transpose((1, 2, 0))
     adv_tensor = torch.from_numpy(adv_img).permute(2, 0, 1).unsqueeze(0)
-    # print(f'adv_tensor:{adv_tensor.shape}')
 
     # 保存attack图片
     save_path = os.path.join(save_dir, label, img_name)
@@ -96,6 +95,11 @@ for data_dict in tqdm(train_loader):
     # plt.imshow(np.clip(adv_img, 0, 1))
     # plt.show()
 
+    # # 结果对比
+    # org_out = ped_model(image)
+    # print(f'org:{torch.softmax(org_out, dim=1)}')
+    # att_out = ped_model(adv_tensor)
+    # print(f'att:{torch.softmax(att_out, dim=1)}')
 
 
     # break
