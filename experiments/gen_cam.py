@@ -34,6 +34,7 @@ def get_args():
     parser.add_argument('--ds_name_list', nargs='+', default=['D1'])
     parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\baselines\D1\efficientNetB0_D1_3_Baseline-18-4.63655.pth')
     parser.add_argument('--perturb_dir', type=str, default=r'D:\my_phd\dataset\Stage6\stage6_ecp\Perturbations\Attack_FastGradient_test')
+    parser.add_argument('--txt_name', type=str, default='train.txt')
 
     args = parser.parse_args()
 
@@ -44,6 +45,7 @@ args = get_args()
 
 torch.manual_seed(43)
 batch_size = 1
+txt_name = args.txt_name
 save_dir = args.save_dir
 ds_name_list = args.ds_name_list
 model_weights = args.model_weights
@@ -57,7 +59,7 @@ ped_model.eval()
 # for name, _ in ped_model.named_modules():
 #     print(f'name: {name}')
 
-train_dataset = my_dataset(ds_name_list=ds_name_list, path_key='Stage6_org', txt_name='test.txt')
+train_dataset = my_dataset(ds_name_list=ds_name_list, path_key='Stage6_org', txt_name=txt_name)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
 grad_layer = ['features.0', 'features.1', 'features.2', 'features.3', 'features.4', 'features.5', 'features.6', 'features.7', 'features.8']
