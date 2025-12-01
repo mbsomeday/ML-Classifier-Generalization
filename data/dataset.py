@@ -100,6 +100,59 @@ class my_dataset(Dataset):
         return image_dict
 
 
+class read_from_dir(Dataset):
+    def __init__(self, base_dir):
+        '''
+            base_dir下为pedestrian和nonPedestrian
+        '''
+        super().__init__()
+        self.base_dir = base_dir
+
+        self.labels = []
+        self.images = []
+        self.img_transforms = transforms.Compose([
+            transforms.ToTensor(),
+        ])
+        cls_dir = os.listdir(self.base_dir)
+        for cls in cls_dir:
+            cur_label = '1' if cls == 'pedestrian' else '0'
+            if cls == 'pedestrian':
+                cur_label = 1
+            elif cls == 'nonPedestrian':
+                cur_label = 0
+            else:
+                raise ValueError('Wrong class name')
+
+            image_list = os.listdir(os.path.join(self.base_dir, cls))
+            for img in image_list:
+                self.labels.append(cur_label)
+                self.images.append(os.path.join(self.base_dir, cls, img))
+
+    def __len__(self):
+        return len(self.images)
+
+    def __getitem__(self, idx):
+        image_path = self.images[idx]
+        ped_label = self.labels[idx]
+
+        image = Image.open(image_path).convert('RGB')
+        image = self.img_transforms(image)
+        ped_label = np.array(ped_label).astype(np.int64)
+
+        image_name = image_path.split(os.sep)[-1]
+
+        image_dict = {
+            'image': image,
+            'img_name': image_name,
+            'img_path': image_path,
+            'ped_label': ped_label,
+        }
+
+        return image_dict
+
+
+
+
 
 if __name__ == '__main__':
     print('test')
@@ -107,6 +160,28 @@ if __name__ == '__main__':
     # path_key = 'Stage6_org'
     # txt_name = 'val.txt'
     # get_dataset = my_dataset(ds_name_list, path_key, txt_name)
+
+    from torch.utils.data import DataLoader
+    import matplotlib.pyplot as plt
+
+    base_dir = r'D:\my_phd\dataset\Stage6\stage6_ecp\Perturbations\Attack_FastGradient_test'
+
+    ds = read_from_dir(base_dir=base_dir)
+    ds_loader = DataLoader(ds, batch_size=1)
+
+    plt_trans = transforms.ToPILImage()
+
+    for data_dict in ds_loader:
+        print(data_dict.keys())
+
+        image = data_dict['image'][0]
+        image_plt = plt_trans(image)
+
+        plt.imshow(image_plt)
+        plt.show()
+
+        break
+
 
 
 
