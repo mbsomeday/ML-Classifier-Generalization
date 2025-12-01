@@ -170,7 +170,7 @@ for data_dict in tqdm(train_loader):
     # 保存perturb + aug图片
     new_image_name = os.path.splitext(img_name)[0] + '_' + trans_name_list[trans_idx] + os.path.splitext(img_name)[-1]
     save_path = os.path.join(save_dir, cls_name, new_image_name)
-    save_image_tensor(perturb_and_aug.unsqueeze(0), new_image_name)
+    save_image_tensor(perturb_and_aug.unsqueeze(0), save_path)
 
 
     # comb_image = transforms.ToTensor()(aug_image) * (1 - plt_mask) + image[0] * plt_mask
