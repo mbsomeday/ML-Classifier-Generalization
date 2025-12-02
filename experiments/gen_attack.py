@@ -33,7 +33,7 @@ def get_args():
 
     parser.add_argument('--save_dir', type=str, default=r'D:\my_phd\on_git\ML-Classifier-Generalization\aa_test\attack')
     parser.add_argument('--ds_name_list', nargs='+', default=['D1'])
-    parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\baselines\D1\efficientNetB0_D1_3_Baseline-18-4.63655.pth')
+    parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
     parser.add_argument('--txt_name', type=str, default='train.txt')
 
     args = parser.parse_args()
@@ -49,7 +49,7 @@ ds_name_list = args.ds_name_list
 batch_size = 1
 
 # 加载模型和数据等
-ped_model = efficientnet_b0(num_classes=2, weights=None)
+ped_model = efficientnet_b0(num_classes=3, weights=None)
 ped_model = load_model(ped_model, model_weights)
 ped_model.eval()
 
@@ -67,7 +67,7 @@ classifier = PyTorchClassifier(
 train_dataset = my_dataset(ds_name_list=ds_name_list, path_key='Stage6_org', txt_name=txt_name)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
-attack = FastGradientMethod(estimator=classifier, eps=0.01)
+attack = FastGradientMethod(estimator=classifier, eps=0.035)
 plt_transforms = transforms.ToPILImage()
 
 for data_dict in tqdm(train_loader):
@@ -89,19 +89,21 @@ for data_dict in tqdm(train_loader):
     save_path = os.path.join(save_dir, label, img_name)
     save_image_tensor(adv_tensor, save_path)
 
-    # # 展示图片
-    # plt.figure()
-    # plt.subplot(1, 2, 1)
-    # plt.imshow(plt_transforms(image[0]))
-    # plt.subplot(1, 2, 2)
-    # plt.imshow(np.clip(adv_img, 0, 1))
-    # plt.show()
-
     # # 结果对比
     # org_out = ped_model(image)
     # print(f'org:{torch.softmax(org_out, dim=1)}')
     # att_out = ped_model(adv_tensor)
     # print(f'att:{torch.softmax(att_out, dim=1)}')
+    #
+    # # 展示图片
+    # plt.figure()
+    # plt.subplot(1, 2, 1)
+    # plt.imshow(plt_transforms(image[0]))
+    # plt.title('org')
+    # plt.subplot(1, 2, 2)
+    # plt.imshow(np.clip(adv_img, 0, 1))
+    # plt.title()
+    # plt.show()
 
 
     # break
