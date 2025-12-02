@@ -114,11 +114,16 @@ class read_from_dir(Dataset):
             transforms.ToTensor(),
         ])
         cls_dir = os.listdir(self.base_dir)
+
+        self.nonPed_num, self.ped_num = 0, 0
+
         for cls in cls_dir:
             if cls == 'pedestrian':
                 cur_label = 1
+                self.ped_num +=1
             elif cls == 'nonPedestrian':
                 cur_label = 0
+                self.nonPed_num += 1
             else:
                 raise ValueError('Wrong class name')
 
@@ -129,6 +134,13 @@ class read_from_dir(Dataset):
 
     def __len__(self):
         return len(self.images)
+
+    def get_ped_cls_num(self):
+        '''
+            获取行人和非行人类别的数量
+        '''
+
+        return self.nonPed_num, self.ped_num
 
     def __getitem__(self, idx):
         image_path = self.images[idx]
