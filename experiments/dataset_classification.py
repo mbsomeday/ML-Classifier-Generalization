@@ -190,7 +190,7 @@ class DS_Classifier():
         self.ds_model.eval()
 
         # test_dataset = my_dataset(self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.test_txt_name, ds_labels=self.opts.ds_labels) # original test set
-        test_dataset = read_from_dir(r'/kaggle/working/Perturb_D1Test0_07', ds_label=0)  # perturbed test set
+        test_dataset = read_from_dir(r'/kaggle/working/Perturb_D1Test0_06', ds_label=0)  # perturbed test set
         test_loader = DataLoader(test_dataset, batch_size=self.opts.test_batch_size, shuffle=False)
 
         test_correct_num = 0
