@@ -23,7 +23,7 @@ import numpy as np
 # import matplotlib.pyplot as plt
 
 from data.dataset import my_dataset
-from utils.utils import load_model, save_image_tensor
+from utils.utils import load_model, save_image_tensor, DEVICE
 
 
 torch.manual_seed(13)
@@ -51,7 +51,7 @@ batch_size = 1
 # 加载模型和数据等
 ped_model = efficientnet_b0(num_classes=3, weights=None)
 ped_model = load_model(ped_model, model_weights)
-ped_model.eval()
+ped_model.eval().to(DEVICE)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(ped_model.parameters(), lr=0.01)
@@ -67,11 +67,11 @@ classifier = PyTorchClassifier(
 train_dataset = my_dataset(ds_name_list=ds_name_list, path_key='Stage6_org', txt_name=txt_name)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
-attack = FastGradientMethod(estimator=classifier, eps=0.035)
+attack = FastGradientMethod(estimator=classifier, eps=0.07)
 plt_transforms = transforms.ToPILImage()
 
 for data_dict in tqdm(train_loader):
-    image = data_dict['image']      # tensor [n, 3, 224, 224]
+    image = data_dict['image'].to(DEVICE)  # tensor [n, 3, 224, 224]
     img_name = data_dict['img_name'][0]
     image_np = image.numpy()        # nparray [1, 3, 224, 224]
 
