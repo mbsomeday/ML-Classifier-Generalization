@@ -45,7 +45,11 @@ def get_opts():
 
 opts = get_opts()
 ds_cls = DS_Classifier(opts)
-ds_cls.test()
+
+if opts.isTrain:
+    ds_cls.train()
+else:
+    ds_cls.test()
 
 
 
