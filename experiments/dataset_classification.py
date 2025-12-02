@@ -5,7 +5,7 @@ import numpy as np
 from tqdm import tqdm
 from sklearn.metrics import confusion_matrix
 
-from data.dataset import my_dataset
+from data.dataset import my_dataset, read_from_dir
 from training.callbacks import EarlyStopping
 from utils.utils import get_obj_from_str, DEVICE, DotDict, load_model
 
@@ -189,7 +189,8 @@ class DS_Classifier():
         self.ds_model = load_model(self.ds_model, self.opts.ds_weights_path)
         self.ds_model.eval()
 
-        test_dataset = my_dataset(self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.test_txt_name, ds_labels=self.opts.ds_labels)
+        test_dataset = my_dataset(self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.test_txt_name, ds_labels=self.opts.ds_labels) # original test set
+        # test_dataset = read_from_dir(r'D:\my_phd\dataset\Stage6\stage6_ecp\Perturbations\V1\Attack_FastGradient_test', ds_label=0)  # perturbed test set
         test_loader = DataLoader(test_dataset, batch_size=self.opts.test_batch_size, shuffle=False)
 
         test_correct_num = 0

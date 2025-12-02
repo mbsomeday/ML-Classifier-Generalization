@@ -101,7 +101,7 @@ class my_dataset(Dataset):
 
 
 class read_from_dir(Dataset):
-    def __init__(self, base_dir):
+    def __init__(self, base_dir, ds_label):
         '''
             base_dir下为pedestrian和nonPedestrian
         '''
@@ -110,6 +110,7 @@ class read_from_dir(Dataset):
 
         self.labels = []
         self.images = []
+        self.ds_labels = []
         self.img_transforms = transforms.Compose([
             transforms.ToTensor(),
         ])
@@ -118,6 +119,7 @@ class read_from_dir(Dataset):
         self.nonPed_num, self.ped_num = 0, 0
 
         for cls in cls_dir:
+
             if cls == 'pedestrian':
                 cur_label = 1
                 self.ped_num +=1
@@ -129,6 +131,7 @@ class read_from_dir(Dataset):
 
             image_list = os.listdir(os.path.join(self.base_dir, cls))
             for img in image_list:
+                self.ds_labels.append(int(ds_label))
                 self.labels.append(cur_label)
                 self.images.append(os.path.join(self.base_dir, cls, img))
 
@@ -145,6 +148,7 @@ class read_from_dir(Dataset):
     def __getitem__(self, idx):
         image_path = self.images[idx]
         ped_label = self.labels[idx]
+        ds_label = self.ds_labels[idx]
 
         image = Image.open(image_path).convert('RGB')
         image = self.img_transforms(image)
@@ -157,6 +161,7 @@ class read_from_dir(Dataset):
             'img_name': image_name,
             'img_path': image_path,
             'ped_label': ped_label,
+            'ds_label': ds_label
         }
 
         return image_dict
