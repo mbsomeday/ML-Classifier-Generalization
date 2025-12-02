@@ -67,7 +67,7 @@ classifier = PyTorchClassifier(
 train_dataset = my_dataset(ds_name_list=ds_name_list, path_key='Stage6_org', txt_name=txt_name)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
-attack = FastGradientMethod(estimator=classifier, eps=0.07)
+attack = FastGradientMethod(estimator=classifier, eps=0.06)
 plt_transforms = transforms.ToPILImage()
 
 for data_dict in tqdm(train_loader):
