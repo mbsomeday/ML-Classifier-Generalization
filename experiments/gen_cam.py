@@ -34,7 +34,7 @@ def get_args():
     parser.add_argument('--ds_name_list', nargs='+', default=['D1'])
     parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\baselines\D1\efficientNetB0_D1_3_Baseline-18-4.63655.pth')
     parser.add_argument('--perturb_dir', type=str, default=r'D:\my_phd\dataset\Stage6\stage6_ecp\Perturbations\Attack_FastGradient_test')
-    parser.add_argument('--txt_name', type=str, default='train.txt')
+    parser.add_argument('--txt_name', type=str, default='test.txt')
 
     args = parser.parse_args()
 
@@ -130,8 +130,8 @@ for data_dict in tqdm(train_loader):
     resized_cam = plt_resize(plt_cam)
 
     cam_array = np.array(resized_cam)
-    # cam_mask = cam_array < (0.2 * cam_array.max())  # 将图像不感兴趣的区域保留
-    cam_mask = cam_array >= (0.4 * cam_array.max())       # 将图像感兴趣的区域保留
+    cam_mask = cam_array < (0.4 * cam_array.max())  # 将图像不感兴趣的区域保留
+    # cam_mask = cam_array >= (0.4 * cam_array.max())       # 将图像感兴趣的区域保留
     plt_mask = cam_mask * 1.0
     plt_mask = plt_mask[np.newaxis, :]
 
@@ -164,7 +164,7 @@ for data_dict in tqdm(train_loader):
     # perturb_out = ped_model(perturb_and_aug.unsqueeze(0).float())
     # print(f'perturb:{torch.softmax(perturb_out, dim=1)}')
 
-    # # 保存转换过的图片
+    # ================== save generated images ==================
 
     # 保存的名字
     # 保存perturb + aug图片
@@ -220,13 +220,13 @@ for data_dict in tqdm(train_loader):
     #
     # plt.subplot(1, plt_imgs, 4)
     # plt.imshow(plt_transformer(perturb_and_aug))
-    # # plt.title('')
+    # plt.title('Aug + Perturb')
     # plt.axis('off')  # 关闭坐标轴
     #
     # # 显示图片
     # plt.show()
-
-
+    #
+    #
     # break
 
 
