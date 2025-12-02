@@ -5,7 +5,7 @@ from torch import nn
 from sklearn.metrics import confusion_matrix, balanced_accuracy_score
 from tqdm import tqdm
 
-from data.dataset import my_dataset
+from data.dataset import my_dataset, read_from_dir
 from utils.utils import DEVICE, get_obj_from_str, DotDict, load_model
 from training.callbacks import EarlyStopping, Model_Logger
 
@@ -58,7 +58,8 @@ class Ped_Classifier():
         if not os.path.exists(self.callback_save_path):
             os.mkdir(self.callback_save_path)
 
-        self.train_dataset = my_dataset(ds_name_list=self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.train_txt)
+        # self.train_dataset = my_dataset(ds_name_list=self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.train_txt)   # train with org images
+        self.train_dataset = read_from_dir(self.opts.perturb_dir)   # train with perturb images
         self.train_loader = DataLoader(self.train_dataset, batch_size=self.opts.batch_size, shuffle=True)
 
         self.val_dataset = my_dataset(ds_name_list=self.opts.ds_name_list, path_key=self.opts.data_key, txt_name='val.txt')

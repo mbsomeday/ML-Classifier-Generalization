@@ -33,6 +33,10 @@ def get_args():
     parser.add_argument('--warmup_epochs', type=int, default=3)
     parser.add_argument('--monitored_metric', type=str, default='loss')
 
+    # train with perturb+aug imagse
+    parser.add_argument('--perturb_dir', type=str, default='')
+
+
     # test
     parser.add_argument('--ped_weights_path', type=str, default=None)
     parser.add_argument('--test_ds_list', nargs='+', default=None)
