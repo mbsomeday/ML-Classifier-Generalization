@@ -51,7 +51,7 @@ batch_size = 1
 # 加载模型和数据等
 ped_model = efficientnet_b0(num_classes=3, weights=None)
 ped_model = load_model(ped_model, model_weights)
-ped_model.eval().to(DEVICE)
+ped_model.eval()
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(ped_model.parameters(), lr=0.01)
@@ -71,7 +71,7 @@ attack = FastGradientMethod(estimator=classifier, eps=0.07)
 plt_transforms = transforms.ToPILImage()
 
 for data_dict in tqdm(train_loader):
-    image = data_dict['image'].to(DEVICE)  # tensor [n, 3, 224, 224]
+    image = data_dict['image']  # tensor [n, 3, 224, 224]
     img_name = data_dict['img_name'][0]
     image_np = image.numpy()        # nparray [1, 3, 224, 224]
 
