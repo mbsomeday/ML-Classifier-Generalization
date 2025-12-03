@@ -1,3 +1,7 @@
+'''
+    生成perturbation + augmentation 的图片
+'''
+
 # 将上级目录加入 sys.path， 防止命令行运行时找不到包
 import os, sys
 
@@ -32,7 +36,7 @@ def get_args():
 
     parser.add_argument('--save_dir', type=str, default=r'D:\my_phd\on_git\ML-Classifier-Generalization\aa_test')
     parser.add_argument('--ds_name_list', nargs='+', default=['D1'])
-    parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\baselines\D1\efficientNetB0_D1_3_Baseline-18-4.63655.pth')
+    parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
     parser.add_argument('--perturb_dir', type=str, default=r'D:\my_phd\dataset\Stage6\stage6_ecp\Perturbations\Attack_FastGradient_test')
     parser.add_argument('--txt_name', type=str, default='test.txt')
 
@@ -40,9 +44,8 @@ def get_args():
 
     return args
 
+# 变量设置
 args = get_args()
-
-
 torch.manual_seed(43)
 batch_size = 1
 txt_name = args.txt_name
@@ -51,8 +54,8 @@ ds_name_list = args.ds_name_list
 model_weights = args.model_weights
 perturb_dir = args.perturb_dir
 
-# 加载模型和数据等
-ped_model = efficientnet_b0(num_classes=2, weights=None)
+# 加载模型和数据
+ped_model = efficientnet_b0(num_classes=3, weights=None)
 ped_model = load_model(ped_model, model_weights)
 ped_model.eval().to(DEVICE)
 
@@ -62,16 +65,13 @@ ped_model.eval().to(DEVICE)
 train_dataset = my_dataset(ds_name_list=ds_name_list, path_key='Stage6_org', txt_name=txt_name)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
+# cam generator
 grad_layer = ['features.0', 'features.1', 'features.2', 'features.3', 'features.4', 'features.5', 'features.6', 'features.7', 'features.8']
 cam_extractor = GradCAM(ped_model, target_layer='features')
 layerCam_extractor = LayerCAM(ped_model, target_layer=grad_layer)
 cur_extractor = layerCam_extractor
 
-# transformers
-plt_transformer = transforms.ToPILImage()
-tensor_transformer = transforms.ToTensor()
-plt_resize = transforms.Resize(224, interpolation=InterpolationMode.BICUBIC)
-
+# augmentation
 gaussion_trans = transforms.GaussianBlur(kernel_size=9, sigma=(1, 3))
 gray_trans = transforms.Grayscale()
 color_trans = transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.02)
@@ -81,6 +81,11 @@ qeualize_trans = transforms.RandomEqualize()
 trans_list = [gaussion_trans, gray_trans, color_trans, sharp_trans, qeualize_trans]
 trans_name_list = ['gaussian', 'gray', 'color', 'sharp', 'qeualize']
 cur_trans = gaussion_trans
+
+# transformers
+plt_transformer = transforms.ToPILImage()
+tensor_transformer = transforms.ToTensor()
+plt_resize = transforms.Resize(224, interpolation=InterpolationMode.BICUBIC)
 
 # # attack
 # criterion = nn.CrossEntropyLoss()
@@ -121,8 +126,6 @@ for data_dict in tqdm(train_loader):
     (cam_min, cam_max) = (comb_layercam.min(), comb_layercam.max())
     norm_cam = (comb_layercam - cam_min) / (((cam_max - cam_min) + 1e-08)).data
 
-    # print(f'vis_heatmaps: {type(vis_heatmaps)}, {vis_heatmaps.shape}')
-    # print(f'comb_layercam: {comb_layercam.shape}')
 
     plt_cam = plt_transformer(norm_cam[0])
 
@@ -225,8 +228,8 @@ for data_dict in tqdm(train_loader):
     #
     # # 显示图片
     # plt.show()
-    #
-    #
+
+
     # break
 
 
