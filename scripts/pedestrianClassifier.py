@@ -52,6 +52,7 @@ start_time = datetime.datetime.now()
 print(f'Started at {str(start_time.strftime("%Y-%m-%d %H:%M:%S"))}')
 
 if args.isTrain:
+    print('Current Mode: Training')
     # 生成程度为n的seed_list
     seed_list = random.sample(range(0, 100), args.seed_num)
     for cur_seed in seed_list:
@@ -61,6 +62,7 @@ if args.isTrain:
         ped_model = Ped_Classifier(args)
         ped_model.train()
 else:
+    print('Current Mode: Testing')
     ped_model = Ped_Classifier(args)
     ped_model.test()
 
