@@ -51,8 +51,10 @@ start_time = datetime.datetime.now()
 print(f'Started at {str(start_time.strftime("%Y-%m-%d %H:%M:%S"))}')
 
 if opts.isTrain:
+    print('Current Mode: 【Training】')
     ds_cls.train()
 else:
+    print('Current Mode: 【Testing】')
     ds_cls.test()
 
 # 结束时间
