@@ -46,7 +46,7 @@ def get_opts():
 opts = get_opts()
 ds_cls = DS_Classifier(opts)
 
-# 打印当前时间
+# 开始时间
 start_time = datetime.datetime.now()
 print(f'Started at {str(start_time.strftime("%Y-%m-%d %H:%M:%S"))}')
 
@@ -55,6 +55,7 @@ if opts.isTrain:
 else:
     ds_cls.test()
 
+# 结束时间
 end_time = datetime.datetime.now()
 duration = end_time - start_time
 print(f'Ended at {str(end_time.strftime("%Y-%m-%d %H:%M:%S"))}')

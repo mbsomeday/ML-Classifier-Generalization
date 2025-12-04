@@ -5,7 +5,7 @@ root_path = os.path.split(curPath)[0]
 sys.path.append(root_path)
 
 import argparse, random, time
-from datetime import datetime
+import datetime
 
 from experiments.pedestrian_classification import Ped_Classifier
 
@@ -26,7 +26,6 @@ def get_args():
     parser.add_argument('--min_train_epoch', type=int, default=10)
     parser.add_argument('--max_train_epoch', type=int, default=50)
     parser.add_argument('--seed_num', type=int, default=1)
-    parser.add_argument('--rand_seed', type=int, default=13)
 
     parser.add_argument('--top_k', type=int, default=1)
     parser.add_argument('--patience', type=int, default=10)
@@ -48,16 +47,16 @@ def get_args():
 
 args = get_args()
 
-currentDateAndTime = datetime.now()
-current_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-print("The current time is", current_time_str)
+# 开始时间
+start_time = datetime.datetime.now()
+print(f'Started at {str(start_time.strftime("%Y-%m-%d %H:%M:%S"))}')
 
 if args.isTrain:
     # 生成程度为n的seed_list
     seed_list = random.sample(range(0, 100), args.seed_num)
     for cur_seed in seed_list:
         # 先调节seed再创建ped实例
-        args.rand_seed = cur_seed
+        setattr(args, 'rand_seed', cur_seed)    # 向args中添加rand seed
 
         ped_model = Ped_Classifier(args)
         ped_model.train()
@@ -66,6 +65,11 @@ else:
     ped_model.test()
 
 
+# 结束时间
+end_time = datetime.datetime.now()
+duration = end_time - start_time
+print(f'Ended at {str(end_time.strftime("%Y-%m-%d %H:%M:%S"))}')
+print(f'Duration: {str(duration)}')
 
 
 
