@@ -77,11 +77,6 @@ KAGGLE = {
     },
 
     'Stage6_org': {
-        # # 3000
-        # 'D1': r'/kaggle/input/stage6-datasets-organize/ECP3000',
-        # 'D2': r'/kaggle/input/stage6-datasets-organize/CityPersons3000',
-        # 'D3': r'/kaggle/input/stage6-datasets-organize/bdd100k3000',
-
         # 4500
         'D1': r'/kaggle/input/stage6-dataset-ecp',
         'D2': r'/kaggle/input/stage6-dataset-citypersons',
