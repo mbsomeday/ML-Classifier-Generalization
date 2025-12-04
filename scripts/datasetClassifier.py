@@ -15,7 +15,7 @@ def get_opts():
     parser.add_argument('--num_cls', type=int, default=3)
     parser.add_argument('--ds_name_list', nargs='+', default=['D1', 'D2', 'D3'])
     parser.add_argument('--data_key', default='Stage6_org')
-    parser.add_argument('--ds_labels', nargs='+', default=['0'])
+    parser.add_argument('--ds_labels', nargs='+', default=['0', '1', '2'])
 
     # train
     parser.add_argument('--isTrain', default=False)
