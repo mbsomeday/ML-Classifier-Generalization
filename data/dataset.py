@@ -24,6 +24,8 @@ class my_dataset(Dataset):
                 self.ds_label_list.append(int(ds_name[1]) - 1)
         else:
             self.ds_label_list = ds_labels
+        if len(self.ds_name_list) != len(self.ds_label_list):
+            raise ValueError(f'Dataset loader name and label match error. Names:{self.ds_name_list}, labels:{self.ds_label_list}')
 
         print(f'Mapping dataset names and labels: {ds_name_list} - {self.ds_label_list}')
 
