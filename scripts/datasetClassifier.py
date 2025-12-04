@@ -32,7 +32,7 @@ def get_opts():
     # test
     parser.add_argument('--ds_weights_path', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
     parser.add_argument('--test_txt_name', default='test.txt')
-    parser.add_argument('--test_batch_size', default=4)
+    parser.add_argument('--test_batch_size', type=int, default=4)
 
     # callback
     parser.add_argument('--top_k', type=int, default=2)
