@@ -12,7 +12,7 @@ class my_dataset(Dataset):
         '''
         :param ds_name_list:
         :param path_key: org_dataset
-        :param txt_name:
+        :param ds_labels: 用于打乱数据集标签
         '''
         self.ds_name_list = ds_name_list
         self.ds_label_list = []
@@ -30,8 +30,6 @@ class my_dataset(Dataset):
         self.txt_name = txt_name
         self.img_transforms = transforms.Compose([
             transforms.ToTensor(),
-            # transforms.Normalize(mean=(0.485, 0.456, 0.406),
-            #                      std=(0.229, 0.224, 0.225))
         ])
 
         self.images, self.ped_labels, self.ds_labels = self.init_ImagesLabels()
@@ -122,7 +120,7 @@ class read_from_dir(Dataset):
 
             if cls == 'pedestrian':
                 cur_label = 1
-                self.ped_num +=1
+                self.ped_num += 1
             elif cls == 'nonPedestrian':
                 cur_label = 0
                 self.nonPed_num += 1
@@ -182,7 +180,7 @@ if __name__ == '__main__':
 
     base_dir = r'D:\my_phd\dataset\Stage6\stage6_ecp\Perturbations\Attack_FastGradient_test'
 
-    ds = read_from_dir(base_dir=base_dir)
+    ds = read_from_dir(base_dir=base_dir, ds_label=0)
     ds_loader = DataLoader(ds, batch_size=1)
 
     plt_trans = transforms.ToPILImage()
