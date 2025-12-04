@@ -33,7 +33,7 @@ def get_args():
     parser.add_argument('--monitored_metric', type=str, default='loss')
 
     # train with perturb+aug imagse
-    parser.add_argument('--perturb_dir', type=str, default='')
+    parser.add_argument('--perturb_dir', type=str, default='', help='A temporal variable, for loading perturbed data')
 
 
     # test
