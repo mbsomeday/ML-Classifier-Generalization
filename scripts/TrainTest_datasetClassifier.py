@@ -4,7 +4,7 @@ curPath = os.path.abspath(os.path.dirname(__file__))
 root_path = os.path.split(curPath)[0]
 sys.path.append(root_path)
 
-import argparse
+import argparse, datetime
 
 from experiments.dataset_classification import DS_Classifier
 
@@ -46,11 +46,19 @@ def get_opts():
 opts = get_opts()
 ds_cls = DS_Classifier(opts)
 
+# 打印当前时间
+start_time = datetime.datetime.now()
+print(f'Started at {str(start_time.strftime("%Y-%m-%d %H:%M:%S"))}')
+
 if opts.isTrain:
     ds_cls.train()
 else:
     ds_cls.test()
 
+end_time = datetime.datetime.now()
+duration = end_time - start_time
+print(f'Ended at {str(end_time.strftime("%Y-%m-%d %H:%M:%S"))}')
+print(f'Duration: {str(duration)}')
 
 
 
