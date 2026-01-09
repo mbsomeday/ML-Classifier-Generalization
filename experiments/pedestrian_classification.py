@@ -44,7 +44,7 @@ class Ped_Classifier():
         torch.manual_seed(self.opts.rand_seed)
         np.random.seed(self.opts.rand_seed)
         random.seed(self.opts.rand_seed)
-        if DEVICE is not 'cpu':
+        if DEVICE != 'cpu':
             torch.cuda.manual_seed(self.opts.rand_seed)
             # 确保CuDNN的确定性行为
             torch.backends.cudnn.deterministic = True
