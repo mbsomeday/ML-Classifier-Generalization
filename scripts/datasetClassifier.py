@@ -19,24 +19,24 @@ def get_opts():
 
     # train
     parser.add_argument('--isTrain', default=False)
-    parser.add_argument('--train_batch_size', type=int, default=4)
+    parser.add_argument('--train_batch_size', type=int, default=64)
     parser.add_argument('--base_lr', type=float, default=0.001)
     parser.add_argument('--monitored_metric', type=str, default='loss')
     parser.add_argument('--max_epochs', type=int, default=60)
-    parser.add_argument('--min_epochs', type=int, default=30)
-    parser.add_argument('--warmup_epochs', type=int, default=1)
+    parser.add_argument('--min_epochs', type=int, default=10)
+    parser.add_argument('--warmup_epochs', type=int, default=3)
 
     # val
-    parser.add_argument('--val_batch_size', default=4)
+    parser.add_argument('--val_batch_size', default=64)
 
     # test
-    parser.add_argument('--ds_weights_path', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
+    parser.add_argument('--ds_weights_path', type=str, default=None)
     parser.add_argument('--test_txt_name', default='test.txt')
     parser.add_argument('--test_batch_size', type=int, default=4)
 
     # callback
-    parser.add_argument('--top_k', type=int, default=2)
-    parser.add_argument('--patience', type=int, default=2)
+    parser.add_argument('--top_k', type=int, default=1)
+    parser.add_argument('--patience', type=int, default=5)
 
     opts = parser.parse_args()
 
