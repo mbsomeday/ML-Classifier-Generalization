@@ -21,7 +21,7 @@ def get_opts():
     parser.add_argument('--isTrain', default=False)
     parser.add_argument('--train_batch_size', type=int, default=4)
     parser.add_argument('--base_lr', type=float, default=0.001)
-    parser.add_argument('--monitored_metric', type=str, default='accuracy')
+    parser.add_argument('--monitored_metric', type=str, default='loss')
     parser.add_argument('--max_epochs', type=int, default=60)
     parser.add_argument('--min_epochs', type=int, default=30)
     parser.add_argument('--warmup_epochs', type=int, default=1)
