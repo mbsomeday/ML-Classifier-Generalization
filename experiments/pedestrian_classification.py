@@ -44,7 +44,7 @@ class Ped_Classifier():
         torch.manual_seed(self.opts.rand_seed)
         np.random.seed(self.opts.rand_seed)
         random.seed(self.opts.rand_seed)
-        if DEVICE == 'gpu':
+        if DEVICE is not 'cpu':
             torch.cuda.manual_seed(self.opts.rand_seed)
             # 确保CuDNN的确定性行为
             torch.backends.cudnn.deterministic = True
@@ -60,10 +60,10 @@ class Ped_Classifier():
 
         self.train_dataset = my_dataset(ds_name_list=self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.train_txt)   # train with org images
         # self.train_dataset = read_from_dir(self.opts.perturb_dir, ds_label=0)   # train with perturb images
-        self.train_loader = DataLoader(self.train_dataset, batch_size=self.opts.batch_size, shuffle=True)
+        self.train_loader = DataLoader(self.train_dataset, batch_size=self.opts.train_batch_size, shuffle=True)
 
         self.val_dataset = my_dataset(ds_name_list=self.opts.ds_name_list, path_key=self.opts.data_key, txt_name='val.txt')
-        self.val_loader = DataLoader(self.val_dataset, batch_size=self.opts.batch_size, shuffle=False)
+        self.val_loader = DataLoader(self.val_dataset, batch_size=self.opts.val_batch_size, shuffle=False)
 
         self.train_nonPed_num, self.train_ped_num = self.train_dataset.get_ped_cls_num()
         self.val_nonPed_num, self.val_ped_num = self.val_dataset.get_ped_cls_num()
@@ -76,7 +76,6 @@ class Ped_Classifier():
         # ********** loss & scheduler **********
         self.optimizer = torch.optim.RMSprop(self.ped_model.parameters(), lr=self.opts.base_lr, weight_decay=1e-5, eps=0.001)
         self.loss_fn = torch.nn.CrossEntropyLoss()
-
 
         self.ped_model = self.init_model(self.ped_model)
 
@@ -135,6 +134,7 @@ class Ped_Classifier():
             'nonPed_acc_num': 0,
             'ped_acc_num': 0,
             'correct_num': 0,
+            # 'loss': [],
             'loss': 0.0
         }
         return pred_info
@@ -165,6 +165,7 @@ class Ped_Classifier():
         self.ped_model.train()
 
         org_dict = self.inif_pred_info()
+        total_loss_sum = 0.0
 
         for batch_idx, data in enumerate(tqdm(self.train_loader)):
             images = data['image'].to(DEVICE)
@@ -184,13 +185,19 @@ class Ped_Classifier():
             nonPed_idx = (ped_labels == 0)
             ped_idx = (ped_labels == 1)
 
-            org_dict['loss'] += loss_value.item()
+            # 便于最终计算每个样本的loss
+            batch_loss_sum = loss_value.item() * self.opts.train_batch_size
+            total_loss_sum += batch_loss_sum
+
+            # org_dict['loss'] += loss_value.item()
+
             org_dict['y_true'].extend(ped_labels.cpu().numpy())
             org_dict['y_pred'].extend(pred.cpu().numpy())
             org_dict['correct_num'] += (pred == ped_labels).sum()
             org_dict['nonPed_acc_num'] += ((ped_labels[nonPed_idx] == pred[nonPed_idx]) * 1).sum()
             org_dict['ped_acc_num'] += ((ped_labels[ped_idx] == pred[ped_idx]) * 1).sum()
 
+        org_dict['loss'] = total_loss_sum / len(self.train_dataset)
         train_epoch_info = self.handle_pred_info(org_pred=org_dict, info_type='Train')
 
         return train_epoch_info
@@ -203,7 +210,8 @@ class Ped_Classifier():
         nonPed_acc_num = 0
         ped_acc_num = 0
         val_correct_num = 0
-        val_loss = 0
+        # val_loss = 0
+        total_loss_sum = 0.0
 
         with torch.no_grad():
             for batch_idx, data in enumerate(tqdm(self.val_loader)):
@@ -212,7 +220,12 @@ class Ped_Classifier():
 
                 logits = self.ped_model(images)
                 preds = torch.argmax(logits, dim=1)
-                val_loss += self.loss_fn(logits, ped_labels).item()
+                loss_val = self.loss_fn(logits, ped_labels)
+
+                batch_loss_sum = loss_val.item() * self.opts.val_batch_size
+                total_loss_sum += batch_loss_sum
+
+                # val_loss += self.loss_fn(logits, ped_labels).item()       # 原代码
 
                 y_true.extend(ped_labels.cpu().numpy())
                 y_pred.extend(preds.cpu().numpy())
@@ -227,12 +240,14 @@ class Ped_Classifier():
         val_accuracy = val_correct_num / len(self.val_dataset)
         val_bc = balanced_accuracy_score(y_true, y_pred)
 
+        average_sample_loss = total_loss_sum / len(self.val_dataset)
+
         val_epoch_info = {
             'accuracy': val_accuracy,
             'balanced_accuracy': val_bc,
-            'loss': val_loss
+            'loss': average_sample_loss
         }
-        print(f'Validation accuracy:{val_accuracy:.6f}, balanced_accuracy:{val_bc:.6f}, loss:{val_loss:.8f}')
+        print(f'Validation accuracy:{val_accuracy:.6f}, balanced_accuracy:{val_bc:.6f}, loss:{average_sample_loss:.8f}')
 
         return DotDict(val_epoch_info)
 
@@ -251,7 +266,7 @@ class Ped_Classifier():
 
         for ds_name in self.opts.test_ds_list:
             test_dataset = my_dataset(ds_name_list=[ds_name], path_key=self.opts.data_key, txt_name='test.txt')
-            test_loader = DataLoader(test_dataset, batch_size=128, shuffle=False)
+            test_loader = DataLoader(test_dataset, batch_size=self.opts.test_batch_size, shuffle=False)
 
             y_true = []
             y_pred = []

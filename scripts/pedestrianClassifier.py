@@ -1,3 +1,9 @@
+'''
+    本代码用于训练/测试 pedestrian classifier
+    训练和测试需传入不同的参数
+
+'''
+
 # 将上级目录加入 sys.path， 防止命令行运行时找不到包
 import os, sys
 curPath = os.path.abspath(os.path.dirname(__file__))
@@ -18,6 +24,9 @@ def get_args():
     parser.add_argument('--ds_name_list', nargs='+', default=['D1'], help='the list means training on all of these datasets')
     parser.add_argument('--data_key', type=str, default='Stage6_org')
     parser.add_argument('--batch_size', type=int, default=64)
+    parser.add_argument('--train_batch_size', type=int, default=64)   # 将train, val和test的batch size分开，方便loss的计算
+    parser.add_argument('--val_batch_size', type=int, default=128)
+
     parser.add_argument('--train_txt', type=str, default='augmentation_train.txt')
 
     # train
@@ -25,7 +34,7 @@ def get_args():
     parser.add_argument('--isTrain', action='store_true')
     parser.add_argument('--min_train_epoch', type=int, default=10)
     parser.add_argument('--max_train_epoch', type=int, default=50)
-    parser.add_argument('--seed_num', type=int, default=1)
+    parser.add_argument('--seed_num', type=int, default=1, help='set the number of training times for getting the average value')
 
     parser.add_argument('--top_k', type=int, default=1)
     parser.add_argument('--patience', type=int, default=10)
@@ -35,10 +44,10 @@ def get_args():
     # train with perturb+aug imagse
     parser.add_argument('--perturb_dir', type=str, default='', help='A temporal variable, for loading perturbed data')
 
-
     # test
     parser.add_argument('--ped_weights_path', type=str, default=None)
     parser.add_argument('--test_ds_list', nargs='+', default=None)
+    parser.add_argument('--test_batch_size', type=int, default=128)
 
     args = parser.parse_args()
 
