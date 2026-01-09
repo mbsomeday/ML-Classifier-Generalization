@@ -105,8 +105,9 @@ class DS_Classifier():
 
     def train_one_epoch(self):
         self.ds_model.train()
-        epoch_loss = 0.0
+        # epoch_loss = 0.0
         correct_num = 0
+        total_loss_sum = 0.0
 
         for batch_idx, data in enumerate(tqdm(self.train_loader)):
             images = data['image'].to(DEVICE)
@@ -116,21 +117,26 @@ class DS_Classifier():
             pred = torch.argmax(logits, 1)
             loss_value = self.loss_fn(logits, ds_labels)
 
-            epoch_loss += loss_value.item()
+            # epoch_loss += loss_value.item()
             correct_num += (pred == ds_labels).sum()
 
             self.optimizer.zero_grad()
             loss_value.backward()
             self.optimizer.step()
 
+            batch_loss_sum = loss_value.item() * self.opts.train_batch_size
+            total_loss_sum += batch_loss_sum
+
+        average_loss = total_loss_sum / len(self.train_dataset)
         train_accuracy = correct_num / len(self.train_dataset)
-        print(f'Training loss:{epoch_loss:.6f}, accuracy:{train_accuracy:.4f}')
+        print(f'Training loss:{average_loss:.6f}, accuracy:{train_accuracy:.4f}')
 
 
     def val_on_epoch_end(self):
         self.ds_model.eval()
         val_correct_num = 0.0
-        val_loss = 0
+        total_loss_sum = 0.0
+        # val_loss = 0
         y_true = []
         y_pred = []
 
@@ -143,21 +149,24 @@ class DS_Classifier():
                 preds = torch.argmax(logits, 1)
                 loss_value = self.loss_fn(logits, ds_labels)
 
-                val_loss += loss_value.item()
+                # val_loss += loss_value.item()
+                batch_loss_val = loss_value.item() * self.opts.val_batch_size
+                total_loss_sum += batch_loss_val
                 val_correct_num += (preds == ds_labels).sum()
 
                 y_true.extend(ds_labels.cpu().numpy())
                 y_pred.extend(preds.cpu().numpy())
 
+        average_loss = total_loss_sum / len(self.val_dataset)
         val_accuracy = val_correct_num / len(self.val_dataset)
         val_cm = confusion_matrix(y_true, y_pred)
 
-        print(f'Val loss {val_loss:.6f}, accuracy:{val_accuracy:.4f}')
+        print(f'Val loss {average_loss:.6f}, accuracy:{val_accuracy:.4f}')
         print(f'CM on validation set:\n{val_cm}')
 
         val_epoch_info = {
             'accuracy': val_accuracy,
-            'loss': val_loss
+            'loss': average_loss
         }
         return DotDict(val_epoch_info)
 
