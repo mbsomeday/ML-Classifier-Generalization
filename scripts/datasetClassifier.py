@@ -18,7 +18,7 @@ def get_opts():
     parser.add_argument('--ds_labels', nargs='+', default=['0', '1', '2'])
 
     # train
-    parser.add_argument('--isTrain', default=False)
+    parser.add_argument('--isTrain', action='store_true')
     parser.add_argument('--train_batch_size', type=int, default=64)
     parser.add_argument('--base_lr', type=float, default=0.001)
     parser.add_argument('--monitored_metric', type=str, default='loss')
