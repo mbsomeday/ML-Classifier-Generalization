@@ -30,7 +30,7 @@ from utils.utils import load_model, DEVICE, save_image_tensor
 def get_opts():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--ds_name_list', default=['D1'])
+    parser.add_argument('--ds_name_list', nargs='+', default=['D1'])
     parser.add_argument('--ds_weights_path', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
     parser.add_argument('--batch_size', type=int, default=1)
 
