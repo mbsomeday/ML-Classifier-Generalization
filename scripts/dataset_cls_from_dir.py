@@ -27,4 +27,6 @@ def get_opts():
 
 
 opts = get_opts()
+print(opts)
+
 ds_cls_from_dir(opts)
