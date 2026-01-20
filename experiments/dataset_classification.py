@@ -1,3 +1,10 @@
+# 将上级目录加入 sys.path， 防止命令行运行时找不到包
+import os, sys
+
+curPath = os.path.abspath(os.path.dirname(__file__))
+root_path = os.path.split(curPath)[0]
+sys.path.append(root_path)
+
 import torch, os
 from torch import nn
 from torch.utils.data import DataLoader
@@ -232,7 +239,7 @@ def ds_cls_from_dir(opts):
     ds_model.eval()
 
     # data
-    test_dataset = read_from_dir(base_dir=opts.dir_path, ds_label=0)
+    test_dataset = read_from_dir(base_dir=opts.dir_path, ds_label=opts.ds_label)
     test_loader = DataLoader(test_dataset, batch_size=opts.test_batch_size)
 
     test_correct_num = 0
@@ -268,6 +275,7 @@ if __name__ == '__main__':
         parser = argparse.ArgumentParser()
 
         parser.add_argument('--dir_path', type=str, default=r'E:\Bias_Reduction_Summary\Datasets\Perturbations\D1_perturb')
+        parser.add_argument('--ds_label', type=int, default=0)
 
         parser.add_argument('--ds_model_obj', default='torchvision.models.efficientnet_b0'),
 
