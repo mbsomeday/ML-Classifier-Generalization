@@ -19,7 +19,7 @@ def get_opts():
     # test
     parser.add_argument('--ds_weights_path',
                         default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
-    parser.add_argument('--test_batch_size', default=2)
+    parser.add_argument('--test_batch_size', type=int, default=2)
 
     opts = parser.parse_args()
 
@@ -27,6 +27,4 @@ def get_opts():
 
 
 opts = get_opts()
-print(opts)
-
 ds_cls_from_dir(opts)
