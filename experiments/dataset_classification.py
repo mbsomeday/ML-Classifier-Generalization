@@ -8,6 +8,7 @@ from sklearn.metrics import confusion_matrix
 from data.dataset import my_dataset, read_from_dir
 from training.callbacks import EarlyStopping
 from utils.utils import get_obj_from_str, DEVICE, DotDict, load_model
+from utils.plt_func import plot_cm
 
 
 class DS_Classifier():
@@ -192,13 +193,10 @@ class DS_Classifier():
                 break
 
     def test(self):
-        '''
-            在 new D1/D2/D3 的test.txt上测试，展示结果但不保存
-        '''
         self.ds_model = load_model(self.ds_model, self.opts.ds_weights_path)
         self.ds_model.eval()
 
-        test_dataset = my_dataset(self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.test_txt_name, ds_labels=self.opts.ds_labels) # original test set
+        test_dataset = my_dataset(self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.test_txt_name, ds_labels=self.opts.ds_labels)
         test_loader = DataLoader(test_dataset, batch_size=self.opts.test_batch_size, shuffle=False)
 
         test_correct_num = 0
@@ -220,7 +218,45 @@ class DS_Classifier():
 
         test_accuracy = test_correct_num / len(test_dataset)
         test_cm = confusion_matrix(y_true, y_pred)
+
         print(f'Test accuracy:{test_accuracy:.6f}\nTest CM:{test_cm}')
+
+        plot_cm(y_true, y_pred, classes=['D1', 'D2', 'D3'], normalize=False)
+
+
+def ds_cls_from_dir(opts):
+
+    # model
+    ds_model = get_obj_from_str(opts.ds_model_obj)(weights=None, progress=True, num_classes=3).to(DEVICE)
+    ds_model = load_model(ds_model, opts.ds_weights_path)
+    ds_model.eval()
+
+    # data
+    test_dataset = read_from_dir(base_dir=opts.dir_path, ds_label=0)
+    test_loader = DataLoader(test_dataset, batch_size=opts.test_batch_size)
+
+    test_correct_num = 0
+    y_true = []
+    y_pred = []
+
+    with torch.no_grad():
+        for batch_idx, data in enumerate(tqdm(test_loader)):
+            images = data['image'].to(DEVICE)
+            ds_labels = data['ds_label'].to(DEVICE)
+
+            logits = ds_model(images)
+            preds = torch.argmax(logits, 1)
+
+            test_correct_num += (preds == ds_labels).sum()
+
+            y_true.extend(ds_labels.cpu().numpy())
+            y_pred.extend(preds.cpu().numpy())
+
+    test_accuracy = test_correct_num / len(test_dataset)
+
+    print(f'test_correct_num/all_samples:{test_correct_num} / {len(test_dataset)}')
+    print(f'Test accuracy:{test_accuracy:.6f}\n')
+
 
 
 
@@ -231,40 +267,20 @@ if __name__ == '__main__':
     def get_opts():
         parser = argparse.ArgumentParser()
 
+        parser.add_argument('--dir_path', type=str, default=r'E:\Bias_Reduction_Summary\Datasets\Perturbations\D1_perturb')
+
         parser.add_argument('--ds_model_obj', default='torchvision.models.efficientnet_b0'),
-        parser.add_argument('--num_cls', type=int, default=3)
-        parser.add_argument('--ds_name_list', nargs='+', default=['D3'])
-        parser.add_argument('--data_key', default='Stage6_org')
-        parser.add_argument('--ds_labels', nargs='+', default=['0'])
-
-        # train
-        parser.add_argument('--isTrain', default=False)
-        parser.add_argument('--train_batch_size', type=int, default=4)
-        parser.add_argument('--base_lr', type=float, default=0.001)
-        parser.add_argument('--monitored_metric', type=str, default='accuracy')
-        parser.add_argument('--max_epochs', type=int, default=60)
-        parser.add_argument('--min_epochs', type=int, default=30)
-        parser.add_argument('--warmup_epochs', type=int, default=1)
-
-        # val
-        parser.add_argument('--val_batch_size', default=4)
 
         # test
-        parser.add_argument('--ds_weights_path', default='D:\my_phd\on_git\PerceptionBaseline\experiments\dsCls_D3_0\dsCls_D3_0-01-1.00000.pth')
-        parser.add_argument('--test_txt_name', default='test.txt')
+        parser.add_argument('--ds_weights_path', default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
         parser.add_argument('--test_batch_size', default=2)
-
-        # callback
-        parser.add_argument('--top_k', type=int, default=2)
-        parser.add_argument('--patience', type=int, default=2)
 
         opts = parser.parse_args()
 
         return opts
 
     opts = get_opts()
-    ds_cls = DS_Classifier(opts)
-    ds_cls.test()
+    ds_cls_from_dir(opts)
 
 
 
