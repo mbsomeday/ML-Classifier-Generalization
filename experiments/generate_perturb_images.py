@@ -149,8 +149,6 @@ def gen_perturbation_image(opts):
 
         img_label = int(data_dict['ped_label'][0])
         label = 'nonPedestrian' if img_label == 0 else 'pedestrian'
-        print(f'img_name:{img_name}')
-        print(f'img_label:{img_label}, label:{label}')
 
         # 生成perturb图片
         perturb_image = pertub_method.generate(x=image_np)
