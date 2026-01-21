@@ -221,7 +221,7 @@ class DS_Classifier():
 
         print(f'Test accuracy:{test_accuracy:.6f}\nTest CM:{test_cm}')
 
-        plot_cm(y_true, y_pred, classes=['D1', 'D2', 'D3'], normalize=False)
+        plot_cm(y_true, y_pred, classes=['D1', 'D2', 'D3'], normalize=False, cm_save_dir=self.opts.cm_save_dir)
 
 
 def ds_cls_from_dirs(opts):
