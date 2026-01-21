@@ -148,8 +148,8 @@ def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Bl
                      cmap=cmap, square=True,
                      xticklabels=classes, yticklabels=classes,
                      cbar_kws={"shrink": 0.8})
-    ax.invert_xaxis()
-    # ax.invert_yaxis()
+    # ax.invert_xaxis()
+    ax.invert_yaxis()
 
     # 设置标题和标签
     if title:
