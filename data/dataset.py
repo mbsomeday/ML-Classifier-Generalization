@@ -167,36 +167,105 @@ class read_from_dir(Dataset):
         return image_dict
 
 
+class read_from_dirs(Dataset):
+    def __init__(self, ds_dir_list, ds_label_list):
+        '''
+            base_dir下为pedestrian和nonPedestrian
+        '''
+        super().__init__()
+        assert len(ds_dir_list) == len(ds_label_list), "error: len(ds_dir_list) != len(ds_label_list)"
+
+        self.ds_dir_list = ds_dir_list
+
+        self.labels = []
+        self.images = []
+        self.ds_labels = []
+        self.img_transforms = transforms.Compose([
+            transforms.ToTensor(),
+        ])
+        self.nonPed_num, self.ped_num = 0, 0
+
+        for idx, ds_dir in enumerate(ds_dir_list):
+            print(ds_dir)
+            cls_dir = os.listdir(ds_dir)
+            for cls in cls_dir:
+                if cls == 'pedestrian':
+                    cur_label = 1
+                    self.ped_num += 1
+                elif cls == 'nonPedestrian':
+                    cur_label = 0
+                    self.nonPed_num += 1
+                else:
+                    raise ValueError('Wrong class name')
+
+                image_list = os.listdir(os.path.join(ds_dir, cls))
+                for img in image_list:
+                    self.ds_labels.append(int(ds_label_list[idx]))
+                    self.labels.append(cur_label)
+                    self.images.append(os.path.join(ds_dir, cls, img))
+
+        # for cls in cls_dir:
+        #
+        #     if cls == 'pedestrian':
+        #         cur_label = 1
+        #         self.ped_num += 1
+        #     elif cls == 'nonPedestrian':
+        #         cur_label = 0
+        #         self.nonPed_num += 1
+        #     else:
+        #         raise ValueError('Wrong class name')
+        #
+        #     image_list = os.listdir(os.path.join(self.base_dir, cls))
+        #     for img in image_list:
+        #         self.ds_labels.append(int(ds_label))
+        #         self.labels.append(cur_label)
+        #         self.images.append(os.path.join(self.base_dir, cls, img))
+
+    def __len__(self):
+        return len(self.images)
+
+    def get_ped_cls_num(self):
+        '''
+            获取行人和非行人类别的数量
+        '''
+
+        return self.nonPed_num, self.ped_num
+
+    def __getitem__(self, idx):
+        image_path = self.images[idx]
+        ped_label = self.labels[idx]
+        ds_label = self.ds_labels[idx]
+
+        image = Image.open(image_path).convert('RGB')
+        image = self.img_transforms(image)
+        ped_label = np.array(ped_label).astype(np.int64)
+
+        image_name = image_path.split(os.sep)[-1]
+
+        image_dict = {
+            'image': image,
+            'img_name': image_name,
+            'img_path': image_path,
+            'ped_label': ped_label,
+            'ds_label': ds_label
+        }
+
+        return image_dict
 
 
 
 if __name__ == '__main__':
     print('test')
-    # ds_name_list = ['D3']
-    # path_key = 'Stage6_org'
-    # txt_name = 'val.txt'
-    # get_dataset = my_dataset(ds_name_list, path_key, txt_name)
 
-    from torch.utils.data import DataLoader
-    import matplotlib.pyplot as plt
+    base_dir_list = [
+        r'E:\Bias_Reduction_Summary\Datasets\Perturbations\D1_perturb',
+        r'E:\Bias_Reduction_Summary\Datasets\Perturbations\D2_perturb'
+    ]
+    ds_label_list = [0, 1]
+    ds = read_from_dirs(base_dir_list, ds_label_list)
+    print(len(ds))
 
-    base_dir = r'D:\my_phd\dataset\Stage6\stage6_ecp\Perturbations\Attack_FastGradient_test'
 
-    ds = read_from_dir(base_dir=base_dir, ds_label=0)
-    ds_loader = DataLoader(ds, batch_size=1)
-
-    plt_trans = transforms.ToPILImage()
-
-    for data_dict in ds_loader:
-        print(data_dict.keys())
-
-        image = data_dict['image'][0]
-        image_plt = plt_trans(image)
-
-        plt.imshow(image_plt)
-        plt.show()
-
-        break
 
 
 

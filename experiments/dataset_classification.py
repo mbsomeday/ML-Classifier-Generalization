@@ -5,7 +5,7 @@ import numpy as np
 from tqdm import tqdm
 from sklearn.metrics import confusion_matrix
 
-from data.dataset import my_dataset, read_from_dir
+from data.dataset import my_dataset, read_from_dirs
 from training.callbacks import EarlyStopping
 from utils.utils import get_obj_from_str, DEVICE, DotDict, load_model
 from utils.plt_func import plot_cm
@@ -224,7 +224,7 @@ class DS_Classifier():
         plot_cm(y_true, y_pred, classes=['D1', 'D2', 'D3'], normalize=False)
 
 
-def ds_cls_from_dir(opts):
+def ds_cls_from_dirs(opts):
 
     # model
     ds_model = get_obj_from_str(opts.ds_model_obj)(weights=None, progress=True, num_classes=3).to(DEVICE)
@@ -232,7 +232,7 @@ def ds_cls_from_dir(opts):
     ds_model.eval()
 
     # data
-    test_dataset = read_from_dir(base_dir=opts.dir_path, ds_label=opts.ds_label)
+    test_dataset = read_from_dirs(ds_dir_list=opts.ds_dir_list, ds_label_list=opts.ds_label)
     test_loader = DataLoader(test_dataset, batch_size=opts.test_batch_size)
 
     test_correct_num = 0

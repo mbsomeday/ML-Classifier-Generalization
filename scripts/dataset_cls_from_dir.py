@@ -1,3 +1,11 @@
+'''
+    本部分代码用dataset classifier直接测试dir_path下的图片属于哪个数据集
+    ds_path结构：
+        pedestrian
+        nonPedestrian
+'''
+
+
 # 将上级目录加入 sys.path， 防止命令行运行时找不到包
 import os, sys
 curPath = os.path.abspath(os.path.dirname(__file__))
@@ -6,13 +14,13 @@ sys.path.append(root_path)
 
 import argparse
 
-from experiments.dataset_classification import ds_cls_from_dir
+from experiments.dataset_classification import ds_cls_from_dirs
 
 def get_opts():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--dir_path', type=str, default=r'E:\Bias_Reduction_Summary\Datasets\Perturbations\D1_perturb')
-    parser.add_argument('--ds_label', type=int, default=0)
+    parser.add_argument('--ds_dir_list', nargs='+', default=[r'E:\Bias_Reduction_Summary\Datasets\Perturbations\D1_perturb'])
+    parser.add_argument('--ds_label', nargs='+', default=[0])
 
     parser.add_argument('--ds_model_obj', default='torchvision.models.efficientnet_b0'),
 
@@ -27,4 +35,4 @@ def get_opts():
 
 
 opts = get_opts()
-ds_cls_from_dir(opts)
+ds_cls_from_dirs(opts)
