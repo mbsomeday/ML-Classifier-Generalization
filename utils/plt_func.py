@@ -132,6 +132,7 @@ def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Bl
         title: 图表标题
         cmap: 颜色映射
     """
+    print(f'cm函数中的classes：{classes}')
 
     # 计算混淆矩阵
     cm = confusion_matrix(y_true, y_pred)
