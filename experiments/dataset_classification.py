@@ -225,6 +225,7 @@ class DS_Classifier():
 
 
 def ds_cls_from_dirs(opts):
+    print(f'Machine: {torch.cuda.get_device_name(0)}')
 
     # model
     ds_model = get_obj_from_str(opts.ds_model_obj)(weights=None, progress=True, num_classes=3).to(DEVICE)
