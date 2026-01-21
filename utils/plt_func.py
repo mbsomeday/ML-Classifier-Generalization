@@ -11,6 +11,7 @@
             ...
         绘制train/val的 balanced acc和loss随epoch的变化曲线
 '''
+import os.path
 import re
 import matplotlib.pyplot as plt
 import numpy as np
@@ -122,7 +123,7 @@ def plot_training_curves(data, save_path=None):
     plt.close()
 
 
-def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Blues, save_path=None):
+def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Blues, cm_save_dir=None):
     """
         y_true: 真实标签
         y_pred: 预测标签
@@ -158,7 +159,8 @@ def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Bl
     ax.set_ylabel('True Label', fontsize=14)
 
     # 保存或显示图片
-    if save_path:
+    if cm_save_dir:
+        save_path = os.path.join(cm_save_dir, 'cm.png')
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         print(f"图片已保存到: {save_path}")
 

@@ -259,7 +259,7 @@ def ds_cls_from_dirs(opts):
     print(f'Test accuracy:{test_accuracy:.6f}\n')
     print(f'cm:{cm}')
 
-    plot_cm(y_true, y_pred, classes=opts.ds_label_list, normalize=False)
+    plot_cm(y_true, y_pred, classes=opts.ds_label_list, normalize=False, cm_save_dir=opts.cm_save_dir)
 
 
 
