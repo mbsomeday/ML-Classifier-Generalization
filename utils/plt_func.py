@@ -122,7 +122,7 @@ def plot_training_curves(data, save_path=None):
     plt.close()
 
 
-def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Blues):
+def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Blues, save_path=None):
     """
         y_true: 真实标签
         y_pred: 预测标签
@@ -157,9 +157,16 @@ def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Bl
     ax.set_xlabel('Predicted Label', fontsize=14)
     ax.set_ylabel('True Label', fontsize=14)
 
+    # 保存或显示图片
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"图片已保存到: {save_path}")
+
     # 调整布局
     plt.tight_layout()
     plt.show()
+
+
 
 
 

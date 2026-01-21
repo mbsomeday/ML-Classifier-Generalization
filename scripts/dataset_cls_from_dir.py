@@ -20,7 +20,7 @@ def get_opts():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--ds_dir_list', nargs='+', default=[r'E:\Bias_Reduction_Summary\Datasets\Perturbations\D1_perturb'])
-    parser.add_argument('--ds_label', nargs='+', default=[0])
+    parser.add_argument('--ds_label_list', nargs='+', default=[0])
 
     parser.add_argument('--ds_model_obj', default='torchvision.models.efficientnet_b0'),
 

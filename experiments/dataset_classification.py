@@ -232,7 +232,7 @@ def ds_cls_from_dirs(opts):
     ds_model.eval()
 
     # data
-    test_dataset = read_from_dirs(ds_dir_list=opts.ds_dir_list, ds_label_list=opts.ds_label)
+    test_dataset = read_from_dirs(ds_dir_list=opts.ds_dir_list, ds_label_list=opts.ds_label_list)
     test_loader = DataLoader(test_dataset, batch_size=opts.test_batch_size)
 
     test_correct_num = 0
@@ -253,11 +253,13 @@ def ds_cls_from_dirs(opts):
             y_pred.extend(preds.cpu().numpy())
 
     test_accuracy = test_correct_num / len(test_dataset)
+    cm = confusion_matrix(y_true, y_pred)
 
     print(f'test_correct_num/all_samples:{test_correct_num} / {len(test_dataset)}')
     print(f'Test accuracy:{test_accuracy:.6f}\n')
+    print(f'cm:{cm}')
 
-
+    plot_cm(y_true, y_pred, classes=opts.ds_label_list, normalize=False)
 
 
 
