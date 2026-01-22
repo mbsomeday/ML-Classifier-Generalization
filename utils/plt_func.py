@@ -163,7 +163,7 @@ def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Bl
 
     # 保存或显示图片
     if cm_save_dir:
-        save_path = os.path.join(cm_save_dir, 'cm.png')
+        save_path = os.path.join(cm_save_dir, title+'.png')
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         print(f"图片已保存到: {save_path}")
 

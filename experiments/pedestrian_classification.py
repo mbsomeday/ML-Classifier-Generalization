@@ -8,6 +8,7 @@ from tqdm import tqdm
 from data.dataset import my_dataset, read_from_dir
 from utils.utils import DEVICE, get_obj_from_str, DotDict, load_model
 from training.callbacks import EarlyStopping, Model_Logger
+from utils.plt_func import plot_cm
 
 
 
@@ -312,6 +313,8 @@ class Ped_Classifier():
 
             with open(write_to_txt, 'a') as f:
                 f.write(f'{ds_name}, {test_bc:.6f}, {test_nonPed_acc:.4f}, {test_ped_acc:.4f}, {tn}, {fp}, {fn}, {tp}\n')
+
+            plot_cm(y_true=y_true, y_pred=y_pred, normalize=False, title=self.opts.cm_title, cm_save_dir=self.opts.cm_save_dir)
 
 
     # def update_learning_rate(self, epoch):
