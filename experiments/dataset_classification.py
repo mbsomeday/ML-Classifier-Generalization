@@ -193,7 +193,7 @@ class DS_Classifier():
                 break
 
     def test(self):
-        self.ds_model = load_model(self.ds_model, self.opts.ds_weights_path)
+        self.ds_model = load_model(self.ds_model, self.opts.ds_weights_path).to(DEVICE)
         self.ds_model.eval()
 
         test_dataset = my_dataset(self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.test_txt_name, ds_labels=self.opts.ds_labels)
@@ -260,7 +260,12 @@ def ds_cls_from_dirs(opts):
     print(f'Test accuracy:{test_accuracy:.6f}\n')
     print(f'cm:{cm}')
 
-    plot_cm(y_true, y_pred, classes=opts.ds_label_list, title=opts.cm_title, normalize=True, cm_save_dir=opts.cm_save_dir)
+    ds_label_list = []
+    for item in opts.ds_label_list:
+        cur_item = 'D' + str(int(item) + 1)
+        ds_label_list.append(cur_item)
+
+    plot_cm(y_true, y_pred, classes=ds_label_list, title=opts.cm_title, normalize=True, cm_save_dir=opts.cm_save_dir)
 
 
 

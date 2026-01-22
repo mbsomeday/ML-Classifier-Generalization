@@ -25,12 +25,11 @@ def get_opts():
     parser.add_argument('--ds_model_obj', default='torchvision.models.efficientnet_b0'),
 
     # test
-    parser.add_argument('--ds_weights_path',
-                        default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
+    parser.add_argument('--ds_weights_path', default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
     parser.add_argument('--test_batch_size', type=int, default=2)
+    parser.add_argument('--save_plt', action='store_true', help='not save CM by default')
     parser.add_argument('--cm_save_dir', type=str, default=None)
     parser.add_argument('--cm_title', type=str, default=None)
-
 
     opts = parser.parse_args()
 
