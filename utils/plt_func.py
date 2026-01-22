@@ -144,7 +144,7 @@ def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Bl
     sns.set(font_scale=1.2)
 
     # 绘制热力图
-    ax = sns.heatmap(cm, annot=True, fmt='.2f' if normalize else 'd',
+    ax = sns.heatmap(cm, annot=True, fmt='.4f' if normalize else 'd',
                      cmap=cmap, square=True,
                      xticklabels=classes, yticklabels=classes,
                      cbar_kws={"shrink": 0.8})
