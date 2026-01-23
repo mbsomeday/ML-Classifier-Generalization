@@ -53,7 +53,7 @@ def get_opts():
 # ### 用于perturbation + augmentation
 
 
-def gen_part_aug(opts):
+def gen_perturb_aug(opts):
     # dataset
     train_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key='Stage6_org', txt_name='train.txt')
     train_loader = DataLoader(train_dataset, batch_size=opts.batch_size, shuffle=False)
@@ -110,14 +110,16 @@ def gen_part_aug(opts):
         # 将不同glayer的cam合并
         resized_hp = []
         for hp in cam:
+            print(hp.size())
             hp = plt_transformer(hp)
             hp = hp.resize((224, 224), resample=Image.BICUBIC)
             cur_hp = tensor_transformer(hp).unsqueeze(0)
             resized_hp.append(cur_hp)
+
         vis_heatmaps = torch.cat(resized_hp, dim=0)
         comb_layercam = torch.sum(vis_heatmaps, 0).unsqueeze(0)
         (cam_min, cam_max) = (comb_layercam.min(), comb_layercam.max())
-        norm_cam = (comb_layercam - cam_min) / (((cam_max - cam_min) + 1e-08)).data
+        norm_cam = (comb_layercam - cam_min) / (((cam_max - cam_min) + 1e-08))
 
         plt_cam = plt_transformer(norm_cam[0])
 
@@ -127,13 +129,14 @@ def gen_part_aug(opts):
         # cam_mask = cam_array >= (0.4 * cam_array.max())       # 将图像感兴趣的区域保留
         plt_mask = cam_mask * 1.0
 
+        print(f'plt_mask:{plt_mask.shape}')
         plt_mask = plt_mask[np.newaxis, :]
-        plt_mask.to(DEVICE)
+        print(f'plt_mask:{plt_mask.shape}')
+        plt_mask = torch.from_numpy(plt_mask).float().to(DEVICE)
 
         # 加载perturb图片
         perturb_image_path = os.path.join(opts.perturb_dir, cls_name, img_name)
         perturb_image = Image.open(perturb_image_path).convert('RGB')
-        perturb_image.to(DEVICE)
 
         # 进行的图片扩增
         # 这里要注意，如果是flip和rotate，需要先将perturbation与org image结合，然后再进行aug操作，否则，CAM对应的位置会变
@@ -143,14 +146,14 @@ def gen_part_aug(opts):
 
         # aug操作为flip和rotate，
         if random_aug_id == 0 or random_aug_id == 1:
-            perturb_and_org = transforms.ToTensor()(perturb_image) * (1 - plt_mask) + image[0] * plt_mask
+            perturb_and_org = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + image[0] * plt_mask
             perturb_and_aug = cur_aug_operation(perturb_and_org)
 
         else:
             # 直接将perturb与org图片合并
             aug_image = cur_aug_operation(plt_transformer(image[0]))
             aug_image_tensor = tensor_transformer(aug_image)
-            perturb_and_aug = transforms.ToTensor()(perturb_image) * (1 - plt_mask) + aug_image_tensor * plt_mask
+            perturb_and_aug = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + aug_image_tensor * plt_mask
 
         save_perturbAug_name = os.path.splitext(img_name)[0] + '_perturb' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
         save_perturbAug_path = os.path.join(opts.perturbAug_save_dir, cls_name, save_perturbAug_name)
@@ -189,8 +192,8 @@ def gen_part_aug(opts):
         #
         # # 显示图片
         # plt.show()
-
-
+        #
+        #
         # break
 
 
@@ -279,7 +282,7 @@ if __name__ == '__main__':
     # gen_perturbation_image(opts)
 
     # 将perturbation与aug结合生成新图片
-    gen_part_aug(opts)
+    gen_perturb_aug(opts)
 
 
 
