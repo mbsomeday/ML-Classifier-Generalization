@@ -42,8 +42,8 @@ def get_opts():
     parser.add_argument('--perturb_save_dir', type=str, default=None)
 
     # 生成perturbation+aug图片
-    parser.add_argument('--perturb_dir', type=str, default=r'E:\Bias_Reduction_Summary\Datasets\Operations\Only Perturbations\test_set\D2_perturb')
-    parser.add_argument('--perturbAug_save_dir', type=str, default=r'E:\Bias_Reduction_Summary\Datasets\Operations\Only Perturbations\D2_CityPersons')
+    parser.add_argument('--perturb_dir', type=str, default=None)
+    parser.add_argument('--perturbAug_save_dir', type=str, default=None)
 
     opts = parser.parse_args()
 
