@@ -42,8 +42,8 @@ def get_opts():
     parser.add_argument('--perturb_save_dir', type=str, default=None)
 
     # 生成perturbation+aug图片
-    parser.add_argument('--perturb_dir', type=str, default=r'E:\Bias_Reduction_Summary\Datasets\Operations\Only Perturbations\test_set\D2_perturb')
-    # parser.add_argument('--perturb_dir', type=str, default=None)
+    # parser.add_argument('--perturb_dir', type=str, default=r'E:\Bias_Reduction_Summary\Datasets\Operations\Only Perturbations\test_set\D2_perturb')
+    parser.add_argument('--perturb_dir', type=str, default=None)
     parser.add_argument('--compondImg_save_dir', type=str, default=None)
 
     opts = parser.parse_args()
@@ -142,7 +142,7 @@ def gen_perturb_aug(opts):
         random_aug_id = random.randint(0, len(aug_list) - 1)
         cur_aug_operation = aug_list[random_aug_id]
 
-        # perturb对应mask的黑色部分，aug对应mask的白色部分
+        # 不论mask如何，perturb都对应mask的黑色部分，aug对应mask的白色部分
         # aug操作为flip和rotate，
         if random_aug_id == 0 or random_aug_id == 1:
             perturb_and_org = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + image[0] * plt_mask
