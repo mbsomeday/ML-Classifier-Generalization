@@ -83,8 +83,8 @@ KAGGLE = {
         'D3': r'/kaggle/input/stage6-dataset-bdd100k',
     },
 
-    'Stage6_fade': {
-        'D1': r'/kaggle/input/stage6-dataset-ecp',
+    'Stage6_experiment': {
+        'D2': r'/kaggle/input/stage6-dataset-citypersons-experiment',
 
     },
 
