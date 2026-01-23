@@ -104,8 +104,6 @@ def gen_part_aug(opts):
         image_path = data_dict['img_path'][0]
         cls_name = image_path.split(os.sep)[-2]
 
-        print(f'image_path:{image_path}')
-
         ds_out = dataset_classifier(image)
         cam = layerCam_extractor(ds_out.squeeze(0).argmax().item(), ds_out)
 
@@ -191,8 +189,7 @@ def gen_part_aug(opts):
         # plt.show()
 
 
-
-        break
+        # break
 
 
 def gen_perturbation_image(opts):
