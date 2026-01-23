@@ -128,9 +128,7 @@ def gen_perturb_aug(opts):
         # cam_mask = cam_array >= (0.4 * cam_array.max())       # 将图像感兴趣的区域保留
         plt_mask = cam_mask * 1.0
 
-        print(f'plt_mask:{plt_mask.shape}')
         plt_mask = plt_mask[np.newaxis, :]
-        print(f'plt_mask:{plt_mask.shape}')
         plt_mask = torch.from_numpy(plt_mask).float().to(DEVICE)
 
         # 加载perturb图片
@@ -141,7 +139,6 @@ def gen_perturb_aug(opts):
         # 这里要注意，如果是flip和rotate，需要先将perturbation与org image结合，然后再进行aug操作，否则，CAM对应的位置会变
         random_aug_id = random.randint(0, len(aug_list) - 1)
         cur_aug_operation = aug_list[random_aug_id]
-        print(f'cur_aug_operation:{cur_aug_operation}')
 
         # aug操作为flip和rotate，
         if random_aug_id == 0 or random_aug_id == 1:
