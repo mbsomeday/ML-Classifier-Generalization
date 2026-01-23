@@ -141,14 +141,14 @@ def gen_part_aug(opts):
 
         # aug操作为flip和rotate，
         if random_aug_id == 0 or random_aug_id == 1:
-            perturb_and_org = transforms.ToTensor()(perturb_image) * (1 - plt_mask) + image[0] * plt_mask
+            perturb_and_org = transforms.ToTensor()(perturb_image) * (1 - plt_mask) + image[0].cpu.numpy() * plt_mask
             perturb_and_aug = cur_aug_operation(perturb_and_org)
 
         else:
             # 直接将perturb与org图片合并
             aug_image = cur_aug_operation(plt_transformer(image[0]))
             aug_image_tensor = tensor_transformer(aug_image)
-            perturb_and_aug = transforms.ToTensor()(perturb_image) * (1 - plt_mask) + aug_image_tensor * plt_mask
+            perturb_and_aug = transforms.ToTensor()(perturb_image) * (1 - plt_mask) + aug_image_tensor.cpu.numpy() * plt_mask
 
         save_perturbAug_name = os.path.splitext(img_name)[0] + '_perturb' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
         save_perturbAug_path = os.path.join(opts.perturbAug_save_dir, cls_name, save_perturbAug_name)
