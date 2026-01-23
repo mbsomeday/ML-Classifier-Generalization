@@ -110,7 +110,6 @@ def gen_perturb_aug(opts):
         # 将不同glayer的cam合并
         resized_hp = []
         for hp in cam:
-            print(hp.size())
             hp = plt_transformer(hp)
             hp = hp.resize((224, 224), resample=Image.BICUBIC)
             cur_hp = tensor_transformer(hp).unsqueeze(0)
@@ -152,7 +151,7 @@ def gen_perturb_aug(opts):
         else:
             # 直接将perturb与org图片合并
             aug_image = cur_aug_operation(plt_transformer(image[0]))
-            aug_image_tensor = tensor_transformer(aug_image)
+            aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
             perturb_and_aug = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + aug_image_tensor * plt_mask
 
         save_perturbAug_name = os.path.splitext(img_name)[0] + '_perturb' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
