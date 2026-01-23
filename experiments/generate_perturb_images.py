@@ -42,6 +42,7 @@ def get_opts():
     parser.add_argument('--perturb_save_dir', type=str, default=None)
 
     # 生成perturbation+aug图片
+    # parser.add_argument('--perturb_dir', type=str, default=r'E:\Bias_Reduction_Summary\Datasets\Operations\Only Perturbations\test_set\D2_perturb')
     parser.add_argument('--perturb_dir', type=str, default=None)
     parser.add_argument('--perturbAug_save_dir', type=str, default=None)
 
@@ -124,12 +125,13 @@ def gen_perturb_aug(opts):
 
         # 生成mask
         cam_array = np.array(plt_cam)
-        cam_mask = cam_array < (0.5 * cam_array.max())  # 将图像不感兴趣的区域保留
-        # cam_mask = cam_array >= (0.4 * cam_array.max())       # 将图像感兴趣的区域保留
+        # cam_mask = cam_array < (0.5 * cam_array.max())
+        cam_mask = cam_array >= (0.5 * cam_array.max())
         plt_mask = cam_mask * 1.0
 
         plt_mask = plt_mask[np.newaxis, :]
         plt_mask = torch.from_numpy(plt_mask).float().to(DEVICE)
+
 
         # 加载perturb图片
         perturb_image_path = os.path.join(opts.perturb_dir, cls_name, img_name)

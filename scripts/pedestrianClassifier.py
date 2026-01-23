@@ -38,7 +38,7 @@ def get_args():
     parser.add_argument('--patience', type=int, default=10)
     parser.add_argument('--warmup_epochs', type=int, default=3)
     parser.add_argument('--monitored_metric', type=str, default='loss')
-    parser.add_argument('--exp_name', type=str, default='')
+    parser.add_argument('--exp_name', type=str, default='', help='the name of the experiment, used for the dir name')
 
     # train with perturb+aug imagse
     parser.add_argument('--perturb_dir', type=str, default='', help='A temporal variable, for loading perturbed data')
