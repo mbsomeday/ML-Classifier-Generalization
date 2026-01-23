@@ -44,7 +44,7 @@ def get_opts():
     # 生成perturbation+aug图片
     # parser.add_argument('--perturb_dir', type=str, default=r'E:\Bias_Reduction_Summary\Datasets\Operations\Only Perturbations\test_set\D2_perturb')
     parser.add_argument('--perturb_dir', type=str, default=None)
-    parser.add_argument('--perturbAug_save_dir', type=str, default=None)
+    parser.add_argument('--compondImg_save_dir', type=str, default=None)
 
     opts = parser.parse_args()
 
@@ -154,7 +154,7 @@ def gen_perturb_aug(opts):
             perturb_and_aug = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + aug_image_tensor * plt_mask
 
         save_perturbAug_name = os.path.splitext(img_name)[0] + '_perturb' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
-        save_perturbAug_path = os.path.join(opts.perturbAug_save_dir, cls_name, save_perturbAug_name)
+        save_perturbAug_path = os.path.join(opts.compondImg_save_dir, cls_name, save_perturbAug_name)
         save_image_tensor(perturb_and_aug.unsqueeze(0), save_perturbAug_path)
 
         # print(f'save_perturbAug_name:{save_perturbAug_name}')
