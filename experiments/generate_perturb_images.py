@@ -34,8 +34,11 @@ def get_opts():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--ds_name_list', nargs='+', default=['D2'])
-    parser.add_argument('--ds_weights_path', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
     parser.add_argument('--txt_name', type=str, default='train.txt')
+    parser.add_argument('--num_classes', type=int, default=2, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
+    parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\baselines\D2\efficientNetB0_D2_51_Baseline-19-2.00064.pth')
+
+    # parser.add_argument('--ds_weights_path', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
     parser.add_argument('--batch_size', type=int, default=1)
 
     # 生成perturbation图片
@@ -56,17 +59,22 @@ def get_opts():
 
 def gen_perturb_aug(opts):
     # dataset
-    train_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key='Stage6_org', txt_name='train.txt')
+    train_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key='Stage6_org', txt_name=opts.txt_name)
     train_loader = DataLoader(train_dataset, batch_size=opts.batch_size, shuffle=False)
 
     # model
-    dataset_classifier = models.efficientnet_b0(weights=None, num_classes=3)
-    dataset_classifier = load_model(dataset_classifier, opts.ds_weights_path)
-    dataset_classifier = dataset_classifier.to(DEVICE).eval()
+    get_classifier = models.efficientnet_b0(weights=None, num_classes=opts.num_classes)
+    get_classifier = load_model(get_classifier, opts.model_weights)
+    get_classifier = get_classifier.to(DEVICE).eval()
+
+    # # model
+    # dataset_classifier = models.efficientnet_b0(weights=None, num_classes=3)
+    # dataset_classifier = load_model(dataset_classifier, opts.ds_weights_path)
+    # dataset_classifier = dataset_classifier.to(DEVICE).eval()
 
     # 选择CAM算法
     grad_layer = ['features.0', 'features.1', 'features.2', 'features.3', 'features.4', 'features.5', 'features.6', 'features.7', 'features.8']
-    layerCam_extractor = LayerCAM(dataset_classifier, target_layer=grad_layer)
+    layerCam_extractor = LayerCAM(get_classifier, target_layer=grad_layer)
 
     # transformers
     plt_transformer = transforms.ToPILImage()
@@ -105,8 +113,8 @@ def gen_perturb_aug(opts):
         image_path = data_dict['img_path'][0]
         cls_name = image_path.split(os.sep)[-2]
 
-        ds_out = dataset_classifier(image)
-        cam = layerCam_extractor(ds_out.squeeze(0).argmax().item(), ds_out)
+        out = get_classifier(image)
+        cam = layerCam_extractor(out.squeeze(0).argmax().item(), out)
 
         # 将不同glayer的cam合并
         resized_hp = []
@@ -205,15 +213,20 @@ def gen_perturbation_image(opts):
     train_loader = DataLoader(train_dataset, batch_size=opts.batch_size, shuffle=False)
 
     # model
-    dataset_classifier = models.efficientnet_b0(weights=None, num_classes=3)
-    dataset_classifier = load_model(dataset_classifier, opts.ds_weights_path)
-    dataset_classifier = dataset_classifier.to(DEVICE).eval()
+    get_classifier = models.efficientnet_b0(weights=None, num_classes=opts.num_classes)
+    get_classifier = load_model(get_classifier, opts.model_weights)
+    get_classifier = get_classifier.to(DEVICE).eval()
+
+    # # model
+    # dataset_classifier = models.efficientnet_b0(weights=None, num_classes=3)
+    # dataset_classifier = load_model(dataset_classifier, opts.ds_weights_path)
+    # dataset_classifier = dataset_classifier.to(DEVICE).eval()
 
     # 对图片进行perturbation
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(dataset_classifier.parameters(), lr=0.01)
+    optimizer = optim.Adam(get_classifier.parameters(), lr=0.01)
     classifier = PyTorchClassifier(
-        model=dataset_classifier,
+        model=get_classifier,
         loss=criterion,
         optimizer=optimizer,
         input_shape=(3, 224, 224),
@@ -261,7 +274,7 @@ def gen_perturbation_image(opts):
         # plt.imshow(np.clip(perturb_image, 0, 1))
         # plt.title('Perturbated Image')
         # plt.show()
-
+        #
         # break
 
 
@@ -276,11 +289,11 @@ if __name__ == '__main__':
     opts = get_opts()
     print(opts)
 
-    # # 生成perturbation图片
-    # gen_perturbation_image(opts)
+    # 生成perturbation图片
+    gen_perturbation_image(opts)
 
     # 将perturbation与aug结合生成新图片
-    gen_perturb_aug(opts)
+    # gen_perturb_aug(opts)
 
 
 
