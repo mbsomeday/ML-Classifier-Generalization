@@ -209,7 +209,7 @@ def gen_perturbation_image(opts):
     '''
 
     # dataset
-    train_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key='Stage6_org', txt_name='train.txt')
+    train_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key='Stage6_org', txt_name=opts.txt_name)
     train_loader = DataLoader(train_dataset, batch_size=opts.batch_size, shuffle=False)
 
     # model
