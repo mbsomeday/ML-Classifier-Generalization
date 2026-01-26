@@ -39,6 +39,7 @@ def get_opts():
     parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\baselines\D2\efficientNetB0_D2_51_Baseline-19-2.00064.pth')
 
     # parser.add_argument('--ds_weights_path', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
+    parser.add_argument('--path_key', type=str, default='Stage6_org')
     parser.add_argument('--batch_size', type=int, default=1)
 
     # 生成perturbation图片
@@ -135,7 +136,7 @@ def gen_perturbation_image(opts):
 
 def gen_perturb_aug(opts):
     # dataset
-    train_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key='Stage6_org', txt_name=opts.txt_name)
+    train_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key=opts.path_key, txt_name=opts.txt_name)
     train_loader = DataLoader(train_dataset, batch_size=opts.batch_size, shuffle=False)
 
     # model
