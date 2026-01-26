@@ -45,8 +45,8 @@ def get_opts():
     parser.add_argument('--perturb_save_dir', type=str, default=None)
 
     # 生成perturbation+aug图片
-    # parser.add_argument('--perturb_dir', type=str, default=r'E:\Bias_Reduction_Summary\Datasets\Operations\Only Perturbations\test_set\D2_perturb')
-    parser.add_argument('--perturb_dir', type=str, default=None)
+    parser.add_argument('--perturb_dir', type=str, default=r'D:\my_phd\dataset\Stage6\stage6_citypersons\Processor\M2CAM\onlyPurturbations\train')
+    # parser.add_argument('--perturb_dir', type=str, default=None)
     parser.add_argument('--compondImg_save_dir', type=str, default=None)
 
     opts = parser.parse_args()
@@ -56,6 +56,82 @@ def get_opts():
 
 # ### 用于perturbation + augmentation
 
+
+
+
+def gen_perturbation_image(opts):
+    '''
+        生成整张perturbated的图片
+    '''
+
+    # dataset
+    train_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key='Stage6_org', txt_name=opts.txt_name)
+    train_loader = DataLoader(train_dataset, batch_size=opts.batch_size, shuffle=False)
+
+    # model
+    get_classifier = models.efficientnet_b0(weights=None, num_classes=opts.num_classes)
+    get_classifier = load_model(get_classifier, opts.model_weights)
+    get_classifier = get_classifier.to(DEVICE).eval()
+
+    # # model
+    # dataset_classifier = models.efficientnet_b0(weights=None, num_classes=3)
+    # dataset_classifier = load_model(dataset_classifier, opts.ds_weights_path)
+    # dataset_classifier = dataset_classifier.to(DEVICE).eval()
+
+    # 对图片进行perturbation
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(get_classifier.parameters(), lr=0.01)
+    classifier = PyTorchClassifier(
+        model=get_classifier,
+        loss=criterion,
+        optimizer=optimizer,
+        input_shape=(3, 224, 224),
+        nb_classes=3,
+    )
+    pertub_method = FastGradientMethod(estimator=classifier, eps=0.04)
+
+    save_ped_dir = os.path.join(opts.perturb_save_dir, 'pedestrian')
+    save_noPed_dir = os.path.join(opts.perturb_save_dir, 'nonPedestrian')
+    if not os.path.exists(save_ped_dir):
+        os.mkdir(save_ped_dir)
+    if not os.path.exists(save_noPed_dir):
+        os.mkdir(save_noPed_dir)
+
+    # 循环遍历
+    for data_dict in tqdm(train_loader):
+        image = data_dict['image']  # tensor [n, 3, 224, 224]
+        img_name = data_dict['img_name'][0]
+        image_np = image.numpy()  # nparray [1, 3, 224, 224]
+
+        img_label = int(data_dict['ped_label'][0])
+        label = 'nonPedestrian' if img_label == 0 else 'pedestrian'
+
+        # 生成perturb图片
+        perturb_image = pertub_method.generate(x=image_np)
+        perturb_image = perturb_image[0].transpose((1, 2, 0))
+        perturb_tensor = torch.from_numpy(perturb_image).permute(2, 0, 1).unsqueeze(0)
+
+        # 保存perturb图片
+        save_path = os.path.join(opts.perturb_save_dir, label, img_name)
+        save_image_tensor(input_tensor=perturb_tensor, filename=save_path)
+
+        # # 结果对比
+        # org_out = dataset_classifier(image)
+        # print(f'\norg:{torch.softmax(org_out, dim=1)}')
+        # att_out = dataset_classifier(perturb_tensor)
+        # print(f'att:{torch.softmax(att_out, dim=1)}')
+        #
+        # # 展示图片
+        # plt.figure()
+        # plt.subplot(1, 2, 1)
+        # plt.imshow(transforms.ToPILImage()(image[0]))
+        # plt.title('Original Image')
+        # plt.subplot(1, 2, 2)
+        # plt.imshow(np.clip(perturb_image, 0, 1))
+        # plt.title('Perturbated Image')
+        # plt.show()
+        #
+        # break
 
 def gen_perturb_aug(opts):
     # dataset
@@ -140,7 +216,6 @@ def gen_perturb_aug(opts):
         plt_mask = plt_mask[np.newaxis, :]
         plt_mask = torch.from_numpy(plt_mask).float().to(DEVICE)
 
-
         # 加载perturb图片
         perturb_image_path = os.path.join(opts.perturb_dir, cls_name, img_name)
         perturb_image = Image.open(perturb_image_path).convert('RGB')
@@ -203,82 +278,6 @@ def gen_perturb_aug(opts):
         # break
 
 
-def gen_perturbation_image(opts):
-    '''
-        生成整张perturbated的图片
-    '''
-
-    # dataset
-    train_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key='Stage6_org', txt_name=opts.txt_name)
-    train_loader = DataLoader(train_dataset, batch_size=opts.batch_size, shuffle=False)
-
-    # model
-    get_classifier = models.efficientnet_b0(weights=None, num_classes=opts.num_classes)
-    get_classifier = load_model(get_classifier, opts.model_weights)
-    get_classifier = get_classifier.to(DEVICE).eval()
-
-    # # model
-    # dataset_classifier = models.efficientnet_b0(weights=None, num_classes=3)
-    # dataset_classifier = load_model(dataset_classifier, opts.ds_weights_path)
-    # dataset_classifier = dataset_classifier.to(DEVICE).eval()
-
-    # 对图片进行perturbation
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(get_classifier.parameters(), lr=0.01)
-    classifier = PyTorchClassifier(
-        model=get_classifier,
-        loss=criterion,
-        optimizer=optimizer,
-        input_shape=(3, 224, 224),
-        nb_classes=3,
-    )
-    pertub_method = FastGradientMethod(estimator=classifier, eps=0.04)
-
-    save_ped_dir = os.path.join(opts.perturb_save_dir, 'pedestrian')
-    save_noPed_dir = os.path.join(opts.perturb_save_dir, 'nonPedestrian')
-    if not os.path.exists(save_ped_dir):
-        os.mkdir(save_ped_dir)
-    if not os.path.exists(save_noPed_dir):
-        os.mkdir(save_noPed_dir)
-
-    # 循环遍历
-    for data_dict in tqdm(train_loader):
-        image = data_dict['image']  # tensor [n, 3, 224, 224]
-        img_name = data_dict['img_name'][0]
-        image_np = image.numpy()  # nparray [1, 3, 224, 224]
-
-        img_label = int(data_dict['ped_label'][0])
-        label = 'nonPedestrian' if img_label == 0 else 'pedestrian'
-
-        # 生成perturb图片
-        perturb_image = pertub_method.generate(x=image_np)
-        perturb_image = perturb_image[0].transpose((1, 2, 0))
-        perturb_tensor = torch.from_numpy(perturb_image).permute(2, 0, 1).unsqueeze(0)
-
-        # 保存perturb图片
-        save_path = os.path.join(opts.perturb_save_dir, label, img_name)
-        save_image_tensor(input_tensor=perturb_tensor, filename=save_path)
-
-        # # 结果对比
-        # org_out = dataset_classifier(image)
-        # print(f'\norg:{torch.softmax(org_out, dim=1)}')
-        # att_out = dataset_classifier(perturb_tensor)
-        # print(f'att:{torch.softmax(att_out, dim=1)}')
-        #
-        # # 展示图片
-        # plt.figure()
-        # plt.subplot(1, 2, 1)
-        # plt.imshow(transforms.ToPILImage()(image[0]))
-        # plt.title('Original Image')
-        # plt.subplot(1, 2, 2)
-        # plt.imshow(np.clip(perturb_image, 0, 1))
-        # plt.title('Perturbated Image')
-        # plt.show()
-        #
-        # break
-
-
-
 
 
 
@@ -289,11 +288,11 @@ if __name__ == '__main__':
     opts = get_opts()
     print(opts)
 
-    # 生成perturbation图片
-    gen_perturbation_image(opts)
+    # # 生成perturbation图片
+    # gen_perturbation_image(opts)
 
     # 将perturbation与aug结合生成新图片
-    # gen_perturb_aug(opts)
+    gen_perturb_aug(opts)
 
 
 
