@@ -210,8 +210,8 @@ def gen_perturb_aug(opts):
 
         # 生成mask
         cam_array = np.array(plt_cam)
-        # cam_mask = cam_array < (0.5 * cam_array.max())        # 值高的部分为黑色
-        cam_mask = cam_array >= (0.5 * cam_array.max())         # 值低的部分为黑色
+        cam_mask = cam_array < (0.5 * cam_array.max())        # 值高的部分为黑色
+        # cam_mask = cam_array >= (0.5 * cam_array.max())         # 值低的部分为黑色
         plt_mask = cam_mask * 1.0
 
         plt_mask = plt_mask[np.newaxis, :]
@@ -269,12 +269,12 @@ def gen_perturb_aug(opts):
         #
         # plt.subplot(1, plt_imgs, 5)
         # plt.imshow(plt_transformer(perturb_and_aug))
-        # plt.title('Aug + Perturb')
+        # title = f'{aug_name_list[random_aug_id]} + Perturb'
+        # plt.title(title)
         # plt.axis('off')  # 关闭坐标轴
         #
         # # 显示图片
         # plt.show()
-        #
         #
         # break
 
