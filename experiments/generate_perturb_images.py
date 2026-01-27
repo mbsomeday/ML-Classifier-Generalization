@@ -210,8 +210,8 @@ def gen_perturb_aug(opts):
 
         # 生成mask
         cam_array = np.array(plt_cam)
-        cam_mask = cam_array < (0.5 * cam_array.max())        # 值高的部分为黑色
-        # cam_mask = cam_array >= (0.5 * cam_array.max())         # 值低的部分为黑色
+        # cam_mask = cam_array < (0.5 * cam_array.max())        # 值高的部分为黑色
+        cam_mask = cam_array >= (0.5 * cam_array.max())         # 值低的部分为黑色
         plt_mask = cam_mask * 1.0
 
         plt_mask = plt_mask[np.newaxis, :]
@@ -221,6 +221,7 @@ def gen_perturb_aug(opts):
         # 这里要注意，如果是flip和rotate，需要先将perturbation与org image结合，然后再进行aug操作，否则，CAM对应的位置会变
         random_aug_id = random.randint(0, len(aug_list) - 1)
         cur_aug_operation = aug_list[random_aug_id]
+        # random_aug_id = 3       # 仅用于测试
 
         # ---------- 组合augmentation代码 开始 ----------
         if random_aug_id == 0 or random_aug_id == 1:
@@ -231,7 +232,8 @@ def gen_perturb_aug(opts):
             aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
             original_and_org = aug_image_tensor * (1 - plt_mask) + image[0] * plt_mask
 
-        save_AugOrg_name = os.path.splitext(img_name)[0] + aug_name_list[random_aug_id] + 'Org' + os.path.splitext(img_name)[-1]
+        # save_AugOrg_name = os.path.splitext(img_name)[0] + aug_name_list[random_aug_id] + 'Org' + os.path.splitext(img_name)[-1]
+        save_AugOrg_name = os.path.splitext(img_name)[0] + 'Org' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
         save_AugOrg_path = os.path.join(opts.compondImg_save_dir, cls_name, save_AugOrg_name)
         save_image_tensor(original_and_org.unsqueeze(0), save_AugOrg_path)
 
