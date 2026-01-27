@@ -210,8 +210,8 @@ def gen_perturb_aug(opts):
 
         # 生成mask
         cam_array = np.array(plt_cam)
-        # cam_mask = cam_array < (0.5 * cam_array.max())        # 值高的部分为黑色
-        cam_mask = cam_array >= (0.5 * cam_array.max())         # 值低的部分为黑色
+        cam_mask = cam_array < (0.5 * cam_array.max())        # 值高的部分为黑色
+        # cam_mask = cam_array >= (0.5 * cam_array.max())         # 值低的部分为黑色
         plt_mask = cam_mask * 1.0
 
         plt_mask = plt_mask[np.newaxis, :]
@@ -232,8 +232,8 @@ def gen_perturb_aug(opts):
             aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
             original_and_org = aug_image_tensor * (1 - plt_mask) + image[0] * plt_mask
 
-        # save_AugOrg_name = os.path.splitext(img_name)[0] + aug_name_list[random_aug_id] + 'Org' + os.path.splitext(img_name)[-1]
-        save_AugOrg_name = os.path.splitext(img_name)[0] + 'Org' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
+        save_AugOrg_name = os.path.splitext(img_name)[0] + '_' +aug_name_list[random_aug_id] + 'Org' + os.path.splitext(img_name)[-1]
+        # save_AugOrg_name = os.path.splitext(img_name)[0] + '_Org' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
         save_AugOrg_path = os.path.join(opts.compondImg_save_dir, cls_name, save_AugOrg_name)
         save_image_tensor(original_and_org.unsqueeze(0), save_AugOrg_path)
 
