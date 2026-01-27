@@ -217,29 +217,50 @@ def gen_perturb_aug(opts):
         plt_mask = plt_mask[np.newaxis, :]
         plt_mask = torch.from_numpy(plt_mask).float().to(DEVICE)
 
-        # 加载perturb图片
-        perturb_image_path = os.path.join(opts.perturb_dir, cls_name, img_name)
-        perturb_image = Image.open(perturb_image_path).convert('RGB')
-
         # 进行的图片扩增
         # 这里要注意，如果是flip和rotate，需要先将perturbation与org image结合，然后再进行aug操作，否则，CAM对应的位置会变
         random_aug_id = random.randint(0, len(aug_list) - 1)
         cur_aug_operation = aug_list[random_aug_id]
 
-        # 不论mask如何，perturb都对应mask的黑色部分，aug对应mask的白色部分
-        # aug操作为flip和rotate，
+        # ---------- 组合augmentation代码 开始 ----------
         if random_aug_id == 0 or random_aug_id == 1:
-            perturb_and_org = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + image[0] * plt_mask
-            perturb_and_aug = cur_aug_operation(perturb_and_org)
+            original_and_org = cur_aug_operation(image[0])
         else:
-            # 直接将perturb与org图片合并
             aug_image = cur_aug_operation(plt_transformer(image[0]))
+            # aug_image = transforms.Grayscale()(plt_transformer(image[0])) # 灰度用于测试
             aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
-            perturb_and_aug = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + aug_image_tensor * plt_mask
+            original_and_org = aug_image_tensor * (1 - plt_mask) + image[0] * plt_mask
 
-        save_perturbAug_name = os.path.splitext(img_name)[0] + '_perturb' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
-        save_perturbAug_path = os.path.join(opts.compondImg_save_dir, cls_name, save_perturbAug_name)
-        save_image_tensor(perturb_and_aug.unsqueeze(0), save_perturbAug_path)
+        save_AugOrg_name = os.path.splitext(img_name)[0] + aug_name_list[random_aug_id] + 'Org' + os.path.splitext(img_name)[-1]
+        save_AugOrg_path = os.path.join(opts.compondImg_save_dir, cls_name, save_AugOrg_name)
+        save_image_tensor(original_and_org.unsqueeze(0), save_AugOrg_path)
+
+        # ---------- 组合augmentation代码 结束 ----------
+
+
+        # # ---------- 需要用到perturb部分的代码 开始 ----------
+        #
+        # # 加载perturb图片
+        # perturb_image_path = os.path.join(opts.perturb_dir, cls_name, img_name)
+        # perturb_image = Image.open(perturb_image_path).convert('RGB')
+        #
+        # # 不论mask如何，perturb都对应mask的黑色部分，aug对应mask的白色部分
+        # # aug操作为flip和rotate，
+        # if random_aug_id == 0 or random_aug_id == 1:
+        #     perturb_and_org = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + image[0] * plt_mask
+        #     perturb_and_aug = cur_aug_operation(perturb_and_org)
+        # else:
+        #     # 直接将perturb与org图片合并
+        #     aug_image = cur_aug_operation(plt_transformer(image[0]))
+        #     aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
+        #     perturb_and_aug = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + aug_image_tensor * plt_mask
+
+        # save_perturbAug_name = os.path.splitext(img_name)[0] + '_perturb' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
+        # save_perturbAug_path = os.path.join(opts.compondImg_save_dir, cls_name, save_perturbAug_name)
+        # save_image_tensor(perturb_and_aug.unsqueeze(0), save_perturbAug_path)
+
+        # ---------- 需要用到perturb部分的代码 结束 ----------
+
 
         # print(f'save_perturbAug_name:{save_perturbAug_name}')
         # print(f'save_perturbAug_path:{save_perturbAug_path}')
@@ -268,7 +289,7 @@ def gen_perturb_aug(opts):
         # # plt.title('aug')
         #
         # plt.subplot(1, plt_imgs, 5)
-        # plt.imshow(plt_transformer(perturb_and_aug))
+        # plt.imshow(plt_transformer(original_and_org))
         # title = f'{aug_name_list[random_aug_id]} + Perturb'
         # plt.title(title)
         # plt.axis('off')  # 关闭坐标轴
