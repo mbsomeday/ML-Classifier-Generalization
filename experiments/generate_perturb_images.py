@@ -144,10 +144,6 @@ def gen_perturb_aug(opts):
     get_classifier = load_model(get_classifier, opts.model_weights)
     get_classifier = get_classifier.to(DEVICE).eval()
 
-    # # model
-    # dataset_classifier = models.efficientnet_b0(weights=None, num_classes=3)
-    # dataset_classifier = load_model(dataset_classifier, opts.ds_weights_path)
-    # dataset_classifier = dataset_classifier.to(DEVICE).eval()
 
     # 选择CAM算法
     grad_layer = ['features.0', 'features.1', 'features.2', 'features.3', 'features.4', 'features.5', 'features.6', 'features.7', 'features.8']
@@ -210,8 +206,8 @@ def gen_perturb_aug(opts):
 
         # 生成mask
         cam_array = np.array(plt_cam)
-        cam_mask = cam_array < (0.5 * cam_array.max())        # 值高的部分为黑色
-        # cam_mask = cam_array >= (0.5 * cam_array.max())         # 值低的部分为黑色
+        # cam_mask = cam_array < (0.5 * cam_array.max())        # 值高的部分为黑色
+        cam_mask = cam_array >= (0.5 * cam_array.max())         # 值低的部分为黑色
         plt_mask = cam_mask * 1.0
 
         plt_mask = plt_mask[np.newaxis, :]
@@ -232,8 +228,8 @@ def gen_perturb_aug(opts):
             aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
             original_and_org = aug_image_tensor * (1 - plt_mask) + image[0] * plt_mask
 
-        save_AugOrg_name = os.path.splitext(img_name)[0] + '_' +aug_name_list[random_aug_id] + 'Org' + os.path.splitext(img_name)[-1]
-        # save_AugOrg_name = os.path.splitext(img_name)[0] + '_Org' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
+        # save_AugOrg_name = os.path.splitext(img_name)[0] + '_' +aug_name_list[random_aug_id] + 'Org' + os.path.splitext(img_name)[-1]
+        save_AugOrg_name = os.path.splitext(img_name)[0] + '_Org' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
         save_AugOrg_path = os.path.join(opts.compondImg_save_dir, cls_name, save_AugOrg_name)
         save_image_tensor(original_and_org.unsqueeze(0), save_AugOrg_path)
 
