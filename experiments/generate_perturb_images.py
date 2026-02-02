@@ -33,44 +33,44 @@ from utils.utils import load_model, DEVICE, save_image_tensor
 def get_opts():
     parser = argparse.ArgumentParser()
 
-    # 用于云端
-    parser.add_argument('--task', type=str, choices=['perturbed', 'cmbined'], required=True, default=None)
-    parser.add_argument('--ds_name_list', nargs='+')
-    parser.add_argument('--txt_name', type=str)
-    parser.add_argument('--num_classes', type=int, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
-    parser.add_argument('--model_weights', type=str)
-
-    parser.add_argument('--path_key', type=str)
-    parser.add_argument('--batch_size', type=int, default=1)
-
-    # 生成perturbation图片
-    parser.add_argument('--perturb_save_dir', type=str)
-
-    # 生成perturbation+aug图片
-    parser.add_argument('--perturb_dir', type=str)
-    parser.add_argument('--compondImg_save_dir', type=str)
-
-
-    # # 用于本地测试
-    # parser.add_argument('--task', type=str, choices=['perturbed', 'cmbined'], default='perturb')
-    # parser.add_argument('--ds_name_list', nargs='+', default=['D2'])
-    # parser.add_argument('--txt_name', type=str, default='train.txt')
-    # parser.add_argument('--num_classes', type=int, default=3, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
-    # parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
+    # # 用于云端
+    # parser.add_argument('--task', type=str, choices=['perturbed', 'cmbined'], required=True, default=None)
+    # parser.add_argument('--ds_name_list', nargs='+')
+    # parser.add_argument('--txt_name', type=str)
+    # parser.add_argument('--num_classes', type=int, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
+    # parser.add_argument('--model_weights', type=str)
     #
-    # # parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\baselines\D2\efficientNetB0_D2_51_Baseline-19-2.00064.pth')
-    #
-    # # parser.add_argument('--ds_weights_path', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
-    # parser.add_argument('--path_key', type=str, default='Stage6_org')
+    # parser.add_argument('--path_key', type=str)
     # parser.add_argument('--batch_size', type=int, default=1)
     #
     # # 生成perturbation图片
-    # parser.add_argument('--perturb_save_dir', type=str, default=None)
+    # parser.add_argument('--perturb_save_dir', type=str)
     #
     # # 生成perturbation+aug图片
-    # parser.add_argument('--perturb_dir', type=str, default=r'D:\my_phd\dataset\Stage6\stage6_citypersons\Processor\M2CAM\onlyPurturbations\train')
-    # # parser.add_argument('--perturb_dir', type=str, default=None)
-    # parser.add_argument('--compondImg_save_dir', type=str, default=None)
+    # parser.add_argument('--perturb_dir', type=str)
+    # parser.add_argument('--compondImg_save_dir', type=str)
+
+
+    # 用于本地测试
+    parser.add_argument('--task', type=str, choices=['perturbed', 'cmbined'], default='cmbined')
+    parser.add_argument('--ds_name_list', nargs='+', default=['D2'])
+    parser.add_argument('--txt_name', type=str, default='test.txt')
+    parser.add_argument('--num_classes', type=int, default=3, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
+    parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
+
+    # parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\baselines\D2\efficientNetB0_D2_51_Baseline-19-2.00064.pth')
+
+    # parser.add_argument('--ds_weights_path', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
+    parser.add_argument('--path_key', type=str, default='Stage6_org')
+    parser.add_argument('--batch_size', type=int, default=1)
+
+    # 生成perturbation图片
+    parser.add_argument('--perturb_save_dir', type=str, default=None)
+
+    # 生成perturbation+aug图片
+    parser.add_argument('--perturb_dir', type=str, default=r'D:\my_phd\dataset\Stage6\stage6_citypersons\All_Processor\DSCAM\onlyPurturbations\test')
+    # parser.add_argument('--perturb_dir', type=str, default=None)
+    parser.add_argument('--compondImg_save_dir', type=str, default=None)
 
     opts = parser.parse_args()
 
@@ -149,6 +149,10 @@ def gen_perturbation_image(opts):
         # break
 
 def gen_perturb_aug(opts):
+    '''
+        生成combined images
+    '''
+
     # dataset
     train_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key=opts.path_key, txt_name=opts.txt_name)
     train_loader = DataLoader(train_dataset, batch_size=opts.batch_size, shuffle=False)
@@ -157,7 +161,6 @@ def gen_perturb_aug(opts):
     get_classifier = models.efficientnet_b0(weights=None, num_classes=opts.num_classes)
     get_classifier = load_model(get_classifier, opts.model_weights)
     get_classifier = get_classifier.to(DEVICE).eval()
-
 
     # 选择CAM算法
     grad_layer = ['features.0', 'features.1', 'features.2', 'features.3', 'features.4', 'features.5', 'features.6', 'features.7', 'features.8']
@@ -192,17 +195,7 @@ def gen_perturb_aug(opts):
     aug_list = [hflip, rotate, jittor, gaussian]
     aug_name_list = ['Hflip', 'Rotate', 'Jittor', 'Gaussian']
 
-    perturb_dir = r'D:\my_phd\dataset\Stage6\stage6_citypersons\All_Processor\onlyPurturbations\pedestrian'
-
-    temp_images = []
-    temp_cams = []
-    temp_masks = []
-
-    fully_perturb = []
-    perturb_aug = []
-    aug_perturb = []
-    aug_org = []
-    org_aug = []
+    # perturb_dir = opts.perturb_dir
 
     # 循环遍历
     for data_dict in tqdm(train_loader):
@@ -240,29 +233,29 @@ def gen_perturb_aug(opts):
 
         # 进行的图片扩增
         # 这里要注意，如果是flip和rotate，需要先将perturbation与org image结合，然后再进行aug操作，否则，CAM对应的位置会变
-        # random_aug_id = random.randint(0, len(aug_list) - 1)
-        # cur_aug_operation = aug_list[random_aug_id]
+        random_aug_id = random.randint(0, len(aug_list) - 1)
+        cur_aug_operation = aug_list[random_aug_id]
 
-        random_aug_id = 2       # 仅用于测试
-        cur_aug_operation = aug_list[random_aug_id] # 仅用于测试
+        # random_aug_id = 2       # 仅用于测试
+        # cur_aug_operation = aug_list[random_aug_id] # 仅用于测试
 
-        # 读取perturb图片
-        perturImg_path = os.path.join(perturb_dir, img_name)
-        perturb_image = Image.open(perturImg_path)
+        # # 读取perturb图片
+        # perturImg_path = os.path.join(opts.perturb_dir, img_name)
+        # perturb_image = Image.open(perturImg_path)
 
         # ---------- 组合augmentation代码 开始 ----------
-        if random_aug_id == 0 or random_aug_id == 1:
-            original_and_org = cur_aug_operation(image[0])
-        else:
-            aug_image = cur_aug_operation(plt_transformer(image[0]))
-            aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
-            original_and_org = aug_image_tensor * (1 - plt_mask) + image[0] * plt_mask
-
-            # 测试用代码
-            perturb_and_aug = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + aug_image_tensor * plt_mask
-            aug_and_perturb = tensor_transformer(perturb_image).to(DEVICE) * plt_mask + aug_image_tensor * (1-plt_mask)
-            Aug_and_org = aug_image_tensor * (1 - plt_mask) + image[0] * plt_mask
-            org_and_aug = aug_image_tensor * plt_mask + image[0] * (1-plt_mask)
+        # if random_aug_id == 0 or random_aug_id == 1:
+        #     original_and_org = cur_aug_operation(image[0])
+        # else:
+        #     aug_image = cur_aug_operation(plt_transformer(image[0]))
+        #     aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
+        #     original_and_org = aug_image_tensor * (1 - plt_mask) + image[0] * plt_mask
+        #
+        #     # 测试用代码
+        #     perturb_and_aug = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + aug_image_tensor * plt_mask
+        #     aug_and_perturb = tensor_transformer(perturb_image).to(DEVICE) * plt_mask + aug_image_tensor * (1-plt_mask)
+        #     Aug_and_org = aug_image_tensor * (1 - plt_mask) + image[0] * plt_mask
+        #     org_and_aug = aug_image_tensor * plt_mask + image[0] * (1-plt_mask)
 
 
         # # save_AugOrg_name = os.path.splitext(img_name)[0] + '_' +aug_name_list[random_aug_id] + 'Org' + os.path.splitext(img_name)[-1]
@@ -274,25 +267,25 @@ def gen_perturb_aug(opts):
 
 
         # # ---------- 需要用到perturb部分的代码 开始 ----------
-        #
-        # # 加载perturb图片
-        # perturb_image_path = os.path.join(opts.perturb_dir, cls_name, img_name)
-        # perturb_image = Image.open(perturb_image_path).convert('RGB')
-        #
-        # # 不论mask如何，perturb都对应mask的黑色部分，aug对应mask的白色部分
-        # # aug操作为flip和rotate，
-        # if random_aug_id == 0 or random_aug_id == 1:
-        #     perturb_and_org = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + image[0] * plt_mask
-        #     perturb_and_aug = cur_aug_operation(perturb_and_org)
-        # else:
-        #     # 直接将perturb与org图片合并
-        #     aug_image = cur_aug_operation(plt_transformer(image[0]))
-        #     aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
-        #     perturb_and_aug = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + aug_image_tensor * plt_mask
 
-        # save_perturbAug_name = os.path.splitext(img_name)[0] + '_perturb' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
-        # save_perturbAug_path = os.path.join(opts.compondImg_save_dir, cls_name, save_perturbAug_name)
-        # save_image_tensor(perturb_and_aug.unsqueeze(0), save_perturbAug_path)
+        # 加载perturb图片
+        perturb_image_path = os.path.join(opts.perturb_dir, cls_name, img_name)
+        perturb_image = Image.open(perturb_image_path).convert('RGB')
+
+        # 不论mask如何，perturb都对应mask的黑色部分，aug对应mask的白色部分
+        # aug操作为flip和rotate，
+        if random_aug_id == 0 or random_aug_id == 1:
+            perturb_and_org = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + image[0] * plt_mask
+            perturb_and_aug = cur_aug_operation(perturb_and_org)
+        else:
+            # 直接将perturb与org图片合并
+            aug_image = cur_aug_operation(plt_transformer(image[0]))
+            aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
+            perturb_and_aug = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + aug_image_tensor * plt_mask
+
+        save_perturbAug_name = os.path.splitext(img_name)[0] + '_perturb' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
+        save_perturbAug_path = os.path.join(opts.compondImg_save_dir, cls_name, save_perturbAug_name)
+        save_image_tensor(perturb_and_aug.unsqueeze(0), save_perturbAug_path)
 
         # ---------- 需要用到perturb部分的代码 结束 ----------
 
@@ -301,12 +294,12 @@ def gen_perturb_aug(opts):
         # print(f'save_perturbAug_path:{save_perturbAug_path}')
 
 
-        # plt.imshow(plt_cam)
-        # plt.axis('off')  # 关闭坐标轴
-        # plt.show()
+        plt.imshow(plt_cam)
+        plt.axis('off')  # 关闭坐标轴
+        plt.show()
 
-        # # 创建一个包含两个子图的网格
-        #
+        # 创建一个包含两个子图的网格
+
         # plt_imgs = 5
         #
         # plt.subplot(1, plt_imgs, 1)
@@ -329,14 +322,14 @@ def gen_perturb_aug(opts):
         # # plt.title('aug')
         #
         # plt.subplot(1, plt_imgs, 5)
-        # plt.imshow(plt_transformer(original_and_org))
+        # plt.imshow(plt_transformer(perturb_and_aug))
         # title = f'{aug_name_list[random_aug_id]} + Perturb'
         # plt.title(title)
         # plt.axis('off')  # 关闭坐标轴
         #
         # # 显示图片
         # plt.show()
-
+        #
         # break
 
 
