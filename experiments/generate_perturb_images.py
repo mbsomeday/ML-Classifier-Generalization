@@ -41,7 +41,7 @@ def get_opts():
     parser.add_argument('--model_weights', type=str)
 
     parser.add_argument('--path_key', type=str)
-    parser.add_argument('--batch_size', type=int)
+    parser.add_argument('--batch_size', type=int, default=1)
 
     # 生成perturbation图片
     parser.add_argument('--perturb_save_dir', type=str)
