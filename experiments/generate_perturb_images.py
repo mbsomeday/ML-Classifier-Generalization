@@ -195,8 +195,6 @@ def gen_perturb_aug(opts):
     aug_list = [hflip, rotate, jittor, gaussian]
     aug_name_list = ['Hflip', 'Rotate', 'Jittor', 'Gaussian']
 
-    # perturb_dir = opts.perturb_dir
-
     # 循环遍历
     for data_dict in tqdm(train_loader):
         image = data_dict['image'].to(DEVICE)
@@ -231,7 +229,7 @@ def gen_perturb_aug(opts):
         plt_mask = plt_mask[np.newaxis, :]
         plt_mask = torch.from_numpy(plt_mask).float().to(DEVICE)
 
-        # plt_mask = 1 - plt_mask
+        plt_mask = 1 - plt_mask
 
         # 进行的图片扩增
         # 这里要注意，如果是flip和rotate，需要先将perturbation与org image结合，然后再进行aug操作，否则，CAM对应的位置会变
@@ -261,8 +259,8 @@ def gen_perturb_aug(opts):
             # Aug_and_org = aug_image_tensor * (1 - plt_mask) + image[0] * plt_mask
             # org_and_aug = aug_image_tensor * plt_mask + image[0] * (1-plt_mask)
 
-        save_AugOrg_name = os.path.splitext(img_name)[0] + '_' +aug_name_list[random_aug_id] + 'Org' + os.path.splitext(img_name)[-1]
-        # save_AugOrg_name = os.path.splitext(img_name)[0] + '_Org' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
+        # save_AugOrg_name = os.path.splitext(img_name)[0] + '_' + aug_name_list[random_aug_id] + 'Org' + os.path.splitext(img_name)[-1]       # AugOrg
+        save_AugOrg_name = os.path.splitext(img_name)[0] + '_Org' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]        # OrgAug
         save_AugOrg_path = os.path.join(opts.compondImg_save_dir, cls_name, save_AugOrg_name)
         save_image_tensor(original_and_org.unsqueeze(0), save_AugOrg_path)
 
