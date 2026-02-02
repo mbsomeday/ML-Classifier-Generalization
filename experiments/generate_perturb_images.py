@@ -294,9 +294,9 @@ def gen_perturb_aug(opts):
         # print(f'save_perturbAug_path:{save_perturbAug_path}')
 
 
-        plt.imshow(plt_cam)
-        plt.axis('off')  # 关闭坐标轴
-        plt.show()
+        # plt.imshow(plt_cam)
+        # plt.axis('off')  # 关闭坐标轴
+        # plt.show()
 
         # 创建一个包含两个子图的网格
 
