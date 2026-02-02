@@ -228,7 +228,7 @@ def gen_perturb_aug(opts):
         plt_mask = plt_mask[np.newaxis, :]
         plt_mask = torch.from_numpy(plt_mask).float().to(DEVICE)
 
-        # plt_mask = 1 - plt_mask
+        plt_mask = 1 - plt_mask
 
         # 进行的图片扩增
         # 这里要注意，如果是flip和rotate，需要先将perturbation与org image结合，然后再进行aug操作，否则，CAM对应的位置会变
@@ -283,8 +283,8 @@ def gen_perturb_aug(opts):
             aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
             perturb_and_aug = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + aug_image_tensor * plt_mask
 
-        save_perturbAug_name = os.path.splitext(img_name)[0] + '_perturb' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]     # PerturbAug
-        # save_perturbAug_name = os.path.splitext(img_name)[0] + '_' + aug_name_list[random_aug_id] + 'perturb' + os.path.splitext(img_name)[-1]       # AugPerturb
+        # save_perturbAug_name = os.path.splitext(img_name)[0] + '_perturb' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]     # PerturbAug
+        save_perturbAug_name = os.path.splitext(img_name)[0] + '_' + aug_name_list[random_aug_id] + 'perturb' + os.path.splitext(img_name)[-1]       # AugPerturb
         save_perturbAug_path = os.path.join(opts.compondImg_save_dir, cls_name, save_perturbAug_name)
         save_image_tensor(perturb_and_aug.unsqueeze(0), save_perturbAug_path)
 
