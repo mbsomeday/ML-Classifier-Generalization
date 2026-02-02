@@ -228,7 +228,7 @@ def gen_perturb_aug(opts):
         plt_mask = plt_mask[np.newaxis, :]
         plt_mask = torch.from_numpy(plt_mask).float().to(DEVICE)
 
-        # plt_mask = 1 - plt_mask
+        plt_mask = 1 - plt_mask
 
         # 进行的图片扩增
         # 这里要注意，如果是flip和rotate，需要先将perturbation与org image结合，然后再进行aug操作，否则，CAM对应的位置会变
