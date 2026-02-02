@@ -235,9 +235,9 @@ def gen_perturb_aug(opts):
         random_aug_id = random.randint(0, len(aug_list) - 1)
         cur_aug_operation = aug_list[random_aug_id]
 
-        random_aug_id = 2       # 仅用于测试
-        cur_aug_operation = aug_list[random_aug_id] # 仅用于测试
-        cur_aug_operation = transforms.Grayscale(num_output_channels=3) # 仅用于测试
+        # random_aug_id = 2       # 仅用于测试
+        # cur_aug_operation = aug_list[random_aug_id] # 仅用于测试
+        # cur_aug_operation = transforms.Grayscale(num_output_channels=3) # 仅用于测试
 
         # ---------- 组合augmentation代码 开始 ----------
 
