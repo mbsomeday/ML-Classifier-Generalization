@@ -34,7 +34,7 @@ def get_opts():
     parser = argparse.ArgumentParser()
 
     # 用于云端
-    parser.add_argument('--task', type=str, choices=['perturbed', 'cmbined'], required=True, default=None)
+    parser.add_argument('--task', type=str, choices=['perturbed', 'combined'], required=True, default=None)
     parser.add_argument('--ds_name_list', nargs='+')
     parser.add_argument('--txt_name', type=str)
     parser.add_argument('--num_classes', type=int, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
