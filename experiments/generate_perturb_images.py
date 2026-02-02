@@ -348,8 +348,10 @@ if __name__ == '__main__':
         print(f'{k}: {v}')
 
     if opts.task == 'perturbed':
+        print('当前生成only perturbed的图片')
         gen_perturbation_image(opts)
     else:
+        print('当前生成combined的图片')
         gen_perturb_aug(opts)
 
     # # 生成perturbation图片
