@@ -33,44 +33,44 @@ from utils.utils import load_model, DEVICE, save_image_tensor
 def get_opts():
     parser = argparse.ArgumentParser()
 
-    # 用于云端
-    parser.add_argument('--task', type=str, choices=['perturbed', 'combined'], required=True, default=None)
-    parser.add_argument('--ds_name_list', nargs='+')
-    parser.add_argument('--txt_name', type=str)
-    parser.add_argument('--num_classes', type=int, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
-    parser.add_argument('--model_weights', type=str)
-
-    parser.add_argument('--path_key', type=str)
-    parser.add_argument('--batch_size', type=int, default=1)
-
-    # 生成perturbation图片
-    parser.add_argument('--perturb_save_dir', type=str)
-
-    # 生成perturbation+aug图片
-    parser.add_argument('--perturb_dir', type=str)
-    parser.add_argument('--compondImg_save_dir', type=str)
-
-
-    # # 用于本地测试
-    # parser.add_argument('--task', type=str, choices=['perturbed', 'cmbined'], default='cmbined')
-    # parser.add_argument('--ds_name_list', nargs='+', default=['D2'])
-    # parser.add_argument('--txt_name', type=str, default='test.txt')
-    # parser.add_argument('--num_classes', type=int, default=3, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
-    # parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
+    # # 用于云端
+    # parser.add_argument('--task', type=str, choices=['perturbed', 'combined'], required=True, default=None)
+    # parser.add_argument('--ds_name_list', nargs='+')
+    # parser.add_argument('--txt_name', type=str)
+    # parser.add_argument('--num_classes', type=int, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
+    # parser.add_argument('--model_weights', type=str)
     #
-    # # parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\baselines\D2\efficientNetB0_D2_51_Baseline-19-2.00064.pth')
-    #
-    # # parser.add_argument('--ds_weights_path', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
-    # parser.add_argument('--path_key', type=str, default='Stage6_org')
+    # parser.add_argument('--path_key', type=str)
     # parser.add_argument('--batch_size', type=int, default=1)
     #
     # # 生成perturbation图片
-    # parser.add_argument('--perturb_save_dir', type=str, default=None)
+    # parser.add_argument('--perturb_save_dir', type=str)
     #
     # # 生成perturbation+aug图片
-    # parser.add_argument('--perturb_dir', type=str, default=r'D:\my_phd\dataset\Stage6\stage6_citypersons\All_Processor\DSCAM\onlyPurturbations\test')
-    # # parser.add_argument('--perturb_dir', type=str, default=None)
-    # parser.add_argument('--compondImg_save_dir', type=str, default=None)
+    # parser.add_argument('--perturb_dir', type=str)
+    # parser.add_argument('--compondImg_save_dir', type=str)
+
+
+    # 用于本地测试
+    parser.add_argument('--task', type=str, choices=['perturbed', 'cmbined'], default='cmbined')
+    parser.add_argument('--ds_name_list', nargs='+', default=['D2'])
+    parser.add_argument('--txt_name', type=str, default='test.txt')
+    parser.add_argument('--num_classes', type=int, default=3, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
+    parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
+
+    # parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\baselines\D2\efficientNetB0_D2_51_Baseline-19-2.00064.pth')
+
+    # parser.add_argument('--ds_weights_path', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
+    parser.add_argument('--path_key', type=str, default='Stage6_org')
+    parser.add_argument('--batch_size', type=int, default=1)
+
+    # 生成perturbation图片
+    parser.add_argument('--perturb_save_dir', type=str, default=None)
+
+    # 生成perturbation+aug图片
+    parser.add_argument('--perturb_dir', type=str, default=r'D:\my_phd\dataset\Stage6\stage6_citypersons\All_Processor\DSCAM\onlyPurturbations\test')
+    # parser.add_argument('--perturb_dir', type=str, default=None)
+    parser.add_argument('--compondImg_save_dir', type=str, default=None)
 
     opts = parser.parse_args()
 
@@ -231,6 +231,8 @@ def gen_perturb_aug(opts):
         plt_mask = plt_mask[np.newaxis, :]
         plt_mask = torch.from_numpy(plt_mask).float().to(DEVICE)
 
+        plt_mask = 1 - plt_mask
+
         # 进行的图片扩增
         # 这里要注意，如果是flip和rotate，需要先将perturbation与org image结合，然后再进行aug操作，否则，CAM对应的位置会变
         random_aug_id = random.randint(0, len(aug_list) - 1)
@@ -238,6 +240,7 @@ def gen_perturb_aug(opts):
 
         # random_aug_id = 2       # 仅用于测试
         # cur_aug_operation = aug_list[random_aug_id] # 仅用于测试
+        # cur_aug_operation = transforms.Grayscale(num_output_channels=3)
 
         # # 读取perturb图片
         # perturImg_path = os.path.join(opts.perturb_dir, img_name)
@@ -283,7 +286,8 @@ def gen_perturb_aug(opts):
             aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
             perturb_and_aug = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + aug_image_tensor * plt_mask
 
-        save_perturbAug_name = os.path.splitext(img_name)[0] + '_perturb' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
+        # save_perturbAug_name = os.path.splitext(img_name)[0] + '_perturb' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]     # PerturbAug
+        save_perturbAug_name = os.path.splitext(img_name)[0] + '_' + aug_name_list[random_aug_id] + 'perturb' + os.path.splitext(img_name)[-1]       # AugPerturb
         save_perturbAug_path = os.path.join(opts.compondImg_save_dir, cls_name, save_perturbAug_name)
         save_image_tensor(perturb_and_aug.unsqueeze(0), save_perturbAug_path)
 
