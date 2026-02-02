@@ -33,10 +33,13 @@ from utils.utils import load_model, DEVICE, save_image_tensor
 def get_opts():
     parser = argparse.ArgumentParser()
 
+    parser.add_argument('--task', type=str, choices=['perturbed', 'cmbined'], default='perturb')
     parser.add_argument('--ds_name_list', nargs='+', default=['D2'])
     parser.add_argument('--txt_name', type=str, default='train.txt')
-    parser.add_argument('--num_classes', type=int, default=2, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
-    parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\baselines\D2\efficientNetB0_D2_51_Baseline-19-2.00064.pth')
+    parser.add_argument('--num_classes', type=int, default=3, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
+    parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
+
+    # parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\baselines\D2\efficientNetB0_D2_51_Baseline-19-2.00064.pth')
 
     # parser.add_argument('--ds_weights_path', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
     parser.add_argument('--path_key', type=str, default='Stage6_org')
@@ -55,9 +58,6 @@ def get_opts():
     return opts
 
 
-# ### 用于perturbation + augmentation
-
-
 
 
 def gen_perturbation_image(opts):
@@ -73,11 +73,6 @@ def gen_perturbation_image(opts):
     get_classifier = models.efficientnet_b0(weights=None, num_classes=opts.num_classes)
     get_classifier = load_model(get_classifier, opts.model_weights)
     get_classifier = get_classifier.to(DEVICE).eval()
-
-    # # model
-    # dataset_classifier = models.efficientnet_b0(weights=None, num_classes=3)
-    # dataset_classifier = load_model(dataset_classifier, opts.ds_weights_path)
-    # dataset_classifier = dataset_classifier.to(DEVICE).eval()
 
     # 对图片进行perturbation
     criterion = nn.CrossEntropyLoss()
@@ -178,6 +173,17 @@ def gen_perturb_aug(opts):
     aug_list = [hflip, rotate, jittor, gaussian]
     aug_name_list = ['Hflip', 'Rotate', 'Jittor', 'Gaussian']
 
+    perturb_dir = r'D:\my_phd\dataset\Stage6\stage6_citypersons\All_Processor\onlyPurturbations\pedestrian'
+
+    temp_images = []
+    temp_cams = []
+    temp_masks = []
+
+    fully_perturb = []
+    perturb_aug = []
+    aug_perturb = []
+    aug_org = []
+    org_aug = []
 
     # 循环遍历
     for data_dict in tqdm(train_loader):
@@ -206,8 +212,8 @@ def gen_perturb_aug(opts):
 
         # 生成mask
         cam_array = np.array(plt_cam)
-        # cam_mask = cam_array < (0.5 * cam_array.max())        # 值高的部分为黑色
-        cam_mask = cam_array >= (0.5 * cam_array.max())         # 值低的部分为黑色
+        cam_mask = cam_array < (0.5 * cam_array.max())        # 值高的部分为黑色
+        # cam_mask = cam_array >= (0.5 * cam_array.max())         # 值低的部分为黑色
         plt_mask = cam_mask * 1.0
 
         plt_mask = plt_mask[np.newaxis, :]
@@ -215,23 +221,35 @@ def gen_perturb_aug(opts):
 
         # 进行的图片扩增
         # 这里要注意，如果是flip和rotate，需要先将perturbation与org image结合，然后再进行aug操作，否则，CAM对应的位置会变
-        random_aug_id = random.randint(0, len(aug_list) - 1)
-        cur_aug_operation = aug_list[random_aug_id]
-        # random_aug_id = 3       # 仅用于测试
+        # random_aug_id = random.randint(0, len(aug_list) - 1)
+        # cur_aug_operation = aug_list[random_aug_id]
+
+        random_aug_id = 2       # 仅用于测试
+        cur_aug_operation = aug_list[random_aug_id] # 仅用于测试
+
+        # 读取perturb图片
+        perturImg_path = os.path.join(perturb_dir, img_name)
+        perturb_image = Image.open(perturImg_path)
 
         # ---------- 组合augmentation代码 开始 ----------
         if random_aug_id == 0 or random_aug_id == 1:
             original_and_org = cur_aug_operation(image[0])
         else:
             aug_image = cur_aug_operation(plt_transformer(image[0]))
-            # aug_image = transforms.Grayscale()(plt_transformer(image[0])) # 灰度用于测试
             aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
             original_and_org = aug_image_tensor * (1 - plt_mask) + image[0] * plt_mask
 
-        # save_AugOrg_name = os.path.splitext(img_name)[0] + '_' +aug_name_list[random_aug_id] + 'Org' + os.path.splitext(img_name)[-1]
-        save_AugOrg_name = os.path.splitext(img_name)[0] + '_Org' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
-        save_AugOrg_path = os.path.join(opts.compondImg_save_dir, cls_name, save_AugOrg_name)
-        save_image_tensor(original_and_org.unsqueeze(0), save_AugOrg_path)
+            # 测试用代码
+            perturb_and_aug = tensor_transformer(perturb_image).to(DEVICE) * (1 - plt_mask) + aug_image_tensor * plt_mask
+            aug_and_perturb = tensor_transformer(perturb_image).to(DEVICE) * plt_mask + aug_image_tensor * (1-plt_mask)
+            Aug_and_org = aug_image_tensor * (1 - plt_mask) + image[0] * plt_mask
+            org_and_aug = aug_image_tensor * plt_mask + image[0] * (1-plt_mask)
+
+
+        # # save_AugOrg_name = os.path.splitext(img_name)[0] + '_' +aug_name_list[random_aug_id] + 'Org' + os.path.splitext(img_name)[-1]
+        # save_AugOrg_name = os.path.splitext(img_name)[0] + '_Org' + aug_name_list[random_aug_id] + os.path.splitext(img_name)[-1]
+        # save_AugOrg_path = os.path.join(opts.compondImg_save_dir, cls_name, save_AugOrg_name)
+        # save_image_tensor(original_and_org.unsqueeze(0), save_AugOrg_path)
 
         # ---------- 组合augmentation代码 结束 ----------
 
@@ -264,7 +282,12 @@ def gen_perturb_aug(opts):
         # print(f'save_perturbAug_path:{save_perturbAug_path}')
 
 
+        # plt.imshow(plt_cam)
+        # plt.axis('off')  # 关闭坐标轴
+        # plt.show()
+
         # # 创建一个包含两个子图的网格
+        #
         # plt_imgs = 5
         #
         # plt.subplot(1, plt_imgs, 1)
@@ -294,7 +317,7 @@ def gen_perturb_aug(opts):
         #
         # # 显示图片
         # plt.show()
-        #
+
         # break
 
 
@@ -306,13 +329,22 @@ if __name__ == '__main__':
     print('start')
 
     opts = get_opts()
-    print(opts)
+
+    for k, v in vars(opts).items():
+        print(f'{k}: {v}')
+
+    if opts.task == 'perturbed':
+        gen_perturbation_image(opts)
+    else:
+        gen_perturb_aug(opts)
 
     # # 生成perturbation图片
     # gen_perturbation_image(opts)
 
     # 将perturbation与aug结合生成新图片
-    gen_perturb_aug(opts)
+    # gen_perturb_aug(opts)
+
+
 
 
 
