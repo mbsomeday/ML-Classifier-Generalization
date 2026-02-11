@@ -175,6 +175,13 @@ deucalion = {
     },
 }
 
+CISUC_Cluster = {
+    'Stage6_org': {
+        'D2': r'd2',
+    },
+}
+
+
 
 cwd = os.getcwd()
 
@@ -196,4 +203,7 @@ elif 'F202407660IACDCF2' in cwd:
     print(f'Run on deucalion -- working dir: {cwd}')
     PATHS = deucalion
 else:
-    raise Exception('运行平台未知，需配置路径!')
+    PATHS = CISUC_Cluster
+
+
+    # raise Exception('运行平台未知，需配置路径!')
