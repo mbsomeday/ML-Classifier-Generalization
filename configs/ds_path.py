@@ -203,7 +203,5 @@ elif 'F202407660IACDCF2' in cwd:
     print(f'Run on deucalion -- working dir: {cwd}')
     PATHS = deucalion
 else:
-    PATHS = CISUC_Cluster
-
-
-    # raise Exception('运行平台未知，需配置路径!')
+    # PATHS = CISUC_Cluster
+    raise Exception('运行平台未知，需配置路径!')
