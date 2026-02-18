@@ -84,7 +84,7 @@ KAGGLE = {
     },
 
     'Stage6_experiment': {
-        'D2': r'/kaggle/input/stage6-dataset-citypersons-experiment',
+        'D2': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-citypersons-experiment',
 
     },
 
