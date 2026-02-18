@@ -78,7 +78,7 @@ KAGGLE = {
 
     'Stage6_org': {
         # 4500
-        'D1': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-citypersons',
+        'D1': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-ecp',
         'D2': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-citypersons',
         'D3': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-bdd100k',
     },
