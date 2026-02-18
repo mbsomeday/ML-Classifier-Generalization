@@ -71,8 +71,8 @@ LOCAL = {
 }
 
 KAGGLE = {
-    'Stage6_CAM': {
-        'D1': r'/kaggle/input/m1-ecp-oppomask',
+    'Stage6_onlyTrain': {
+        'D2': r'/kaggle/input/m1-ecp-oppomask',
 
     },
 
