@@ -61,37 +61,41 @@ if args.isTrain:
         setattr(args, 'cur_seed', cur_seed)
         dann_cls = DANN_Trainer(args)
 
-
 else:
     print('Current Mode: 【Testing】')
 
 
+# 结束时间
+end_time = datetime.datetime.now()
+duration = end_time - start_time
+print(f'Ended at {str(end_time.strftime("%Y-%m-%d %H:%M:%S"))}')
+print(f'Duration: {str(duration)}')
 
 
-manual_seed = args.seed
-random.seed(manual_seed)
-torch.manual_seed(manual_seed)
-np.random.seed(manual_seed)
-os.environ['PYTHONHASHSEED'] = str(manual_seed)
-
-if torch.cuda.is_available():
-    torch.cuda.manual_seed(manual_seed)         # 设置当前GPU的seed
-    torch.cuda.manual_seed_all(manual_seed)     # 有多个GPU的情况，确保所有GPU都用相同的seed
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-
-start_time = datetime.datetime.now()
-print("Started at " + str(start_time.strftime('%Y-%m-%d %H:%M:%S')))
-
-dann_cls = DANN_Trainer(args)
-if args.isTrain:
-    dann_cls.train()
-    end_time = datetime.datetime.now()
-    duration = end_time - start_time
-    print("Ended at " + str(end_time.strftime('%Y-%m-%d %H:%M:%S')))
-    print("Duration: " + str(duration))
-else:
-    dann_cls.test()
+# manual_seed = args.seed
+# random.seed(manual_seed)
+# torch.manual_seed(manual_seed)
+# np.random.seed(manual_seed)
+# os.environ['PYTHONHASHSEED'] = str(manual_seed)
+#
+# if torch.cuda.is_available():
+#     torch.cuda.manual_seed(manual_seed)         # 设置当前GPU的seed
+#     torch.cuda.manual_seed_all(manual_seed)     # 有多个GPU的情况，确保所有GPU都用相同的seed
+#     torch.backends.cudnn.deterministic = True
+#     torch.backends.cudnn.benchmark = False
+#
+# start_time = datetime.datetime.now()
+# print("Started at " + str(start_time.strftime('%Y-%m-%d %H:%M:%S')))
+#
+# dann_cls = DANN_Trainer(args)
+# if args.isTrain:
+#     dann_cls.train()
+#     end_time = datetime.datetime.now()
+#     duration = end_time - start_time
+#     print("Ended at " + str(end_time.strftime('%Y-%m-%d %H:%M:%S')))
+#     print("Duration: " + str(duration))
+# else:
+#     dann_cls.test()
 
 
 
