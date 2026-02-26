@@ -249,7 +249,7 @@ class DANN_Trainer(object):
                                                           desc=f'Epoch {epoch} train'):
             # 调节domain classifier的alpha
             # total_iters += 1
-            alpha = adjust_alpha(batch_idx, epoch, min_len, self.max_epochs)
+            alpha = adjust_alpha(batch_idx, epoch, min_len, self.args.max_train_epochs)
 
             # 加载数据
             source, s_labels = source_dict['image'].to(DEVICE), source_dict['ped_label'].to(DEVICE)
