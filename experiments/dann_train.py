@@ -65,7 +65,7 @@ class DANN_Trainer(object):
         '''
 
         # ********** 用seed固定GPU **********
-        torch.manual_seed(self.args.rand_seed)
+        torch.manual_seed(self.args.cur_seed)
         np.random.seed(self.args.rand_seed)
         random.seed(self.args.rand_seed)
         if DEVICE != 'cpu':
