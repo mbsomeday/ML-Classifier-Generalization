@@ -1,5 +1,9 @@
 import os, torch
 
+
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+
 LCA = {
     'org_dataset': {
         'D1': r'/tormenta/s/ssesaai/data/Stage4_D1_ECPDaytime_7Augs',
@@ -205,3 +209,4 @@ elif 'F202407660IACDCF2' in cwd:
 else:
     # PATHS = CISUC_Cluster
     raise Exception('运行平台未知，需配置路径!')
+
