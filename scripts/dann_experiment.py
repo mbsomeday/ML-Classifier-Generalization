@@ -60,6 +60,7 @@ if args.isTrain:
     for cur_seed in args.seed_list:
         setattr(args, 'cur_seed', cur_seed)
         dann_cls = DANN_Trainer(args)
+        dann_cls.train()
 
 else:
     print('Current Mode: 【Testing】')
