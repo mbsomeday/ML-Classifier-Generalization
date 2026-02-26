@@ -49,8 +49,6 @@ class DANN_Trainer(object):
         self.print_args()
 
 
-
-
         self.batch_size = self.args.batch_size
         self.min_epochs = self.args.min_epochs
         self.max_epochs = self.args.max_epochs
@@ -76,10 +74,10 @@ class DANN_Trainer(object):
 
         # ********** 加载 source / target data **********
         self.s_train_dataset = my_dataset(ds_name_list=self.args.source, path_key=self.args.path_key, txt_name=self.args.train_txt)
-        self.s_train_loader = DataLoader(self.s_train_dataset, batch_size=self.batch_size, shuffle=True, drop_last=False)
+        self.s_train_loader = DataLoader(self.s_train_dataset, batch_size=self.args.train_batch_size, shuffle=True, drop_last=False)
 
         self.s_val_dataset = my_dataset(ds_name_list=self.args.source, path_key=self.args.path_key, txt_name=self.args.val_txt)
-        self.s_val_loader = DataLoader(self.s_val_dataset, batch_size=self.batch_size, shuffle=False, drop_last=False)
+        self.s_val_loader = DataLoader(self.s_val_dataset, batch_size=self.args.val_batch_size, shuffle=False, drop_last=False)
 
         # # 用random noise代替target domain，后来实验验证不可行
         # self.t_train_dataset = noise_dataset(num=len(self.s_train_dataset))
@@ -90,10 +88,10 @@ class DANN_Trainer(object):
 
         # 用真实数据作为target domain
         self.t_train_dataset = my_dataset(ds_name_list=self.args.target, path_key=self.args.path_key, txt_name=self.args.train_txt)
-        self.t_train_loader = DataLoader(self.t_train_dataset, batch_size=self.batch_size, shuffle=True, drop_last=False)
+        self.t_train_loader = DataLoader(self.t_train_dataset, batch_size=self.args.train_batch_size, shuffle=True, drop_last=False)
 
         self.t_val_dataset = my_dataset(ds_name_list=self.args.target, path_key=self.args.path_key, txt_name=self.args.val_txt)
-        self.t_val_loader = DataLoader(self.t_val_dataset, batch_size=128, shuffle=False, drop_last=False)
+        self.t_val_loader = DataLoader(self.t_val_dataset, batch_size=self.args.val_batch_size, shuffle=False, drop_last=False)
 
         # ********** callback **********  命名规则为: DANN{source}{target}
         self.callback_save_dir = f'DANN{self.args.source}{self.args.target}'

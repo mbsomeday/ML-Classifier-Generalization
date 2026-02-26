@@ -21,7 +21,9 @@ def get_args():
     parser.add_argument('--path_key', type=str, default='Stage6_org')
     parser.add_argument('--train_txt', type=str, default='train.txt')       # augmentation_train
     parser.add_argument('--val_txt', type=str, default='val.txt')
-    parser.add_argument('--batch_size', type=int, default=64)
+    parser.add_argument('--train_batch_size', type=int, default=64)
+    parser.add_argument('--val_batch_size', type=int, default=64)
+
 
     # train
     parser.add_argument('--monitored_metric', default='loss')
