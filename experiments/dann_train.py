@@ -66,10 +66,10 @@ class DANN_Trainer(object):
 
         # ********** 用seed固定GPU **********
         torch.manual_seed(self.args.cur_seed)
-        np.random.seed(self.args.rand_seed)
-        random.seed(self.args.rand_seed)
+        np.random.seed(self.args.cur_seed)
+        random.seed(self.args.cur_seed)
         if DEVICE != 'cpu':
-            torch.cuda.manual_seed(self.args.rand_seed)
+            torch.cuda.manual_seed(self.args.cur_seed)
             # 确保CuDNN的确定性行为
             torch.backends.cudnn.deterministic = True
             torch.backends.cudnn.benchmark = False
