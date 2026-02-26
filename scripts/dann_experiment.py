@@ -31,7 +31,6 @@ def get_args():
     parser.add_argument('--max_epochs', type=int, default=50)
     parser.add_argument('--warmup_epochs', type=int, default=3)
     parser.add_argument('--seed_list', nargs='+', default=[82])
-    parser.add_argument('--patience', type=int, default=5)
 
     # callbacks
     parser.add_argument('--top_k', default=1)
