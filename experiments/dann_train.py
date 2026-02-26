@@ -50,11 +50,9 @@ class DANN_Trainer(object):
 
 
         # self.batch_size = self.args.batch_size
-        self.min_epochs = self.args.min_epochs
-        self.max_epochs = self.args.max_epochs
-        self.warmup_epochs = self.args.warmup_epochs
-
-
+        # self.min_epochs = self.args.min_epochs
+        # self.max_epochs = self.args.max_epochs
+        # self.warmup_epochs = self.args.warmup_epochs
 
 
     def train_setup(self):
@@ -229,8 +227,8 @@ class DANN_Trainer(object):
         # old_lr = self.optimizer.param_groups[0]['lr']
 
         # warm-up阶段
-        if epoch <= self.warmup_epochs:  # warm-up阶段
-            self.optimizer.param_groups[0]['lr'] = self.args.base_lr * epoch / self.warmup_epochs
+        if epoch <= self.args.warmup_epochs:  # warm-up阶段
+            self.optimizer.param_groups[0]['lr'] = self.args.base_lr * epoch / self.args.warmup_epochs
         else:
             self.optimizer.param_groups[0]['lr'] = self.args.base_lr * 0.963 ** (epoch / 3)  # gamma=0.963, lr decay epochs=3
 
@@ -308,7 +306,7 @@ class DANN_Trainer(object):
         print("Target iters per epoch: %d" % (t_iter_per_epoch))
         print("iters per epoch: %d" % (min(s_iter_per_epoch, t_iter_per_epoch)))
 
-        for EPOCH in range(self.max_epochs):
+        for EPOCH in range(self.args.max_train_epochs):
 
             # 在epoch开始之前调节lr
             self.update_learning_rate(EPOCH + 1)
