@@ -325,7 +325,7 @@ class DANN_Trainer(object):
             self.update_learning_rate(EPOCH + 1)
 
             # 当训练次数超过最低epoch时，其中early_stop策略
-            if (EPOCH + 1) > self.args.min_train_epoch:
+            if (EPOCH + 1) > self.args.min_train_epochs:
                 self.early_stopping(EPOCH + 1, enc=self.feature_model, clf=self.label_model, fd=self.domain_model, val_epoch_info=val_info)
 
                 if self.early_stopping.early_stop:
