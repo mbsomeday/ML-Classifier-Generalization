@@ -26,11 +26,13 @@ def get_args():
     # train
     parser.add_argument('--monitored_metric', default='loss')
     parser.add_argument('--isTrain', action='store_true')
-    parser.add_argument('--seed', default=13)
     parser.add_argument('--base_lr', type=float, default=0.01)
-    parser.add_argument('-min_epochs', type=int, default=10)
-    parser.add_argument('-max_epochs', type=int, default=50)
+    parser.add_argument('--min_epochs', type=int, default=10)
+    parser.add_argument('--max_epochs', type=int, default=50)
     parser.add_argument('--warmup_epochs', type=int, default=3)
+    parser.add_argument('--seed_list', nargs='+', default=[82])
+    parser.add_argument('--patience', type=int, default=5)
+    parser.add_argument('--monitored_metric', type=str, default='loss')
 
     # callbacks
     parser.add_argument('--top_k', default=1)
@@ -41,13 +43,30 @@ def get_args():
     parser.add_argument('--weight_dir', type=str, default='./model')
     parser.add_argument('--test_txt', type=str, default=None, help='txt file that records test results')
 
-
     args = parser.parse_args()
 
     return args
 
 
 args = get_args()
+
+# 开始时间
+start_time = datetime.datetime.now()
+print(f'Started at {str(start_time.strftime("%Y-%m-%d %H:%M:%S"))}')
+
+if args.isTrain:
+    print('Current Mode: 【Training】')
+    # 遍历每个seed
+    for cur_seed in args.seed_list:
+        setattr(args, 'cur_seed', cur_seed)
+        dann_cls = DANN_Trainer(args)
+
+
+else:
+    print('Current Mode: 【Testing】')
+
+
+
 
 manual_seed = args.seed
 random.seed(manual_seed)

@@ -1,41 +1,28 @@
-import torch, copy
+import torch, copy, random
 import torch.nn as nn
 import os
 from torch import optim
 from sklearn.metrics import confusion_matrix, balanced_accuracy_score
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-
+import numpy as np
 
 from utils.dann_utils import adjust_alpha, DotDict
 from implement_models.dann import Feature_extractor, Label_classifier, Domain_Classifier
 from data.dataset import my_dataset
 from data.dann_dataset import noise_dataset
 from configs.ds_path import DEVICE
-from training.callbacks import EarlyStopping, Model_Logger
+from training.dann_callbacks import EarlyStopping, Model_Logger
 
 
 class DANN_Trainer(object):
     def __init__(self, args):
         self.args = args
-        self.print_args()
-
-        self.drop_last = False
-        self.batch_size = self.args.batch_size
-        self.min_epochs = self.args.min_epochs
-        self.max_epochs = self.args.max_epochs
-        self.warmup_epochs = self.args.warmup_epochs
-
-        torch.manual_seed(self.args.seed)
 
         # 加载模型
         self.feature_model = Feature_extractor().to(DEVICE)
         self.label_model = Label_classifier().to(DEVICE)
         self.domain_model = Domain_Classifier().to(DEVICE)
-
-        # self.enc = Feature_extractor().to(DEVICE)
-        # self.clf = Label_classifier().to(DEVICE)
-        # self.fd = Domain_Classifier().to(DEVICE)
 
         # 损失函数，训练和测试都需要计算loss
         self.ce = nn.CrossEntropyLoss().to(DEVICE)
@@ -52,16 +39,49 @@ class DANN_Trainer(object):
 
         if self.args.isTrain:
             self.train_setup()
+        else:
+            # 若是测试，则创建 test 文件夹用于存储结果
+            self.callback_save_path = os.path.join(os.getcwd(), 'Test')
+            if not os.path.exists(self.callback_save_path):
+                os.mkdir(self.callback_save_path)
+            print(f'Test saving dir:{self.callback_save_path}')
+
+        self.print_args()
+
+
+
+
+        self.batch_size = self.args.batch_size
+        self.min_epochs = self.args.min_epochs
+        self.max_epochs = self.args.max_epochs
+        self.warmup_epochs = self.args.warmup_epochs
+
+
+
 
     def train_setup(self):
-        # 加载data
+        '''
+            初始化训练的各种参数
+        '''
+
+        # ********** 用seed固定GPU **********
+        torch.manual_seed(self.args.rand_seed)
+        np.random.seed(self.args.rand_seed)
+        random.seed(self.args.rand_seed)
+        if DEVICE != 'cpu':
+            torch.cuda.manual_seed(self.args.rand_seed)
+            # 确保CuDNN的确定性行为
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+
+        # ********** 加载 source / target data **********
         self.s_train_dataset = my_dataset(ds_name_list=self.args.source, path_key=self.args.path_key, txt_name=self.args.train_txt)
-        self.s_train_loader = DataLoader(self.s_train_dataset, batch_size=self.batch_size, shuffle=True, drop_last=self.drop_last)
+        self.s_train_loader = DataLoader(self.s_train_dataset, batch_size=self.batch_size, shuffle=True, drop_last=False)
 
         self.s_val_dataset = my_dataset(ds_name_list=self.args.source, path_key=self.args.path_key, txt_name=self.args.val_txt)
-        self.s_val_loader = DataLoader(self.s_val_dataset, batch_size=self.batch_size, shuffle=False, drop_last=self.drop_last)
+        self.s_val_loader = DataLoader(self.s_val_dataset, batch_size=self.batch_size, shuffle=False, drop_last=False)
 
-        # # 用random noise代替target domain
+        # # 用random noise代替target domain，后来实验验证不可行
         # self.t_train_dataset = noise_dataset(num=len(self.s_train_dataset))
         # self.t_train_loader = DataLoader(self.t_train_dataset, batch_size=self.batch_size, shuffle=True, drop_last=self.drop_last)
         #
@@ -70,36 +90,45 @@ class DANN_Trainer(object):
 
         # 用真实数据作为target domain
         self.t_train_dataset = my_dataset(ds_name_list=self.args.target, path_key=self.args.path_key, txt_name=self.args.train_txt)
-        self.t_train_loader = DataLoader(self.t_train_dataset, batch_size=self.batch_size, shuffle=True, drop_last=self.drop_last)
+        self.t_train_loader = DataLoader(self.t_train_dataset, batch_size=self.batch_size, shuffle=True, drop_last=False)
 
         self.t_val_dataset = my_dataset(ds_name_list=self.args.target, path_key=self.args.path_key, txt_name=self.args.val_txt)
-        self.t_val_loader = DataLoader(self.t_val_dataset, batch_size=128, shuffle=False, drop_last=self.drop_last)
+        self.t_val_loader = DataLoader(self.t_val_dataset, batch_size=128, shuffle=False, drop_last=False)
 
-        # optimizer
+        # ********** callback **********  命名规则为: DANN{source}{target}
+        self.callback_save_dir = f'DANN{self.args.source}{self.args.target}'
+        self.callback_save_path = os.path.join(os.getcwd(), self.callback_save_dir)
+        print(f'Callback_save_dir:{self.callback_save_path}')
+        if not os.path.exists(self.callback_save_path):
+            os.mkdir(self.callback_save_path)
+
+        self.early_stopping = EarlyStopping(self.callback_save_path, top_k=self.args.top_k, cur_epoch=0, patience=self.args.patience, monitored_metric=self.args.monitored_metric)
+        self.model_logger = Model_Logger(callback_dir=self.callback_save_path, model_name='DANN', ds_name_list=[self.args.source[0], self.args.target[0]])
+
+        # ********** loss & scheduler **********
         self.optimizer = torch.optim.RMSprop(params=list(self.feature_model.parameters()) + list(self.label_model.parameters()) + list(self.domain_model.parameters()), lr=0.0, weight_decay=1e-5, eps=0.001)
-
-        # callbacks
-        self.early_stopping = EarlyStopping(self.callback_dir, top_k=self.args.top_k, cur_epoch=0, patience=self.args.patience, monitored_metric=self.args.monitored_metric)
-        # self.model_logger = Model_Logger(save_dir=self.callback_dir, model_name='DANN', ds_name_list=[self.args.source[0], self.args.target[0]])
 
 
     def print_args(self):
         '''
-            Printing args to the console & Saing args to .txt file
+            参数打印并保存到txt文件中
         '''
         print('-' * 40 + ' Args ' + '-' * 40)
-        self.callback_name = 'DANN' + '_' + self.args.source[0] + self.args.target[0] + f'_{self.args.seed}'
 
-        self.callback_dir = os.path.join(os.getcwd(), self.callback_name)
-        if not os.path.exists(self.callback_dir):
-            os.mkdir(self.callback_dir)
-        print(f'Callback dir: {self.callback_dir}')
+        info = []
+        for k, v in vars(self.args).items():
+            msg = f'{k}: {v}'
+            print(msg)
+            info.append(msg)
 
-        with open(os.path.join(self.callback_dir, 'Args.txt'), 'a') as f:
-            for k, v in vars(self.args).items():
-                msg = f'{k}: {v}'
-                print(msg)
-                f.write(msg + '\n')
+        # 将本次实验的参数写入txt中
+        write_to_txt = os.path.join(self.callback_save_path, 'Args.txt')
+        if os.path.exists(write_to_txt):
+            os.remove(write_to_txt)
+        with open(write_to_txt, 'a') as f:
+            for item in info:
+                f.write(item+'\n')
+
 
     def val_on_epoch_end(self, data_loader, epoch):
         self.feature_model.eval()
@@ -281,35 +310,42 @@ class DANN_Trainer(object):
         print("Target iters per epoch: %d" % (t_iter_per_epoch))
         print("iters per epoch: %d" % (min(s_iter_per_epoch, t_iter_per_epoch)))
 
-        # self.optimizer = optim.Adam(params=list(self.feature_model.parameters()) + list(self.label_model.parameters()) + list(self.domain_model.parameters()), lr=self.base_lr, betas=(0.9, 0.999), eps=1e-8, weight_decay=0)
-        # self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, T_max=self.max_epochs - self.warmup_epochs)
-
-
         for EPOCH in range(self.max_epochs):
 
             # 在epoch开始之前调节lr
             self.update_learning_rate(EPOCH + 1)
 
             train_info = self.train_one_epoch(EPOCH+1, min_len=min_len)
-            # val_info = self.val_on_epoch_end(self.t_val_loader, epoch=EPOCH+1)        # 用真实数据作为target
-            val_info = self.val_on_epoch_end(self.s_val_loader, epoch=EPOCH+1)          # 用noise作为target
+            val_info = self.val_on_epoch_end(self.t_val_loader, epoch=EPOCH+1)        # 用真实数据作为target
 
             print(f'Learning Rate: {self.optimizer.param_groups[0]["lr"]}')
             print(f'Train loss {train_info["loss"]:.6f}, train_bc:{train_info["balanced_accuracy"]:.4f}')
             print(f'Val loss {val_info["loss"]:.6f}, val_bc:{val_info["balanced_accuracy"]:.4f}')
 
-            # callback, model logger
+            # ------------------------ 调用callbacks ------------------------
             self.model_logger(epoch=EPOCH+1, training_info=train_info, val_info=val_info)
 
-            # 在低于min train epoch时，每次重置early stop的参数
-            if (EPOCH + 1) <= self.min_epochs:
-                self.early_stopping.counter = 0
-                self.early_stopping.early_stop = False
-            else:  # 当训练次数超过最低epoch时，其中early_stop策略
+            # ------------------------ 学习率调整 ------------------------
+            self.update_learning_rate(EPOCH + 1)
+
+            # 当训练次数超过最低epoch时，其中early_stop策略
+            if (EPOCH + 1) > self.args.min_train_epoch:
                 self.early_stopping(EPOCH + 1, enc=self.feature_model, clf=self.label_model, fd=self.domain_model, val_epoch_info=val_info)
+
                 if self.early_stopping.early_stop:
                     print(f'Early Stopping!')
                     break
+
+
+            # # 在低于min train epoch时，每次重置early stop的参数
+            # if (EPOCH + 1) <= self.min_epochs:
+            #     self.early_stopping.counter = 0
+            #     self.early_stopping.early_stop = False
+            # else:  # 当训练次数超过最低epoch时，其中early_stop策略
+            #     self.early_stopping(EPOCH + 1, enc=self.feature_model, clf=self.label_model, fd=self.domain_model, val_epoch_info=val_info)
+            #     if self.early_stopping.early_stop:
+            #         print(f'Early Stopping!')
+            #         break
 
 
 
