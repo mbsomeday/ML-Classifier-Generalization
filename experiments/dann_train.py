@@ -49,7 +49,7 @@ class DANN_Trainer(object):
         self.print_args()
 
 
-        self.batch_size = self.args.batch_size
+        # self.batch_size = self.args.batch_size
         self.min_epochs = self.args.min_epochs
         self.max_epochs = self.args.max_epochs
         self.warmup_epochs = self.args.warmup_epochs
