@@ -35,8 +35,8 @@ def get_args():
     parser.add_argument('--seed_list', nargs='+', default=[82])
 
     # callbacks
-    parser.add_argument('--top_k', default=1)
-    parser.add_argument('--patience', default=5)
+    parser.add_argument('--top_k', type=int, default=1)
+    parser.add_argument('--patience', type=int, default=5)
 
     # test
     parser.add_argument('--test_ds_list', nargs='+', default=None)
