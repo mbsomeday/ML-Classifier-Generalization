@@ -92,7 +92,7 @@ class DANN_Trainer(object):
         self.t_val_loader = DataLoader(self.t_val_dataset, batch_size=self.args.val_batch_size, shuffle=False, drop_last=False)
 
         # ********** callback **********  命名规则为: DANN{source}{target}
-        self.callback_save_dir = f'DANN{self.args.source[0]}{self.args.target[0]}_{self.args.cur_seed}'
+        self.callback_save_dir = f'DANN{self.args.source[0]}{self.args.target[0]}_{self.args.cur_seed[0]}'
         self.callback_save_path = os.path.join(os.getcwd(), self.callback_save_dir)
         print(f'Callback_save_dir:{self.callback_save_path}')
         if not os.path.exists(self.callback_save_path):
