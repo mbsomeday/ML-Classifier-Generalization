@@ -32,7 +32,6 @@ def get_args():
     parser.add_argument('--warmup_epochs', type=int, default=3)
     parser.add_argument('--seed_list', nargs='+', default=[82])
     parser.add_argument('--patience', type=int, default=5)
-    parser.add_argument('--monitored_metric', type=str, default='loss')
 
     # callbacks
     parser.add_argument('--top_k', default=1)
