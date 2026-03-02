@@ -31,7 +31,7 @@ def get_args():
     parser.add_argument('--base_lr', type=float, default=0.01)
     parser.add_argument('--isTrain', action='store_true')
     parser.add_argument('--min_train_epoch', type=int, default=10)
-    parser.add_argument('--max_train_epoch', type=int, default=50)
+    parser.add_argument('--max_train_epoch', type=int, default=100)
     parser.add_argument('--seed_num', type=int, default=1, help='set the number of training times for getting the average value')
 
     parser.add_argument('--top_k', type=int, default=1)
