@@ -89,7 +89,7 @@ KAGGLE = {
 
     'Stage6_experiment': {
         'D2': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-citypersons-experiment',
-        'cycleGAN': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-cyclegan-d2tod1/CycleGAN_D2toD1'
+        'D6': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-cyclegan-d2tod1/CycleGAN_D2toD1'
 
 
     },
