@@ -275,7 +275,6 @@ class Ped_Classifier():
             ped_acc_num = 0
             test_correct_num = 0
 
-
             test_nonPed_num, test_ped_num = test_dataset.get_ped_cls_num()
 
             with torch.no_grad():

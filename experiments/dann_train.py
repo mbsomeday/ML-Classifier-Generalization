@@ -165,9 +165,9 @@ class DANN_Trainer(object):
         return f'{tn}, {fp}, {fn}, {tp}'
 
     def test(self):
-        # load test data
-        test_dataset = my_dataset(ds_name_list=self.args.test_ds_list, path_key=self.args.path_key, txt_name='test.txt')
-        test_loader = DataLoader(test_dataset, batch_size=self.args.test_batch_size, shuffle=False)
+        '''
+            遍历每个数据集对模型进行测试，并将结果保存到Test文件夹中
+        '''
 
         # load model
         for item in os.listdir(self.args.weight_dir):
@@ -185,32 +185,73 @@ class DANN_Trainer(object):
 
         self.feature_model.eval()
         self.label_model.eval()
+        self.domain_model.eval()
 
-        # 开始测试
-        y_true = []
-        y_pred = []
-        test_loss = 0.0
+        write_to_txt = os.path.join(self.callback_save_path, 'Test.txt')
+        with open(write_to_txt, 'a') as f:
+            f.write('-' * 80 + '\n')
+            f.write(f'Testing model weights dir: {os.listdir(self.args.weight_dir)}.\n')
+            f.write('ds_name, test_ba, tnr, tpr, tn, fp, fn, tp\n')
 
-        with torch.no_grad():
-            for batch_idx, data_dict in enumerate(tqdm(test_loader, desc='Test')):
-                images, labels = data_dict['image'].to(DEVICE), data_dict['ped_label'].to(DEVICE)
+        for ds_name in self.args.test_ds_list:
 
-                logits = self.label_model(self.feature_model(images))
-                preds = torch.argmax(logits, dim=1)
-                loss_value = self.ce(logits, labels)
-                test_loss += loss_value.item()
+            # load test data
+            test_dataset = my_dataset(ds_name_list=[ds_name], path_key=self.args.path_key, txt_name='test.txt')
+            test_loader = DataLoader(test_dataset, batch_size=self.args.test_batch_size, shuffle=False)
 
-                y_true.extend(labels.cpu().numpy())
-                y_pred.extend(preds.cpu().numpy())
+            y_true = []
+            y_pred = []
+            nonPed_acc_num = 0
+            ped_acc_num = 0
+            test_correct_num = 0
+            test_loss = 0.0
 
-            test_ba = balanced_accuracy_score(y_true, y_pred)
-            test_cm = confusion_matrix(y_true, y_pred)
-            print(f'cm: {test_cm}')
+            test_nonPed_num, test_ped_num = test_dataset.get_ped_cls_num()
 
-            with open(self.args.res_save_txt, 'a') as f:
-                msg = f'model_weights: {self.args.weight_dir}\nds_name: {self.args.test_ds_list[0]}\nTest loss: {test_loss:.4f}\nTest balanced acc: {test_ba:.4f}\ntn, fp, fn, tp: {self.decomp_cm(test_cm)}\n'
+            with torch.no_grad():
+                for batch_idx, data_dict in enumerate(tqdm(test_loader, desc='Test')):
+                    images, ped_labels = data_dict['image'].to(DEVICE), data_dict['ped_label'].to(DEVICE)
+
+                    logits = self.label_model(self.feature_model(images))
+                    preds = torch.argmax(logits, dim=1)
+                    loss_value = self.ce(logits, ped_labels)
+                    test_loss += loss_value.item()
+
+                    y_true.extend(ped_labels.cpu().numpy())
+                    y_pred.extend(preds.cpu().numpy())
+
+                    nonPed_idx = (ped_labels == 0)
+                    nonPed_acc_num += (ped_labels[nonPed_idx] == preds[nonPed_idx]).sum()
+                    ped_idx = (ped_labels == 1)
+                    ped_acc_num += ((ped_labels[ped_idx] == preds[ped_idx]) * 1).sum()
+
+                test_ba = balanced_accuracy_score(y_true, y_pred)
+                test_cm = confusion_matrix(y_true, y_pred)
+
+                test_nonPed_acc = nonPed_acc_num / test_nonPed_num
+                test_ped_acc = ped_acc_num / test_ped_num
+
+                msg = f'DS_name:{ds_name}, Balanced accuracy:{test_ba:.4f}\nNon-ped accuracy:{test_nonPed_acc:.4f}({nonPed_acc_num}/{test_nonPed_num}), Ped accuracy:{test_ped_acc:.4f}({ped_acc_num}/{test_ped_num})'
                 print(msg)
-                f.write(msg)
+                print(f'CM on test set:\n{test_cm}')
+
+                print('-' * 40 + 'Test Info' + '-' * 40)
+
+                tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+                print(tn, fp, fn, tp)
+
+                with open(write_to_txt, 'a') as f:
+                    f.write(
+                        f'{ds_name}, {test_ba:.6f}, {test_nonPed_acc:.4f}, {test_ped_acc:.4f}, {tn}, {fp}, {fn}, {tp}\n')
+
+
+
+            # print(f'cm: {test_cm}')
+            #
+            # with open(self.args.res_save_txt, 'a') as f:
+            #     msg = f'model_weights: {self.args.weight_dir}\nds_name: {self.args.test_ds_list[0]}\nTest loss: {test_loss:.4f}\nTest balanced acc: {test_ba:.4f}\ntn, fp, fn, tp: {self.decomp_cm(test_cm)}\n'
+            #     print(msg)
+            #     f.write(msg)
 
     # def update_learning_rate(self, epoch):
     #     old_lr = self.optimizer.param_groups[0]['lr']
