@@ -166,8 +166,8 @@ class DANN_Trainer(object):
 
     def test(self):
         # load test data
-        test_dataset = my_dataset(ds_name_list=self.args.test_ds_list, path_key='Stage6_org', txt_name='test.txt')
-        test_loader = DataLoader(test_dataset, batch_size=128, shuffle=False)
+        test_dataset = my_dataset(ds_name_list=self.args.test_ds_list, path_key=self.args.path_key, txt_name='test.txt')
+        test_loader = DataLoader(test_dataset, batch_size=self.args.test_batch_size, shuffle=False)
 
         # load model
         for item in os.listdir(self.args.weight_dir):
@@ -207,7 +207,7 @@ class DANN_Trainer(object):
             test_cm = confusion_matrix(y_true, y_pred)
             print(f'cm: {test_cm}')
 
-            with open(self.args.test_txt, 'a') as f:
+            with open(self.args.res_save_txt, 'a') as f:
                 msg = f'model_weights: {self.args.weight_dir}\nds_name: {self.args.test_ds_list[0]}\nTest loss: {test_loss:.4f}\nTest balanced acc: {test_ba:.4f}\ntn, fp, fn, tp: {self.decomp_cm(test_cm)}\n'
                 print(msg)
                 f.write(msg)

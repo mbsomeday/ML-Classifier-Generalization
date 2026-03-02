@@ -8,8 +8,8 @@ sys.path.append(root_path)
 import argparse, random, torch, os, datetime
 import numpy as np
 
-
 from experiments.dann_train import DANN_Trainer
+from utils.utils import load_model
 
 
 def get_args():
@@ -27,7 +27,7 @@ def get_args():
 
     # train
     parser.add_argument('--monitored_metric', default='loss')
-    parser.add_argument('--isTrain', action='store_true')
+    parser.add_argument('--isTrain', action='store_true', default=False)
     parser.add_argument('--base_lr', type=float, default=0.01)
     parser.add_argument('--min_train_epochs', type=int, default=10)
     parser.add_argument('--max_train_epochs', type=int, default=100)
@@ -39,9 +39,10 @@ def get_args():
     parser.add_argument('--patience', type=int, default=5)
 
     # test
-    parser.add_argument('--test_ds_list', nargs='+', default=None)
-    parser.add_argument('--weight_dir', type=str, default='./model')
-    parser.add_argument('--test_txt', type=str, default=None, help='txt file that records test results')
+    parser.add_argument('--test_ds_list', nargs='+', default=['D2'])
+    parser.add_argument('--weight_dir', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\DANN\DANND2D1_6\25_15.36598')
+    parser.add_argument('--res_save_txt', type=str, default='DANN_res.txt', help='txt file that records test results')
+    parser.add_argument('--test_batch_size', type=int, default=128)
 
     args = parser.parse_args()
 
@@ -64,6 +65,8 @@ if args.isTrain:
 
 else:
     print('Current Mode: 【Testing】')
+    dann_cls = DANN_Trainer(args)
+    dann_cls.test()
 
 
 # 结束时间
@@ -73,30 +76,6 @@ print(f'Ended at {str(end_time.strftime("%Y-%m-%d %H:%M:%S"))}')
 print(f'Duration: {str(duration)}')
 
 
-# manual_seed = args.seed
-# random.seed(manual_seed)
-# torch.manual_seed(manual_seed)
-# np.random.seed(manual_seed)
-# os.environ['PYTHONHASHSEED'] = str(manual_seed)
-#
-# if torch.cuda.is_available():
-#     torch.cuda.manual_seed(manual_seed)         # 设置当前GPU的seed
-#     torch.cuda.manual_seed_all(manual_seed)     # 有多个GPU的情况，确保所有GPU都用相同的seed
-#     torch.backends.cudnn.deterministic = True
-#     torch.backends.cudnn.benchmark = False
-#
-# start_time = datetime.datetime.now()
-# print("Started at " + str(start_time.strftime('%Y-%m-%d %H:%M:%S')))
-#
-# dann_cls = DANN_Trainer(args)
-# if args.isTrain:
-#     dann_cls.train()
-#     end_time = datetime.datetime.now()
-#     duration = end_time - start_time
-#     print("Ended at " + str(end_time.strftime('%Y-%m-%d %H:%M:%S')))
-#     print("Duration: " + str(duration))
-# else:
-#     dann_cls.test()
 
 
 
