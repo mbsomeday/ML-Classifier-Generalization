@@ -385,10 +385,10 @@ class DANN_Trainer(object):
 
             print(f'Train info:')
             for k, v in train_info.items():
-                print(f'{k} - {v}')
+                print(f'{k} - {v:.6f}')
             print(f'Val info:')
             for k, v in val_info.items():
-                print(f'{k} - {v}')
+                print(f'{k} - {v:.6f}')
 
             # print(f'Train loss {train_info["loss"]:.6f}, train_bc:{train_info["balanced_accuracy"]:.4f}')
             # print(f'Val loss {val_info["loss"]:.6f}, val_bc:{val_info["balanced_accuracy"]:.4f}')
