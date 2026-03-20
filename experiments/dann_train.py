@@ -358,8 +358,8 @@ class DANN_Trainer(object):
         domain_model_bc = balanced_accuracy_score(domain_true, domain_pred)
 
         train_epoch_info = {
-            'label model balanced_accuracy': train_bc,
-            'domain model balanced_accuracy': domain_model_bc,
+            'label model balanced accuracy': train_bc,
+            'domain model balanced accuracy': domain_model_bc,
             'loss': average_train_loss
         }
 
@@ -376,12 +376,20 @@ class DANN_Trainer(object):
         print("iters per epoch: %d" % (min(s_iter_per_epoch, t_iter_per_epoch)))
 
         for EPOCH in range(self.args.max_train_epochs):
+            print(f'Learning Rate: {self.optimizer.param_groups[0]["lr"]}')
+
             train_info = self.train_one_epoch(EPOCH+1, min_len=min_len)
             val_info = self.val_on_epoch_end(self.s_val_loader, self.s_val_dataset, epoch=EPOCH+1)        # 用真实数据作为target
 
-            print(f'Learning Rate: {self.optimizer.param_groups[0]["lr"]}')
-            print(f'Train loss {train_info["loss"]:.6f}, train_bc:{train_info["balanced_accuracy"]:.4f}')
-            print(f'Val loss {val_info["loss"]:.6f}, val_bc:{val_info["balanced_accuracy"]:.4f}')
+            print(f'Train info:')
+            for k, v in train_info.items():
+                print(f'{k} - {v}')
+            print(f'Val info:')
+            for k, v in val_info.items():
+                print(f'{k} - {v}')
+
+            # print(f'Train loss {train_info["loss"]:.6f}, train_bc:{train_info["balanced_accuracy"]:.4f}')
+            # print(f'Val loss {val_info["loss"]:.6f}, val_bc:{val_info["balanced_accuracy"]:.4f}')
 
             # ------------------------ 调用callbacks ------------------------
             self.model_logger(epoch=EPOCH+1, training_info=train_info, val_info=val_info)
