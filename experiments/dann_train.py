@@ -155,7 +155,7 @@ class DANN_Trainer(object):
                 domain_true.extend(domain_label.cpu().numpy())
                 domain_pred.extend(torch.argmax(domain_out, dim=1).cpu().numpy())
 
-                domain_correct_num += (domain_out == domain_label).sum()
+                domain_correct_num += (torch.argmax(domain_out, dim=1) == domain_label).sum()
 
                 # 便于最终计算每个样本的loss
                 batch_loss_sum = loss_value.item() * self.args.val_batch_size
