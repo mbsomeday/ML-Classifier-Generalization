@@ -124,17 +124,21 @@ class DANN_Trainer(object):
     def val_on_epoch_end(self, data_loader, val_dataset, epoch):
         self.feature_model.eval()
         self.label_model.eval()
+        self.domain_model.eval()
 
         y_true = []
         y_pred = []
-        # val_loss = 0.0
         total_loss_sum = 0.0
+
+        domain_true = []
+        domain_pred = []
 
         with torch.no_grad():
             for batch_idx, data_dict in enumerate(tqdm(data_loader, desc=f'Epoch {epoch} val')):
                 images, labels = data_dict['image'].to(DEVICE), data_dict['ped_label'].to(DEVICE)
 
-                logits = self.label_model(self.feature_model(images))
+                features = self.feature_model(images)
+                logits = self.label_model(features)
                 preds = torch.argmax(logits, dim=1)
                 # loss_value = self.ce(logits, labels)
                 loss_value = self.label_loss(logits, labels)
@@ -143,17 +147,26 @@ class DANN_Trainer(object):
                 y_true.extend(labels.cpu().numpy())
                 y_pred.extend(preds.cpu().numpy())
 
+                # 用于计算domain model的准确率
+                domain_out = self.domain_model(features)
+                domain_label = torch.zeros(size=(images.shape[0],), dtype=torch.long).to(DEVICE)
+
+                domain_true.extend(domain_label.cpu().numpy())
+                domain_pred.extend(torch.argmax(domain_out, dim=1).cpu().numpy())
+
                 # 便于最终计算每个样本的loss
                 batch_loss_sum = loss_value.item() * self.args.val_batch_size
                 total_loss_sum += batch_loss_sum
 
         val_bc = balanced_accuracy_score(y_true, y_pred)
+        domain_model_ba = balanced_accuracy_score(domain_true, domain_pred)
         average_val_loss = total_loss_sum / len(val_dataset)
 
         cm = confusion_matrix(y_true=y_true, y_pred=y_pred, labels=range(2))
 
         val_epoch_info = {
-            'balanced_accuracy': val_bc,
+            'label model balanced_accuracy': val_bc,
+            'domain model balanced_accuracy': domain_model_ba,
             'loss': average_val_loss
         }
         return DotDict(val_epoch_info)
@@ -288,6 +301,9 @@ class DANN_Trainer(object):
         y_true = []
         y_pred = []
 
+        domain_true = []
+        domain_pred = []
+
         for batch_idx, (source_dict, target_dict) in tqdm(enumerate(zip(self.s_train_loader, self.t_train_loader)), total=len(self.s_train_loader), desc=f'Epoch {epoch} train'):
             # 调节domain classifier的alpha
             alpha = adjust_alpha(batch_idx, epoch, min_len, self.args.max_train_epochs)
@@ -307,16 +323,21 @@ class DANN_Trainer(object):
             s_domain_out = self.domain_model(s_feature, alpha=alpha)
             t_domain_out = self.domain_model(t_feature, alpha=alpha)
 
-            # 重新设置了source and target label
+            # source and target label
             source_domain_label = torch.zeros(size=(source.shape[0],), dtype=torch.long).to(DEVICE)
             target_domain_label = torch.ones(size=(target.shape[0],), dtype=torch.long).to(DEVICE)
             s_domain_err = self.domain_loss(s_domain_out, source_domain_label)
             t_domain_err = self.domain_loss(t_domain_out, target_domain_label)
 
+            # 计算domain model的准确率
+            domain_true.extend(source_domain_label.cpu().numpy())
+            domain_pred.extend(torch.argmax(s_domain_out, dim=1).cpu().numpy())
+            domain_true.extend(target_domain_label.cpu().numpy())
+            domain_pred.extend(torch.argmax(t_domain_out, dim=1).cpu().numpy())
+
             domain_loss = s_domain_err + t_domain_err
             s_label_loss = self.label_loss(s_out, s_labels)
             loss_value = s_label_loss + domain_loss
-            # loss_val += loss.item()
 
             self.optimizer.zero_grad()
             loss_value.backward()
@@ -333,8 +354,12 @@ class DANN_Trainer(object):
         train_bc = balanced_accuracy_score(y_true, y_pred)
         average_train_loss = total_loss_sum / len(self.s_train_dataset)
 
+        # 计算domain model的准确率
+        domain_model_bc = balanced_accuracy_score(domain_true, domain_pred)
+
         train_epoch_info = {
-            'balanced_accuracy': train_bc,
+            'label model balanced_accuracy': train_bc,
+            'domain model balanced_accuracy': domain_model_bc,
             'loss': average_train_loss
         }
 
