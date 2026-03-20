@@ -21,6 +21,8 @@ class GradReverse(Function):
 def adjust_alpha(i, epoch, min_len, nepochs):
     '''
         sigmoid函数的变体，将alpha逐渐从0增加到1
+        p: 训练进度，从0到1
+        alpha: 对抗强度，从0到1，慢慢增加对抗强度，最开始主要学习label classifier,等label学会了，再给domain classifier上强度
     '''
     p = float(i + epoch * min_len) / nepochs / min_len
     o = -10

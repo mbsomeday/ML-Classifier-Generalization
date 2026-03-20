@@ -1,3 +1,5 @@
+# https://github.com/NaJaeMin92/pytorch-DANN
+
 import torch, copy, random
 import torch.nn as nn
 import os
@@ -26,7 +28,10 @@ class DANN_Trainer(object):
 
         # 损失函数，训练和测试都需要计算loss
         self.ce = nn.CrossEntropyLoss().to(DEVICE)
-        # self.bce = nn.BCELoss()
+
+        # todo: 分别为 label_model 和 domain_model 设置loss
+        self.label_loss = nn.CrossEntropyLoss().to(DEVICE)
+        self.domain_loss = nn.CrossEntropyLoss().to(DEVICE)
 
         self.best_ba = 0    # balanced acc
         self.time_taken = None
@@ -47,13 +52,6 @@ class DANN_Trainer(object):
             print(f'Test saving dir:{self.callback_save_path}')
 
         self.print_args()
-
-
-        # self.batch_size = self.args.batch_size
-        # self.min_epochs = self.args.min_epochs
-        # self.max_epochs = self.args.max_epochs
-        # self.warmup_epochs = self.args.warmup_epochs
-
 
     def train_setup(self):
         '''
@@ -140,7 +138,8 @@ class DANN_Trainer(object):
 
                 logits = self.label_model(self.feature_model(images))
                 preds = torch.argmax(logits, dim=1)
-                loss_value = self.ce(logits, labels)
+                # loss_value = self.ce(logits, labels)
+                loss_value = self.label_loss(logits, labels)
                 val_loss += loss_value.item()
 
                 y_true.extend(labels.cpu().numpy())
@@ -214,7 +213,8 @@ class DANN_Trainer(object):
 
                     logits = self.label_model(self.feature_model(images))
                     preds = torch.argmax(logits, dim=1)
-                    loss_value = self.ce(logits, ped_labels)
+                    # loss_value = self.ce(logits, ped_labels)
+                    loss_value = self.label_loss(logits, ped_labels)
                     test_loss += loss_value.item()
 
                     y_true.extend(ped_labels.cpu().numpy())
@@ -285,11 +285,8 @@ class DANN_Trainer(object):
         y_true = []
         y_pred = []
 
-        for batch_idx, (source_dict, target_dict) in tqdm(enumerate(zip(self.s_train_loader, self.t_train_loader)),
-                                                          total=len(self.s_train_loader),
-                                                          desc=f'Epoch {epoch} train'):
+        for batch_idx, (source_dict, target_dict) in tqdm(enumerate(zip(self.s_train_loader, self.t_train_loader)), total=len(self.s_train_loader), desc=f'Epoch {epoch} train'):
             # 调节domain classifier的alpha
-            # total_iters += 1
             alpha = adjust_alpha(batch_idx, epoch, min_len, self.args.max_train_epochs)
 
             # 加载数据
@@ -308,14 +305,20 @@ class DANN_Trainer(object):
             s_domain_out = self.domain_model(s_feature, alpha=alpha)
             t_domain_out = self.domain_model(t_feature, alpha=alpha)
 
-            # 两个classifier都用交叉熵损失
-            real_label = torch.ones(size=(source.shape[0],), dtype=torch.long).to(DEVICE)
-            fake_label = torch.zeros(size=(target.shape[0],), dtype=torch.long).to(DEVICE)
-            s_domain_err = self.ce(s_domain_out, real_label)
-            t_domain_err = self.ce(t_domain_out, fake_label)
+            # 重新设置了source and target label
+            source_domain_label = torch.zeros(size=(source.shape[0],), dtype=torch.long).to(DEVICE)
+            target_domain_label = torch.ones(size=(target.shape[0],), dtype=torch.long).to(DEVICE)
+            s_domain_err = self.domain_loss(s_domain_out, source_domain_label)
+            t_domain_err = self.domain_loss(t_domain_out, target_domain_label)
+
+            # # 两个classifier都用交叉熵损失
+            # real_label = torch.ones(size=(source.shape[0],), dtype=torch.long).to(DEVICE)
+            # fake_label = torch.zeros(size=(target.shape[0],), dtype=torch.long).to(DEVICE)
+            # s_domain_err = self.ce(s_domain_out, real_label)
+            # t_domain_err = self.ce(t_domain_out, fake_label)
 
             domain_loss = s_domain_err + t_domain_err
-            s_label_loss = self.ce(s_out, s_labels)
+            s_label_loss = self.label_loss(s_out, s_labels)
             loss = s_label_loss + domain_loss
             loss_val += loss.item()
 
@@ -341,17 +344,12 @@ class DANN_Trainer(object):
         s_iter_per_epoch = len(self.s_train_loader)
         t_iter_per_epoch = len(self.t_train_loader)
         min_len = min(s_iter_per_epoch, t_iter_per_epoch)
-        # total_iters = 0
 
         print("Source iters per epoch: %d" % (s_iter_per_epoch))
         print("Target iters per epoch: %d" % (t_iter_per_epoch))
         print("iters per epoch: %d" % (min(s_iter_per_epoch, t_iter_per_epoch)))
 
         for EPOCH in range(self.args.max_train_epochs):
-
-            # 在epoch开始之前调节lr
-            self.update_learning_rate(EPOCH + 1)
-
             train_info = self.train_one_epoch(EPOCH+1, min_len=min_len)
             val_info = self.val_on_epoch_end(self.t_val_loader, epoch=EPOCH+1)        # 用真实数据作为target
 
@@ -361,9 +359,9 @@ class DANN_Trainer(object):
 
             # ------------------------ 调用callbacks ------------------------
             self.model_logger(epoch=EPOCH+1, training_info=train_info, val_info=val_info)
-
-            # ------------------------ 学习率调整 ------------------------
-            self.update_learning_rate(EPOCH + 1)
+            #
+            # # ------------------------ 学习率调整 ------------------------
+            # self.update_learning_rate(EPOCH + 1)
 
             # 当训练次数超过最低epoch时，其中early_stop策略
             if (EPOCH + 1) > self.args.min_train_epochs:

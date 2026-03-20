@@ -85,6 +85,7 @@ KAGGLE = {
         'D1': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-ecp',
         'D2': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-citypersons',
         'D3': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-bdd100k',
+        'cycleD2toD1': r''
     },
 
     'Stage6_experiment': {
@@ -92,6 +93,8 @@ KAGGLE = {
 
 
     },
+
+
 
     'org_dataset': {
         'D1': r'/kaggle/input/stage4-d1-ecpdaytime-7augs',

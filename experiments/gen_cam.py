@@ -37,7 +37,7 @@ def get_args():
     parser.add_argument('--save_dir', type=str, default=r'D:\my_phd\on_git\ML-Classifier-Generalization\aa_test')
     parser.add_argument('--ds_name_list', nargs='+', default=['D1'])
     parser.add_argument('--model_weights', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\dsClsD1D2D3-08-1.09839.pth')
-    parser.add_argument('--perturb_dir', type=str, default=r'D:\my_phd\dataset\Stage6\stage6_ecp\Perturbations\Attack_FastGradient_test')
+    parser.add_argument('--perturb_dir', type=str, default=r'D:\my_phd\dataset\Stage6\stage6_ecp\Perturbations\V1\Attack_FastGradient_test')
     parser.add_argument('--txt_name', type=str, default='test.txt')
 
     args = parser.parse_args()
@@ -46,7 +46,8 @@ def get_args():
 
 # 变量设置
 args = get_args()
-torch.manual_seed(43)
+# 35, 39, 48
+torch.manual_seed(48)
 batch_size = 1
 txt_name = args.txt_name
 save_dir = args.save_dir
@@ -107,6 +108,7 @@ for data_dict in tqdm(train_loader):
     img_name = data_dict['img_name'][0]
     ped_label = data_dict['ped_label'].to(DEVICE)
     # print(f'img_name:{img_name}， ped_label:{ped_label}')
+    print(f'image_path:{image_path}')
 
     cls_name = image_path.split(os.sep)[-2]
 
@@ -126,7 +128,6 @@ for data_dict in tqdm(train_loader):
     (cam_min, cam_max) = (comb_layercam.min(), comb_layercam.max())
     norm_cam = (comb_layercam - cam_min) / (((cam_max - cam_min) + 1e-08)).data
 
-
     plt_cam = plt_transformer(norm_cam[0])
 
     # plt_cam = plt_transformer(cam[0])
@@ -136,6 +137,7 @@ for data_dict in tqdm(train_loader):
     cam_mask = cam_array < (0.4 * cam_array.max())  # 将图像不感兴趣的区域保留
     # cam_mask = cam_array >= (0.4 * cam_array.max())       # 将图像感兴趣的区域保留
     plt_mask = cam_mask * 1.0
+
     plt_mask = plt_mask[np.newaxis, :]
 
     # 加载perturb图片
@@ -153,11 +155,11 @@ for data_dict in tqdm(train_loader):
     aug_image = cur_trans(plt_transformer(image[0]))
     aug_image_tensor = tensor_transformer(aug_image)
 
-    # # 将perturb与org图片合并
-    # perturb_and_org = transforms.ToTensor()(perturb_image) * (1 - plt_mask) + image[0] * plt_mask
+    # 将perturb与org图片合并
+    perturb_and_org = transforms.ToTensor()(perturb_image) * (1 - plt_mask) + image[0] * plt_mask
 
-    # 将perturb与扩增图片合并
-    perturb_and_aug = transforms.ToTensor()(perturb_image) * (1 - plt_mask) + aug_image_tensor * plt_mask
+    # # 将perturb与扩增图片合并
+    # perturb_and_aug = transforms.ToTensor()(perturb_image) * (1 - plt_mask) + aug_image_tensor * plt_mask
 
     # print(f'image:{image.dtype}, perturb_and_org:{perturb_and_org.dtype}')
 
@@ -173,7 +175,7 @@ for data_dict in tqdm(train_loader):
     # 保存perturb + aug图片
     new_image_name = os.path.splitext(img_name)[0] + '_' + trans_name_list[trans_idx] + os.path.splitext(img_name)[-1]
     save_path = os.path.join(save_dir, cls_name, new_image_name)
-    save_image_tensor(perturb_and_aug.unsqueeze(0), save_path)
+    # save_image_tensor(perturb_and_aug.unsqueeze(0), save_path)
 
 
     # comb_image = transforms.ToTensor()(aug_image) * (1 - plt_mask) + image[0] * plt_mask
@@ -182,7 +184,7 @@ for data_dict in tqdm(train_loader):
 
     # 保存原始图片
     save_path = os.path.join(save_dir, cls_name, img_name)
-    save_image_tensor(image, save_path)
+    # save_image_tensor(image, save_path)
 
 
     # 循环所有的trans
@@ -202,35 +204,38 @@ for data_dict in tqdm(train_loader):
     # # print(type(comb_image))
     # save_image_tensor(comb_image.unsqueeze(0), save_path)
 
-
-    # plt_imgs = 4
-    #
-    # # 创建一个包含两个子图的网格
-    # plt.subplot(1, plt_imgs, 1)
-    # plt.imshow(plt_transformer(image[0]))
-    # plt.title('org')
-    # plt.axis('off')  # 关闭坐标轴
-    #
-    # plt.subplot(1, plt_imgs, 2)
-    # plt.imshow(plt_cam)
-    # plt.title('cam')
-    # plt.axis('off')  # 关闭坐标轴
-    #
-    # plt.subplot(1, plt_imgs, 3)
-    # plt.imshow(plt_mask[0], cmap='gray')
-    # # plt.imshow(plt_transformer(norm_cam[0]))
-    # plt.title('mask')
-    #
-    # plt.subplot(1, plt_imgs, 4)
-    # plt.imshow(plt_transformer(perturb_and_aug))
-    # plt.title('Aug + Perturb')
-    # plt.axis('off')  # 关闭坐标轴
-    #
-    # # 显示图片
-    # plt.show()
+    plt.imshow(plt_transformer(perturb_and_aug))
+    plt.show()
 
 
-    # break
+    # 创建一个包含两个子图的网格
+    plt_imgs = 4
+
+    plt.subplot(1, plt_imgs, 1)
+    plt.imshow(plt_transformer(image[0]))
+    plt.title('org')
+    plt.axis('off')  # 关闭坐标轴
+
+    plt.subplot(1, plt_imgs, 2)
+    plt.imshow(plt_cam)
+    plt.title('cam')
+    plt.axis('off')  # 关闭坐标轴
+
+    plt.subplot(1, plt_imgs, 3)
+    plt.imshow(plt_mask[0], cmap='gray')
+    # plt.imshow(plt_transformer(norm_cam[0]))
+    plt.title('mask')
+
+    plt.subplot(1, plt_imgs, 4)
+    plt.imshow(plt_transformer(perturb_and_aug))
+    plt.title('Aug + Perturb')
+    plt.axis('off')  # 关闭坐标轴
+
+    # 显示图片
+    plt.show()
+
+
+    break
 
 
 # def gen_comb_txt():
