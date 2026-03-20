@@ -376,7 +376,9 @@ class DANN_Trainer(object):
         print("iters per epoch: %d" % (min(s_iter_per_epoch, t_iter_per_epoch)))
 
         for EPOCH in range(self.args.max_train_epochs):
-            print(f'Learning Rate: {self.optimizer.param_groups[0]["lr"]}')
+            print('=' * 30 + ' Begin EPOCH ' + str(EPOCH + 1) + '=' * 30)
+
+            print(f'Learning Rate: {self.optimizer.param_groups[0]["lr"]:.6f}')
 
             train_info = self.train_one_epoch(EPOCH+1, min_len=min_len)
             val_info = self.val_on_epoch_end(self.s_val_loader, self.s_val_dataset, epoch=EPOCH+1)        # 用真实数据作为target
