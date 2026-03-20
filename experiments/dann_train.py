@@ -155,21 +155,23 @@ class DANN_Trainer(object):
                 domain_true.extend(domain_label.cpu().numpy())
                 domain_pred.extend(torch.argmax(domain_out, dim=1).cpu().numpy())
 
-                # domain_correct_num += (domain_out == domain_label).sum()
+                domain_correct_num += (domain_out == domain_label).sum()
 
                 # 便于最终计算每个样本的loss
                 batch_loss_sum = loss_value.item() * self.args.val_batch_size
                 total_loss_sum += batch_loss_sum
 
         val_bc = balanced_accuracy_score(y_true, y_pred)
-        domain_model_ba = balanced_accuracy_score(domain_true, domain_pred)
+        # domain_model_ba = balanced_accuracy_score(domain_true, domain_pred)
+        domain_model_acc = domain_correct_num / len(val_dataset)
+
         average_val_loss = total_loss_sum / len(val_dataset)
 
         # cm = confusion_matrix(y_true=y_true, y_pred=y_pred, labels=range(2))
 
         val_epoch_info = {
             'label model balanced_accuracy': val_bc,
-            'domain model balanced_accuracy': domain_model_ba,
+            'domain model balanced_accuracy': domain_model_acc,
             'loss': average_val_loss
         }
         return DotDict(val_epoch_info)
