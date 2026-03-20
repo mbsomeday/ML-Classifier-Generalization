@@ -26,8 +26,8 @@ class DANN_Trainer(object):
         self.label_model = Label_classifier().to(DEVICE)
         self.domain_model = Domain_Classifier().to(DEVICE)
 
-        # 损失函数，训练和测试都需要计算loss
-        self.ce = nn.CrossEntropyLoss().to(DEVICE)
+        # # 损失函数，训练和测试都需要计算loss
+        # self.ce = nn.CrossEntropyLoss().to(DEVICE)
 
         # 分别为 label_model 和 domain_model 设置loss
         self.label_loss = nn.CrossEntropyLoss().to(DEVICE)
@@ -121,7 +121,7 @@ class DANN_Trainer(object):
                 f.write(item+'\n')
 
 
-    def val_on_epoch_end(self, data_loader, epoch):
+    def val_on_epoch_end(self, data_loader, val_dataset, epoch):
         self.feature_model.eval()
         self.label_model.eval()
 
@@ -148,7 +148,7 @@ class DANN_Trainer(object):
                 total_loss_sum += batch_loss_sum
 
         val_bc = balanced_accuracy_score(y_true, y_pred)
-        average_val_loss = total_loss_sum / len(data_loader)
+        average_val_loss = total_loss_sum / len(val_dataset)
 
         cm = confusion_matrix(y_true=y_true, y_pred=y_pred, labels=range(2))
 
@@ -331,7 +331,7 @@ class DANN_Trainer(object):
             total_loss_sum += batch_loss_sum
 
         train_bc = balanced_accuracy_score(y_true, y_pred)
-        average_train_loss = total_loss_sum / len(self.s_train_loader)
+        average_train_loss = total_loss_sum / len(self.s_train_dataset)
 
         train_epoch_info = {
             'balanced_accuracy': train_bc,
@@ -352,7 +352,7 @@ class DANN_Trainer(object):
 
         for EPOCH in range(self.args.max_train_epochs):
             train_info = self.train_one_epoch(EPOCH+1, min_len=min_len)
-            val_info = self.val_on_epoch_end(self.t_val_loader, epoch=EPOCH+1)        # 用真实数据作为target
+            val_info = self.val_on_epoch_end(self.s_val_loader, self.s_val_dataset, epoch=EPOCH+1)        # 用真实数据作为target
 
             print(f'Learning Rate: {self.optimizer.param_groups[0]["lr"]}')
             print(f'Train loss {train_info["loss"]:.6f}, train_bc:{train_info["balanced_accuracy"]:.4f}')
