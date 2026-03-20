@@ -29,7 +29,7 @@ class DANN_Trainer(object):
         # 损失函数，训练和测试都需要计算loss
         self.ce = nn.CrossEntropyLoss().to(DEVICE)
 
-        # todo: 分别为 label_model 和 domain_model 设置loss
+        # 分别为 label_model 和 domain_model 设置loss
         self.label_loss = nn.CrossEntropyLoss().to(DEVICE)
         self.domain_loss = nn.CrossEntropyLoss().to(DEVICE)
 
@@ -299,7 +299,7 @@ class DANN_Trainer(object):
             s_preds = torch.argmax(s_out, dim=1)
 
             t_feature = self.feature_model(target)
-            t_out = self.label_model(t_feature)
+            # t_out = self.label_model(t_feature)
 
             # domain classifier
             s_domain_out = self.domain_model(s_feature, alpha=alpha)
