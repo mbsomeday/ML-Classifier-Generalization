@@ -360,8 +360,8 @@ class DANN_Trainer(object):
             # ------------------------ 调用callbacks ------------------------
             self.model_logger(epoch=EPOCH+1, training_info=train_info, val_info=val_info)
             #
-            # # ------------------------ 学习率调整 ------------------------
-            # self.update_learning_rate(EPOCH + 1)
+            # ------------------------ 学习率调整 ------------------------
+            self.update_learning_rate(EPOCH + 1)
 
             # 当训练次数超过最低epoch时，其中early_stop策略
             if (EPOCH + 1) > self.args.min_train_epochs:
