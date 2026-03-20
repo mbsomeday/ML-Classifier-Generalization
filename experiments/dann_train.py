@@ -36,9 +36,6 @@ class DANN_Trainer(object):
         self.best_ba = 0    # balanced acc
         self.time_taken = None
 
-        # # 用于 domain classifier训练的label，cbe作为损失函数时
-        # self.fake_label = torch.FloatTensor(self.args.batch_size, 1).fill_(0).to(DEVICE)
-        # self.real_label = torch.FloatTensor(self.args.batch_size, 1).fill_(1).to(DEVICE)
 
         self.best_weight_dir = None
 
@@ -100,7 +97,7 @@ class DANN_Trainer(object):
         self.model_logger = Model_Logger(callback_dir=self.callback_save_path, model_name='DANN', ds_name_list=[self.args.source[0], self.args.target[0]])
 
         # ********** loss & scheduler **********
-        self.optimizer = torch.optim.RMSprop(params=list(self.feature_model.parameters()) + list(self.label_model.parameters()) + list(self.domain_model.parameters()), lr=0.0, weight_decay=1e-5, eps=0.001)
+        self.optimizer = torch.optim.RMSprop(params=list(self.feature_model.parameters()) + list(self.label_model.parameters()) + list(self.domain_model.parameters()), lr=0.01, weight_decay=1e-5, eps=0.001)
 
 
     def print_args(self):
@@ -130,7 +127,8 @@ class DANN_Trainer(object):
 
         y_true = []
         y_pred = []
-        val_loss = 0.0
+        # val_loss = 0.0
+        total_loss_sum = 0.0
 
         with torch.no_grad():
             for batch_idx, data_dict in enumerate(tqdm(data_loader, desc=f'Epoch {epoch} val')):
@@ -140,19 +138,23 @@ class DANN_Trainer(object):
                 preds = torch.argmax(logits, dim=1)
                 # loss_value = self.ce(logits, labels)
                 loss_value = self.label_loss(logits, labels)
-                val_loss += loss_value.item()
+                # val_loss += loss_value.item()
 
                 y_true.extend(labels.cpu().numpy())
                 y_pred.extend(preds.cpu().numpy())
 
-        val_bc = balanced_accuracy_score(y_true, y_pred)
-        cm = confusion_matrix(y_true=y_true, y_pred=y_pred, labels=range(2))
+                # 便于最终计算每个样本的loss
+                batch_loss_sum = loss_value.item() * self.args.val_batch_size
+                total_loss_sum += batch_loss_sum
 
-        # print(f'CM on validation set:\n{cm}')
+        val_bc = balanced_accuracy_score(y_true, y_pred)
+        average_val_loss = total_loss_sum / len(data_loader)
+
+        cm = confusion_matrix(y_true=y_true, y_pred=y_pred, labels=range(2))
 
         val_epoch_info = {
             'balanced_accuracy': val_bc,
-            'loss': val_loss
+            'loss': average_val_loss
         }
         return DotDict(val_epoch_info)
 
@@ -281,7 +283,8 @@ class DANN_Trainer(object):
         self.feature_model.train()
         self.domain_model.train()
 
-        loss_val = 0.0
+        # loss_val = 0.0
+        total_loss_sum = 0.0
         y_true = []
         y_pred = []
 
@@ -299,7 +302,6 @@ class DANN_Trainer(object):
             s_preds = torch.argmax(s_out, dim=1)
 
             t_feature = self.feature_model(target)
-            # t_out = self.label_model(t_feature)
 
             # domain classifier
             s_domain_out = self.domain_model(s_feature, alpha=alpha)
@@ -311,30 +313,29 @@ class DANN_Trainer(object):
             s_domain_err = self.domain_loss(s_domain_out, source_domain_label)
             t_domain_err = self.domain_loss(t_domain_out, target_domain_label)
 
-            # # 两个classifier都用交叉熵损失
-            # real_label = torch.ones(size=(source.shape[0],), dtype=torch.long).to(DEVICE)
-            # fake_label = torch.zeros(size=(target.shape[0],), dtype=torch.long).to(DEVICE)
-            # s_domain_err = self.ce(s_domain_out, real_label)
-            # t_domain_err = self.ce(t_domain_out, fake_label)
-
             domain_loss = s_domain_err + t_domain_err
             s_label_loss = self.label_loss(s_out, s_labels)
-            loss = s_label_loss + domain_loss
-            loss_val += loss.item()
+            loss_value = s_label_loss + domain_loss
+            # loss_val += loss.item()
 
             self.optimizer.zero_grad()
-            loss.backward()
+            loss_value.backward()
             self.optimizer.step()
 
             # 记录在source domain上的accuracy
             y_true.extend(s_labels.cpu().numpy())
             y_pred.extend(s_preds.cpu().numpy())
 
+            # 计算出该batch的loss
+            batch_loss_sum = loss_value.item() * self.args.train_batch_size
+            total_loss_sum += batch_loss_sum
+
         train_bc = balanced_accuracy_score(y_true, y_pred)
+        average_train_loss = total_loss_sum / len(self.s_train_loader)
 
         train_epoch_info = {
             'balanced_accuracy': train_bc,
-            'loss': loss_val
+            'loss': average_train_loss
         }
 
         return train_epoch_info
@@ -363,13 +364,13 @@ class DANN_Trainer(object):
             # ------------------------ 学习率调整 ------------------------
             self.update_learning_rate(EPOCH + 1)
 
-            # 当训练次数超过最低epoch时，其中early_stop策略
+            # DANN为固定epoch，不需要early stop，这里用到early stop callback中的模型保存功能
             if (EPOCH + 1) > self.args.min_train_epochs:
                 self.early_stopping(EPOCH + 1, enc=self.feature_model, clf=self.label_model, fd=self.domain_model, val_epoch_info=val_info)
 
-                if self.early_stopping.early_stop:
-                    print(f'Early Stopping!')
-                    break
+            #     if self.early_stopping.early_stop:
+            #         print(f'Early Stopping!')
+            #         break
 
 
             # # 在低于min train epoch时，每次重置early stop的参数
