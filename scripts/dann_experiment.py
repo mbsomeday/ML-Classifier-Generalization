@@ -40,7 +40,7 @@ def get_args():
 
     # test
     parser.add_argument('--test_ds_list', nargs='+', default=['D2'])
-    parser.add_argument('--weight_dir', type=str, default=r'D:\my_phd\Model_Weights\Stage6\new_dataset\DANN\DANND2D1_6\25_15.36598')
+    parser.add_argument('--weight_dir', type=str, default=None)
     # parser.add_argument('--res_save_txt', type=str, default='DANN_res.txt', help='txt file that records test results')
     parser.add_argument('--test_batch_size', type=int, default=128)
 
