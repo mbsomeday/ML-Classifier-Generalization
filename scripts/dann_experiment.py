@@ -27,7 +27,7 @@ def get_args():
 
     # train
     parser.add_argument('--monitored_metric', default='loss')
-    parser.add_argument('--isTrain', action='store_true', default=False)
+    parser.add_argument('--isTrain', action='store_true')
     parser.add_argument('--base_lr', type=float, default=0.01)
     parser.add_argument('--min_train_epochs', type=int, default=10)
     parser.add_argument('--max_train_epochs', type=int, default=100)
