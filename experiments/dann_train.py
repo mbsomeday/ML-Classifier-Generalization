@@ -36,7 +36,6 @@ class DANN_Trainer(object):
         self.best_ba = 0    # balanced acc
         self.time_taken = None
 
-
         self.best_weight_dir = None
 
         if self.args.isTrain:
@@ -407,6 +406,13 @@ class DANN_Trainer(object):
             # DANN为固定epoch，不需要early stop，这里用到early stop callback中的模型保存功能
             if (EPOCH + 1) > self.args.min_train_epochs:
                 self.early_stopping(EPOCH + 1, enc=self.feature_model, clf=self.label_model, fd=self.domain_model, val_epoch_info=val_info)
+
+            # 最后一个epoch保存latest model
+            if EPOCH == self.args.max_train_epochs:
+                torch.save(self.feature_model.state_dict(), os.path.join(self.callback_save_path, f'dann_feature_lastEpoch.pt'))
+                torch.save(self.label_model.state_dict(), os.path.join(self.callback_save_path, f'dann_label_lastEpoch.pt'))
+                torch.save(self.domain_model.state_dict(), os.path.join(self.callback_save_path, f'dann_domain_lastEpoch.pt'))
+
 
             #     if self.early_stopping.early_stop:
             #         print(f'Early Stopping!')
