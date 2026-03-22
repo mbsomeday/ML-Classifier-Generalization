@@ -50,6 +50,7 @@ def get_args():
 
 
 args = get_args()
+print(args)
 
 # 开始时间
 start_time = datetime.datetime.now()
