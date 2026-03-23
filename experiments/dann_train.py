@@ -408,7 +408,7 @@ class DANN_Trainer(object):
                 self.early_stopping(EPOCH + 1, enc=self.feature_model, clf=self.label_model, fd=self.domain_model, val_epoch_info=val_info)
 
             # 最后一个epoch保存latest model
-            if EPOCH == self.args.max_train_epochs:
+            if (EPOCH+1) == self.args.max_train_epochs:
                 torch.save(self.feature_model.state_dict(), os.path.join(self.callback_save_path, f'dann_feature_lastEpoch.pt'))
                 torch.save(self.label_model.state_dict(), os.path.join(self.callback_save_path, f'dann_label_lastEpoch.pt'))
                 torch.save(self.domain_model.state_dict(), os.path.join(self.callback_save_path, f'dann_domain_lastEpoch.pt'))
