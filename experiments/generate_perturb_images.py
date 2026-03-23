@@ -34,7 +34,7 @@ def get_opts():
     parser = argparse.ArgumentParser()
 
     # 用于云端
-    parser.add_argument('--task', type=str, choices=['perturbed', 'combined'], required=True, default=None)
+    parser.add_argument('--task', type=str, choices=['onlyPerturb', 'combined'], required=True, default=None)
     parser.add_argument('--ds_name_list', nargs='+')
     parser.add_argument('--txt_name', type=str)
     parser.add_argument('--num_classes', type=int, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
@@ -44,11 +44,11 @@ def get_opts():
     parser.add_argument('--batch_size', type=int, default=1)
 
     # 生成perturbation图片
-    parser.add_argument('--perturb_save_dir', type=str)
+    parser.add_argument('--perturb_save_dir', type=str, required=False)
 
     # 生成perturbation+aug图片
-    parser.add_argument('--perturb_dir', type=str)
-    parser.add_argument('--compondImg_save_dir', type=str)
+    parser.add_argument('--perturb_dir', type=str, required=False)
+    parser.add_argument('--compondImg_save_dir', type=str, required=False)
 
     # # 用于本地测试
     # parser.add_argument('--task', type=str, choices=['perturbed', 'cmbined'], default='cmbined')
@@ -84,7 +84,7 @@ def gen_perturbation_image(opts):
     '''
 
     # dataset
-    train_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key='Stage6_org', txt_name=opts.txt_name)
+    train_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key=opts.path_key, txt_name=opts.txt_name)
     train_loader = DataLoader(train_dataset, batch_size=opts.batch_size, shuffle=False)
 
     # model
@@ -340,18 +340,16 @@ if __name__ == '__main__':
     for k, v in vars(opts).items():
         print(f'{k}: {v}')
 
-    if opts.task == 'perturbed':
+    if opts.task == 'onlyPerturb':
         print('当前生成only perturbed的图片')
         gen_perturbation_image(opts)
-    else:
+    elif opts.task == 'combined':
         print('当前生成combined的图片')
         gen_perturb_aug(opts)
+    else:
+        raise ValueError('Wrong name for task.')
 
-    # # 生成perturbation图片
-    # gen_perturbation_image(opts)
 
-    # 将perturbation与aug结合生成新图片
-    # gen_perturb_aug(opts)
 
 
 
