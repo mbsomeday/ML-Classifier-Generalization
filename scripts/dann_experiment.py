@@ -24,7 +24,6 @@ def get_args():
     parser.add_argument('--train_batch_size', type=int, default=64)
     parser.add_argument('--val_batch_size', type=int, default=64)
 
-
     # train
     parser.add_argument('--monitored_metric', default='loss')
     parser.add_argument('--isTrain', action='store_true')
