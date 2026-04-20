@@ -14,7 +14,7 @@ sys.path.append(root_path)
 
 import argparse
 
-from experiments.dataset_classification import ds_cls_from_dirs
+from experiment_classes.dataset_classification import ds_cls_from_dirs
 
 def get_opts():
     parser = argparse.ArgumentParser()

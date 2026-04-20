@@ -6,7 +6,7 @@ sys.path.append(root_path)
 
 import argparse, datetime
 
-from experiments.dataset_classification import DS_Classifier
+from experiment_classes.dataset_classification import DS_Classifier
 
 def get_opts():
     parser = argparse.ArgumentParser()

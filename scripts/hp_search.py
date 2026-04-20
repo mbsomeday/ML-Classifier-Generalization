@@ -6,7 +6,7 @@ sys.path.append(root_path)
 
 import argparse
 
-from experiments.hyperparam_search import HPSelection
+from experiment_classes.hyperparam_search import HPSelection
 
 
 def get_args():

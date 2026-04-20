@@ -13,7 +13,7 @@ sys.path.append(root_path)
 import argparse, random, time
 import datetime
 
-from experiments.pedestrian_classification import Ped_Classifier
+from experiment_classes.pedestrian_classification import Ped_Classifier
 
 
 def get_args():

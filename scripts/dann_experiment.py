@@ -8,7 +8,7 @@ sys.path.append(root_path)
 import argparse, random, torch, os, datetime
 import numpy as np
 
-from experiments.dann_train import DANN_Trainer
+from experiment_classes.dann_train import DANN_Trainer
 from utils.utils import load_model
 
 
