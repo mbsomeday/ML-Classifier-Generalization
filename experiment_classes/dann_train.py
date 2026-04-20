@@ -191,7 +191,7 @@ class DANN_Trainer(object):
         for item in os.listdir(self.args.weight_dir):
             weight_path = os.path.join(self.args.weight_dir, item)
             print(f'weight_path: {weight_path}')
-            state_dict = torch.load(weight_path, map_location=DEVICE)
+            state_dict = torch.load(weight_path, map_location=DEVICE, weights_only=False)
             if item.split('_')[1] == 'feature':
                 self.feature_model.load_state_dict(state_dict)
             elif item.split('_')[1] == 'label':
