@@ -10,7 +10,7 @@ from tqdm import tqdm
 import numpy as np
 
 from utils.dann_utils import adjust_alpha, DotDict
-from implement_models.dann import Feature_extractor, Label_classifier, Domain_Classifier
+from implemented_models.dann import Feature_extractor, Label_classifier, Domain_Classifier
 from data.dataset import my_dataset
 from data.dann_dataset import noise_dataset
 from configs.ds_path import DEVICE
