@@ -2,6 +2,9 @@ import os
 
 
 class Base_Trainer():
+    '''
+        Implementing the general functions for all trainers.
+    '''
     def __init__(self, args):
         self.args = args
 

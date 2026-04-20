@@ -1,3 +1,7 @@
+'''
+    Callbacks in this file is designed for DANN group.
+'''
+
 import torch, os, shutil
 import numpy as np
 
@@ -62,7 +66,6 @@ class EarlyStopping():
         else:
             raise ValueError('Wrong monitored metrics!')
 
-        # 对于非DANN的组，需要在early_stop的时候保存
         if model_save:
             # 表现提升的情况
             if improved_flag:
