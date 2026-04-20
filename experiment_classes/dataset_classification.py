@@ -6,14 +6,14 @@ from tqdm import tqdm
 from sklearn.metrics import confusion_matrix
 
 from data.dataset import my_dataset, read_from_dirs
-from training.callbacks import EarlyStopping
+from training_func.callbacks import EarlyStopping
 from utils.utils import get_obj_from_str, DEVICE, DotDict, load_model
 from utils.plt_func import plot_cm
 
 
 class DS_Classifier():
     '''
-        class for training the dataset classifier
+        class for training_func the dataset classifier
     '''
     def __init__(self, opts):
         # the experiment only requires one GPU
@@ -174,7 +174,7 @@ class DS_Classifier():
 
     def train(self):
         print('-' * 20 + 'Training Info' + '-' * 20)
-        print('Total training Samples:', len(self.train_dataset))
+        print('Total training_func Samples:', len(self.train_dataset))
         print('Total Batch:', len(self.train_loader))
 
         print('-' * 20 + 'Validation Info' + '-' * 20)

@@ -14,7 +14,7 @@ from implemented_models.dann import Feature_extractor, Label_classifier, Domain_
 from data.dataset import my_dataset
 from data.dann_dataset import noise_dataset
 from configs.ds_path import DEVICE
-from training.dann_callbacks import EarlyStopping, Model_Logger
+from training_func.dann_callbacks import EarlyStopping, Model_Logger
 
 
 class DANN_Trainer(object):

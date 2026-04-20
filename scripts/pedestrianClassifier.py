@@ -21,7 +21,7 @@ def get_args():
 
     # model & data
     parser.add_argument('--ped_model_obj', type=str, default='torchvision.models.efficientnet_b0')
-    parser.add_argument('--ds_name_list', nargs='+', default=['D1'], help='the list means training on all of these datasets')
+    parser.add_argument('--ds_name_list', nargs='+', default=['D1'], help='the list means training_func on all of these datasets')
     parser.add_argument('--data_key', type=str, default='Stage6_org')
     parser.add_argument('--train_batch_size', type=int, default=64)   # 将train, val和test的batch size分开，方便loss的计算
     parser.add_argument('--val_batch_size', type=int, default=128)
@@ -32,7 +32,7 @@ def get_args():
     parser.add_argument('--isTrain', action='store_true')
     parser.add_argument('--min_train_epoch', type=int, default=10)
     parser.add_argument('--max_train_epoch', type=int, default=200)
-    parser.add_argument('--seed_num', type=int, default=1, help='set the number of training times for getting the average value')
+    parser.add_argument('--seed_num', type=int, default=1, help='set the number of training_func times for getting the average value')
 
     parser.add_argument('--top_k', type=int, default=1)
     parser.add_argument('--patience', type=int, default=10)

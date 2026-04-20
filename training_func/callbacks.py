@@ -1,22 +1,21 @@
-import torch, os, shutil
+import torch, os
 import numpy as np
-
 
 
 class EarlyStopping():
     def __init__(self, callback_path,
-                 top_k=1,
+                 top_k=2,
                  cur_epoch=0,
                  monitored_metric='loss',
+                 # metric_val=-np.inf,
                  patience=10,
                  delta=0.00001):
         '''
-            saving [top_k] best perform models and early stop training when model don't improve for [patience] epochs
+            saving [top_k] best perform models and early stop training_func when model don't improve for [patience] epochs
             callback_save_path: 保存模型的文件夹
             :param top_k: 保存几个最好模型
             :param patience: 当监控的 metric 连续 patience 个 epoch 不增加，则触发early stopping
             :param delta: 监控metric增加的最小值，当超过该值的时候表示模型有进步
-            按照epoch数字创建文件夹来保存
         '''
 
         self.model_save_dir = callback_path
@@ -34,7 +33,6 @@ class EarlyStopping():
         self.counter = 0            # 记录loss不变的epoch数目
         self.early_stop = False     # 是否停止训练
         self.delta = delta
-        self.best_weight_dir = None
 
         print('-' * 20 + ' Early Stopping Info ' + '-' * 20)
         print(f'Create early stopping, monitoring [validation {self.monitored_metric}] changes')
@@ -46,10 +44,12 @@ class EarlyStopping():
         with open(os.path.join(self.model_save_dir, 'cb_EarlyStop.txt'), 'a') as f:
             f.write(msg)
 
-    def __call__(self, epoch, enc, clf, fd, val_epoch_info, model_save=True):
+    def __call__(self, epoch, model, optimizer, val_epoch_info, scheduler=None):
 
         improved_flag = True
         self.cur_epoch = epoch
+        cur_lr = optimizer.param_groups[0]['lr']
+        print(f'Current lr: {cur_lr}')
 
         if self.monitored_metric in ['accuracy', 'balanced_accuracy']:
             if val_epoch_info[self.monitored_metric] < self.monitored_metric_value + self.delta:       # 表现没有提升的情况
@@ -62,80 +62,87 @@ class EarlyStopping():
         else:
             raise ValueError('Wrong monitored metrics!')
 
-        # 对于非DANN的组，需要在early_stop的时候保存
-        if model_save:
-            # 表现提升的情况
-            if improved_flag:
-                metrics = [self.monitored_metric_value, val_epoch_info[self.monitored_metric]]
-                self.save_checkpoint(enc, clf, fd, metrics=metrics, ckpt_dir=self.model_save_dir)
-                self.counter = 0
-            else:
-                print(f'Performance Not Improved on Epoch {epoch}. EarlyStopping counter: {self.counter} / {self.patience}')
+        # 表现提升的情况
+        if improved_flag:
+            metrics = [self.monitored_metric_value, val_epoch_info[self.monitored_metric]]
+            self.save_checkpoint(model=model, metrics=metrics, optimizer=optimizer, ckpt_dir=self.model_save_dir, scheduler=scheduler)
+            self.counter = 0
+        else:
+            print(f'Performance Not Improved on Epoch {epoch}. EarlyStopping counter: {self.counter} / {self.patience}')
 
-            # 根据counter判断是否设置停止flag
-            if self.counter >= self.patience:
-                self.early_stop = True
+        # 根据counter判断是否设置停止flag
+        if self.counter >= self.patience:
+            self.early_stop = True
 
-            # Wring Earlystop Info
-            msg = f"Epoch:{epoch}, overall counter:{self.counter}/{self.patience}\n"
-            with open(os.path.join(self.model_save_dir, 'cb_EarlyStop.txt'), 'a') as f:
-                f.write(msg)
+        # Wring Earlystop Info
+        msg = f"Epoch:{epoch}, overall counter:{self.counter}/{self.patience}, current lr: {cur_lr:.8f}\n"
+        with open(os.path.join(self.model_save_dir, 'cb_EarlyStop.txt'), 'a') as f:
+            f.write(msg)
 
 
     def del_redundant_weights(self, ckpt_dir):
-        '''
-            模型按 {epoch}_{loss}来保存的，因此删除的时候需要直接删掉整个文件夹
-        '''
+        all_weights_temp = os.listdir(ckpt_dir)
+        all_weights = []
+        for weights in all_weights_temp:
+            if weights.endswith('.pth'):
+                all_weights.append(weights)
 
-        # 先整合保存权重的文件夹
-        temp = os.listdir(ckpt_dir)
-        weights_dir_list = []
-        for f_path in temp:
-            if os.path.isdir(os.path.join(ckpt_dir, f_path)):
-                weights_dir_list.append(f_path)
-
-        if len(weights_dir_list) > self.top_k - 1:
+        # 按存储格式来： save_name = prefix_{epoch}_{balanced_acc/loss}.pth
+        if len(all_weights) > self.top_k - 1:
             sorted = []
-            for dir_name in weights_dir_list:
-                val_acc = dir_name.split('_')[-1]
-                sorted.append((dir_name, val_acc))
+            for weight in all_weights:
+                val_acc = weight.split('-')[-1]
+                sorted.append((weight, val_acc))
 
             if self.monitored_metric == 'balanced_accuracy':
                 sorted.sort(key=lambda w: w[1], reverse=False)
             else:
                 sorted.sort(key=lambda w: w[1], reverse=True)
+
             print('After sorting:', sorted)
 
             del_path = os.path.join(self.model_save_dir, sorted[0][0])
-            shutil.rmtree(del_path)
+            os.remove(del_path)
             print('Del file:', del_path)
 
 
-    def save_checkpoint(self, enc, clf, fd, metrics, ckpt_dir):
+    def save_checkpoint(self, model, metrics, optimizer, ckpt_dir, scheduler=None):
         print(f'Performance [{self.monitored_metric}] better ({metrics[0]} --> {metrics[1]}). Saving Model.')
 
         self.del_redundant_weights(ckpt_dir)
-        # save_name = f"{self.save_prefix}-{self.cur_epoch:02d}-{metrics[1]:.5f}.pth"     # 格式：prefix_{epoch}_{balanced_acc}.pth
-        self.monitored_metric_value = metrics[1]        # 更新最优值，用于后续比较
+        save_name = f"{self.save_prefix}-{self.cur_epoch:02d}-{metrics[1]:.4f}.pth"     # 格式：prefix_{epoch}_{balanced_acc}.pth
+        self.monitored_metric_value = metrics[1]
 
-        self.best_weight_dir = os.path.join(ckpt_dir, f'{self.cur_epoch}_{metrics[1]:.5f}')
-        if not os.path.exists(self.best_weight_dir):
-            os.makedirs(self.best_weight_dir)
-        torch.save(enc.state_dict(), os.path.join(self.best_weight_dir, f'dann_feature_{self.cur_epoch:02d}.pt'))
-        torch.save(clf.state_dict(), os.path.join(self.best_weight_dir, f'dann_label_{self.cur_epoch:02d}.pt'))
-        torch.save(fd.state_dict(), os.path.join(self.best_weight_dir, f'dann_domain_{self.cur_epoch:02d}.pt'))
+        checkpoint = {
+            'epoch': self.cur_epoch,
+            'model_state_dict': model.state_dict(),
+            # 'optimizer_state_dict': optimizer.state_dict(),
+            # 'best_monitored_val': self.monitored_metric_value,
+            # 'lr': scheduler.get_last_lr() if scheduler is not None else 0,
+        }
+
+        save_path = os.path.join(ckpt_dir, save_name)
+        torch.save(checkpoint, save_path)
+
 
 
 class Model_Logger():
     '''
         用于记录训练过程中的loss，accuracy变化情况
     '''
-    def __init__(self, callback_dir, model_name, ds_name_list):
+    def __init__(self, save_dir, model_name, ds_name_list, train_num_info, val_num_info):
         super().__init__()
-        self.callback_dir = callback_dir
+        self.save_dir = save_dir
         self.model_name = model_name
-        self.ds_name_list = 'to'.join(ds_name_list)
-        self.txt_path = os.path.join(self.callback_dir, 'Train_info.txt')
+        self.ds_name_list = ds_name_list
+        self.train_num, self.train_nonPed_num, self.train_ped_num = train_num_info      # 获取数据集的总量，各个类别的量
+        self.val_num, self.val_nonPed_num, self.val_ped_num = val_num_info
+        self.txt_path = os.path.join(self.save_dir, 'Train_info.txt')
+
+        # 注：训练时取消下列注释
+        # __stderr__ = sys.stderr  # 将当前默认的错误输出结果保存为__stderr__
+        # sys.stderr = open(os.path.join(self.save_dir, 'errorLog.txt'), 'a')  # 将后续的报错信息写入对应的文件中
+        # assert not os.path.exists(self.txt_path), f'The {self.txt_path} already exists, please chcek!'
 
         # 在文件的开头写入训练的信息
         with open(self.txt_path, 'a') as f:
@@ -147,7 +154,10 @@ class Model_Logger():
         '''
             tool_function，对 accuracy 和 loss 进行输出时设置不同的打印位数
         '''
-        if key in ['loss', 'accuracy', 'balanced_accuracy', 'ba']:
+
+        if 'loss' in key:
+            return '{:.4f}'
+        if 'accuracy' in key or 'bc' in key:
             return '{:.4f}'
         else:
             return '{}'
@@ -163,8 +173,6 @@ class Model_Logger():
             f.write(f'------------------------------ Epoch: {epoch} ------------------------------\n')
             f.write(train_msg)
             f.write(val_msg)
-
-
 
 
 

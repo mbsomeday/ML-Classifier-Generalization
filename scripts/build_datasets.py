@@ -52,7 +52,7 @@ for type in type_list:
 print(f'Now spliting dataset into train, val and test set.')
 cur_ds.split_dataset()
 
-# Augmentating training set
+# Augmentating training_func set
 rand_aug = random_aimage_aug(base_dir=opts.base_dir)
 rand_aug()
 rand_aug.gen_aug_txt()

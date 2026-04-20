@@ -11,7 +11,7 @@ from torchvision import models
 from tqdm import tqdm
 from sklearn.metrics import confusion_matrix, balanced_accuracy_score
 import matplotlib.pyplot as plt
-from training.callbacks import EarlyStopping
+from training_func.callbacks import EarlyStopping
 
 from data.dataset import my_dataset
 from utils.utils import DEVICE, load_model

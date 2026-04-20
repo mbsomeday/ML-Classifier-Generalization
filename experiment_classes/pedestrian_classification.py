@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from data.dataset import my_dataset, read_from_dir
 from utils.utils import DEVICE, get_obj_from_str, DotDict, load_model
-from training.callbacks import EarlyStopping, Model_Logger
+from training_func.callbacks import EarlyStopping, Model_Logger
 from utils.plt_func import plot_cm
 
 
@@ -343,7 +343,7 @@ class Ped_Classifier():
 
     def train(self):
         print('-' * 20 + 'Training Info' + '-' * 20)
-        print('Total training Samples:', len(self.train_dataset))
+        print('Total training_func Samples:', len(self.train_dataset))
         print('Total Batch:', len(self.train_loader))
 
         print('-' * 20 + 'Validation Info' + '-' * 20)
