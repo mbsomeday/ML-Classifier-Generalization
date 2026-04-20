@@ -46,7 +46,7 @@ class EarlyStopping():
         with open(os.path.join(self.model_save_dir, 'cb_EarlyStop.txt'), 'a') as f:
             f.write(msg)
 
-    def __call__(self, epoch, enc, clf, fd, val_epoch_info):
+    def __call__(self, epoch, enc, clf, fd, val_epoch_info, model_save=True):
 
         improved_flag = True
         self.cur_epoch = epoch
@@ -62,22 +62,24 @@ class EarlyStopping():
         else:
             raise ValueError('Wrong monitored metrics!')
 
-        # 表现提升的情况
-        if improved_flag:
-            metrics = [self.monitored_metric_value, val_epoch_info[self.monitored_metric]]
-            self.save_checkpoint(enc, clf, fd, metrics=metrics, ckpt_dir=self.model_save_dir)
-            self.counter = 0
-        else:
-            print(f'Performance Not Improved on Epoch {epoch}. EarlyStopping counter: {self.counter} / {self.patience}')
+        # 对于非DANN的组，需要在early_stop的时候保存
+        if model_save:
+            # 表现提升的情况
+            if improved_flag:
+                metrics = [self.monitored_metric_value, val_epoch_info[self.monitored_metric]]
+                self.save_checkpoint(enc, clf, fd, metrics=metrics, ckpt_dir=self.model_save_dir)
+                self.counter = 0
+            else:
+                print(f'Performance Not Improved on Epoch {epoch}. EarlyStopping counter: {self.counter} / {self.patience}')
 
-        # 根据counter判断是否设置停止flag
-        if self.counter >= self.patience:
-            self.early_stop = True
+            # 根据counter判断是否设置停止flag
+            if self.counter >= self.patience:
+                self.early_stop = True
 
-        # Wring Earlystop Info
-        msg = f"Epoch:{epoch}, overall counter:{self.counter}/{self.patience}\n"
-        with open(os.path.join(self.model_save_dir, 'cb_EarlyStop.txt'), 'a') as f:
-            f.write(msg)
+            # Wring Earlystop Info
+            msg = f"Epoch:{epoch}, overall counter:{self.counter}/{self.patience}\n"
+            with open(os.path.join(self.model_save_dir, 'cb_EarlyStop.txt'), 'a') as f:
+                f.write(msg)
 
 
     def del_redundant_weights(self, ckpt_dir):

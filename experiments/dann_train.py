@@ -405,7 +405,7 @@ class DANN_Trainer(object):
 
             # DANN为固定epoch，不需要early stop，这里用到early stop callback中的模型保存功能
             if (EPOCH + 1) > self.args.min_train_epochs:
-                self.early_stopping(EPOCH + 1, enc=self.feature_model, clf=self.label_model, fd=self.domain_model, val_epoch_info=val_info)
+                self.early_stopping(EPOCH + 1, enc=self.feature_model, clf=self.label_model, fd=self.domain_model, val_epoch_info=val_info, model_save=False)
 
             # 最后一个epoch保存latest model
             if (EPOCH+1) == self.args.max_train_epochs:
