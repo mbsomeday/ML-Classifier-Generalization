@@ -190,16 +190,17 @@ class DANN_Trainer(object):
         # load model
         for item in os.listdir(self.args.weight_dir):
             weight_path = os.path.join(self.args.weight_dir, item)
-            print(f'weight_path: {weight_path}')
-            state_dict = torch.load(weight_path, map_location=DEVICE, weights_only=False)
-            if item.split('_')[1] == 'feature':
-                self.feature_model.load_state_dict(state_dict)
-            elif item.split('_')[1] == 'label':
-                self.label_model.load_state_dict(state_dict)
-            elif item.split('_')[1] == 'domain':
-                self.domain_model.load_state_dict(state_dict)
-            else:
-                print('Not found model for weights!')
+            if weight_path.endswith('.pt'):
+                print(f'weight_path: {weight_path}')
+                state_dict = torch.load(weight_path, map_location=DEVICE)
+                if item.split('_')[1] == 'feature':
+                    self.feature_model.load_state_dict(state_dict)
+                elif item.split('_')[1] == 'label':
+                    self.label_model.load_state_dict(state_dict)
+                elif item.split('_')[1] == 'domain':
+                    self.domain_model.load_state_dict(state_dict)
+                else:
+                    print('Not found model for weights!')
 
         self.feature_model.eval()
         self.label_model.eval()
