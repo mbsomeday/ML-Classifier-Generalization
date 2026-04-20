@@ -16,10 +16,10 @@ def get_args():
     parser = argparse.ArgumentParser()
 
     # data
-    parser.add_argument('--source', nargs='+', default=['D1'])
-    parser.add_argument('--target', nargs='+', default=['D2'])
+    parser.add_argument('--source', nargs='+', default=['D2'])
+    parser.add_argument('--target', nargs='+', default=['D1'])
     parser.add_argument('--path_key', type=str, default='Stage6_org')
-    parser.add_argument('--train_txt', type=str, default='train.txt')       # augmentation_train
+    parser.add_argument('--train_txt', type=str, default='augmentation_train.txt')       # augmentation_train
     parser.add_argument('--val_txt', type=str, default='val.txt')
     parser.add_argument('--train_batch_size', type=int, default=64)
     parser.add_argument('--val_batch_size', type=int, default=64)
@@ -73,7 +73,7 @@ else:
 end_time = datetime.datetime.now()
 duration = end_time - start_time
 print(f'Ended at {str(end_time.strftime("%Y-%m-%d %H:%M:%S"))}')
-print(f'Duration: {str(duration)}')
+print(f'Total Duration: {str(duration)}')
 
 
 
