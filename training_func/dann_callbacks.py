@@ -78,6 +78,8 @@ class EarlyStopping():
             # 根据counter判断是否设置停止flag
             if self.counter >= self.patience:
                 self.early_stop = True
+                self.counter = 0
+
 
             # Wring Earlystop Info
             msg = f"Epoch:{epoch}, overall counter:{self.counter}/{self.patience}\n"
