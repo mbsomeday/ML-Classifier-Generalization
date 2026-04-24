@@ -85,13 +85,13 @@ KAGGLE = {
         'D1': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-ecp',
         'D2': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-citypersons',
         'D3': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-bdd100k',
-        'cycleD2toD1': r''
+
     },
 
     'Stage6_experiment': {
-        'D1': r'/kaggle/input/datasets/jiaweiwang802/stage6-temp-dsperturb/D1_perturb',
-        'D2': r'/kaggle/input/datasets/jiaweiwang802/stage6-temp-dsperturb/D2_perturb',
-        'D3': r'/kaggle/input/datasets/jiaweiwang802/stage6-temp-dsperturb/D3_perturb',
+        # 'D1': r'/kaggle/input/datasets/jiaweiwang802/stage6-temp-dsperturb/D1_perturb',
+        'D2': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-citypersons-experiment',
+        # 'D3': r'/kaggle/input/datasets/jiaweiwang802/stage6-temp-dsperturb/D3_perturb',
 
     },
 
