@@ -32,7 +32,7 @@ def get_opts():
 
     # 用于本地测试
     parser.add_argument('--task', type=str, choices=['perturbed', 'cmbined'], default='cmbined')
-    parser.add_argument('--ds_name_list', nargs='+', default=['D2'])
+    parser.add_argument('--ds_name_list', nargs='+', default=['D3'])
     # parser.add_argument('--txt_name', type=str, default='test.txt')
     parser.add_argument('--txt_name_list', nargs='+', default=['val.txt', 'test.txt'])
     parser.add_argument('--num_classes', type=int, default=3, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
@@ -45,7 +45,7 @@ def get_opts():
     parser.add_argument('--batch_size', type=int, default=1)
 
     # 生成perturbation图片
-    parser.add_argument('--perturb_save_dir', type=str, default=r'D:\my_phd\dataset\Stage6\stage6_bdd100k\All_Processor\M3CAM\OnlyPerturb')
+    parser.add_argument('--perturb_save_dir', type=str, default=r'D:\my_phd\dataset\Stage6\stage6_bdd100k\All_Processor\M3CAM\OnlyPerturb', help='base dir path, no need to add the txt name')
 
     # 生成perturbation+aug图片
     parser.add_argument('--perturb_dir', type=str, default=r'D:\my_phd\dataset\Stage6\stage6_citypersons\All_Processor\DSCAM\onlyPurturbations\test')

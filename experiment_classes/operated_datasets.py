@@ -83,7 +83,7 @@ def gen_perturbation_image(opts):
             save_path = os.path.join(opts.perturb_save_dir, txt_name.split('.')[0], label, img_name)
             save_image_tensor(input_tensor=perturb_tensor, filename=save_path)
 
-            break
+            # break
 
         # # 结果对比
         # org_out = dataset_classifier(image)
