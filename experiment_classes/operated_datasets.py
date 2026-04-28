@@ -77,7 +77,7 @@ def gen_perturbation_image(opts):
             perturb_tensor = torch.from_numpy(perturb_image).permute(2, 0, 1).unsqueeze(0)
 
             # 保存perturb图片
-            save_path = os.path.join(opts.genImg_save_dir, txt_name.split('.')[0], cls_name, img_name)
+            save_path = os.path.join(opts.genImg_save_dir, 'onlyPerturb', txt_name.split('.')[0], cls_name, img_name)
             save_image_tensor(input_tensor=perturb_tensor, filename=save_path)
             print(f'save_path_perturb:{save_path}')
 
