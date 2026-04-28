@@ -209,7 +209,8 @@ class DANN_Trainer(object):
         write_to_txt = os.path.join(self.callback_save_path, 'Test.txt')
         with open(write_to_txt, 'a') as f:
             f.write('-' * 80 + '\n')
-            f.write(f'Testing model weights dir: {os.listdir(self.args.weight_dir)}.\n')
+            # f.write(f'Testing model weights dir: {os.listdir(self.args.weight_dir)}.\n')
+            f.write(f'Testing model weights dir: {self.args.weight_dir}.\n')
             f.write('ds_name, test_ba, tnr, tpr, tn, fp, fn, tp\n')
 
         for ds_name in self.args.test_ds_list:
