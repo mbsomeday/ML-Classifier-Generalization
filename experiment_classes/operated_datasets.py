@@ -7,7 +7,7 @@ curPath = os.path.abspath(os.path.dirname(__file__))
 root_path = os.path.split(curPath)[0]
 sys.path.append(root_path)
 
-import argparse, torch, random
+import argparse, torch, random, cv2
 from torch import nn, optim
 import torchvision.transforms.functional as F
 from PIL import Image
@@ -20,6 +20,7 @@ import numpy as np
 from art.estimators.classification import PyTorchClassifier
 from art.attacks.evasion import FastGradientMethod
 import matplotlib.pyplot as plt
+import torch.nn.functional as nnF
 
 from data.dataset import my_dataset
 from utils.utils import load_model, DEVICE, save_image_tensor
@@ -105,7 +106,120 @@ def gen_perturbation_image(opts):
 
 
 def gen_CAM_mask(opts):
-    pass
+    '''
+        to generate LayerCAM and 0.5 mask
+    '''
+
+    CAM_save_dir = os.path.join(opts.genImg_save_dir, 'CAM')
+    Mask_save_dir = os.path.join(opts.genImg_save_dir, 'Mask')
+
+    for txt_name in opts.txt_name_list:
+        # dataset
+        get_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key=opts.path_key, txt_name=txt_name)
+        get_loader = DataLoader(get_dataset, batch_size=opts.batch_size, shuffle=False)
+
+        # model
+        get_classifier = models.efficientnet_b0(weights=None, num_classes=opts.num_classes)
+        get_classifier = load_model(get_classifier, opts.model_weights)
+        get_classifier = get_classifier.to(DEVICE).eval()
+
+        # 选择CAM算法
+        grad_layer = ['features.0', 'features.1', 'features.2', 'features.3', 'features.4', 'features.5', 'features.6', 'features.7', 'features.8']
+        layerCam_extractor = LayerCAM(get_classifier, target_layer=grad_layer)
+
+        # transformers
+        plt_transformer = transforms.ToPILImage()
+        tensor_transformer = transforms.ToTensor()
+        plt_resize = transforms.Resize(224, interpolation=InterpolationMode.BICUBIC)
+
+        for data_dict in tqdm(get_loader):
+            image = data_dict['image'].to(DEVICE)
+            img_name = data_dict['img_name'][0]
+            image_path = data_dict['img_path'][0]
+            cls_name = image_path.split(os.sep)[-2]
+
+            out = get_classifier(image)
+            cam_list = layerCam_extractor(out.squeeze(0).argmax().item(), out)
+
+            # # 将不同glayer的cam合并
+            # resized_hp = []
+            # for hp in cam_list:
+            #     print('cam', type(hp), hp.shape)
+            #     hp = plt_transformer(hp)
+            #     hp = hp.resize((224, 224), resample=Image.BICUBIC)
+            #     cur_hp = tensor_transformer(hp).unsqueeze(0)
+            #     resized_hp.append(cur_hp)
+            #
+            # vis_heatmaps = torch.cat(resized_hp, dim=0)
+            # comb_layercam = torch.sum(vis_heatmaps, 0).unsqueeze(0)
+            # (cam_min, cam_max) = (comb_layercam.min(), comb_layercam.max())
+            # norm_cam = (comb_layercam - cam_min) / (((cam_max - cam_min) + 1e-08))
+
+            # 将不同layer的cam进行resize
+            # ---------- gen & save CAM ----------
+            resized_cam_list = []
+            for cur_cam in cam_list:
+                cur_cam = cur_cam.unsqueeze(0)
+                resized = nnF.interpolate(cur_cam, size=(224, 224), mode='bilinear', align_corners=False)
+                resized_cam_list.append(resized)
+
+            cams_tensor = torch.cat(resized_cam_list, dim=0)
+            sum_cam = torch.sum(cams_tensor, dim=0)
+
+            cam_min, cam_max = sum_cam.min(), sum_cam.max()
+            norm_cam = (sum_cam - cam_min) / (((cam_max - cam_min) + 1e-08))
+            cam_np = norm_cam.squeeze().detach().cpu().numpy()  # [224, 224]
+            cam_uint8 = np.uint8(255 * cam_np) # 转成 0-255 uint8
+            color_cam = cv2.applyColorMap(cam_uint8, cv2.COLORMAP_JET)
+            color_cam = cv2.cvtColor(color_cam, cv2.COLOR_BGR2RGB)  # OpenCV 是 BGR，需要转成 RGB
+
+            cam_save_path = os.path.join(CAM_save_dir, txt_name.split('.')[0], cls_name, img_name)
+            Image.fromarray(color_cam).save(cam_save_path)
+            print(f'cam_save_path:{cam_save_path}')
+
+            # ---------- gen & save mask ----------
+            # plt_cam = plt_transformer(norm_cam[0])
+            # cam_array = np.array(plt_cam)
+
+            cam_array = np.array(cam_np)
+            threshold = 0.5
+            cam_mask = cam_array < threshold  # 这里直接跟threshold比，因为cam_array已经归一化了，其max为1.0，值高的部分为黑色
+            # cam_mask = cam_array >= (threshold * cam_array.max())         # 值低的部分为黑色
+            plt_mask = cam_mask * 1.0
+
+            mask_uint8 = np.uint8(plt_mask * 255)       # 转成 0/255
+            mask_save_path = os.path.join(Mask_save_dir, txt_name.split('.')[0], cls_name, img_name)
+            Image.fromarray(mask_uint8).save(mask_save_path)
+            print(f'mask_save_path:{mask_save_path}')
+
+            # # 将不同glayer的cam合并
+            # resized_hp = []
+            # for hp in cam:
+            #     print('cam', type(hp), hp.shape)
+            #     hp = plt_transformer(hp)
+            #     hp = hp.resize((224, 224), resample=Image.BICUBIC)
+            #     cur_hp = tensor_transformer(hp).unsqueeze(0)
+            #     resized_hp.append(cur_hp)
+            #
+            # vis_heatmaps = torch.cat(resized_hp, dim=0)
+            # comb_layercam = torch.sum(vis_heatmaps, 0).unsqueeze(0)
+            # (cam_min, cam_max) = (comb_layercam.min(), comb_layercam.max())
+            # norm_cam = (comb_layercam - cam_min) / (((cam_max - cam_min) + 1e-08))
+            #
+            # cam_np = norm_cam.squeeze().detach().cpu().numpy()  # [224, 224]
+            # cam_uint8 = np.uint8(255 * cam_np) # 转成 0-255 uint8
+            # color_cam = cv2.applyColorMap(cam_uint8, cv2.COLORMAP_JET)
+            # color_cam = cv2.cvtColor(color_cam, cv2.COLOR_BGR2RGB)  # OpenCV 是 BGR，需要转成 RGB
+
+            # save_path = os.path.join(save_dir, img_name)
+            # Image.fromarray(color_cam).save('out.jpg')
+
+            break
+
+
+
+
+
 
 
 def gen_operated(opts):
