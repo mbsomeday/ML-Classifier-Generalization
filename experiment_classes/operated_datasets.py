@@ -114,6 +114,12 @@ def gen_CAM_mask(opts):
     Mask_save_dir = os.path.join(opts.genImg_save_dir, 'Mask')
 
     for txt_name in opts.txt_name_list:
+        # ---------- create saving dir ----------
+        os.makedirs(os.path.join(CAM_save_dir, txt_name.split('.')[0], 'pedestrian'), exist_ok=True)
+        os.makedirs(os.path.join(CAM_save_dir, txt_name.split('.')[0], 'nonPedestrian'), exist_ok=True)
+        os.makedirs(os.path.join(Mask_save_dir, txt_name.split('.')[0], 'pedestrian'), exist_ok=True)
+        os.makedirs(os.path.join(Mask_save_dir, txt_name.split('.')[0], 'nonPedestrian'), exist_ok=True)
+
         # dataset
         get_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key=opts.path_key, txt_name=txt_name)
         get_loader = DataLoader(get_dataset, batch_size=opts.batch_size, shuffle=False)
