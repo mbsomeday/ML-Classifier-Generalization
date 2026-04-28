@@ -16,7 +16,8 @@ def get_opts():
     parser.add_argument('--gen_task_name_list', nargs='+', default=['CAM', 'onlyPerturb'])
     parser.add_argument('--ds_name_list', nargs='+')
     parser.add_argument('--txt_name_list', nargs='+', required=True)
-    parser.add_argument('--num_classes', type=int, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
+    parser.add_argument('--num_classes', type=int,
+                        help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
     parser.add_argument('--model_weights', type=str)
 
     parser.add_argument('--path_key', type=str, default='Stage6_org')
@@ -26,13 +27,12 @@ def get_opts():
     # parser.add_argument('--perturb_save_dir', type=str, required=False)
 
     # 生成图片的保存dir
-    parser.add_argument('--genImg_save_dir', type=str, required=False, help='base dir path, no need to add the txt name')
+    parser.add_argument('--genImg_save_dir', type=str, required=False,
+                        help='base dir path, no need to add the txt name')
 
     # # 生成perturbation+aug图片
     # parser.add_argument('--perturb_dir', type=str, required=False)
     # parser.add_argument('--compondImg_save_dir', type=str, required=False)
-
-
 
     # # 用于本地测试
     # parser.add_argument('--task', type=str, choices=['perturbed', 'cmbined'], default='cmbined')
@@ -72,13 +72,8 @@ if __name__ == '__main__':
         if task_func is None:
             raise ValueError(f'Unknown task name:{t_name}')
 
-        print(f'Current running task:{t_name}')
+        print('-' * 10, f'Current running task:{t_name}', '-' * 10)
         task_func(opts)
 
     # gen_perturbation_image(opts)
     # gen_CAM_mask(opts)
-
-
-
-
-
