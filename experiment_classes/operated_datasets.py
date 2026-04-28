@@ -65,9 +65,11 @@ def gen_perturbation_image(opts):
             image = data_dict['image']  # tensor [n, 3, 224, 224]
             img_name = data_dict['img_name'][0]
             image_np = image.numpy()  # nparray [1, 3, 224, 224]
+            image_path = data_dict['img_path'][0]
+            cls_name = image_path.split(os.sep)[-2]
 
-            img_label = int(data_dict['ped_label'][0])
-            label = 'nonPedestrian' if img_label == 0 else 'pedestrian'
+            # img_label = int(data_dict['ped_label'][0])
+            # label = 'nonPedestrian' if img_label == 0 else 'pedestrian'
 
             # 生成perturb图片
             perturb_image = pertub_method.generate(x=image_np)
@@ -75,7 +77,7 @@ def gen_perturbation_image(opts):
             perturb_tensor = torch.from_numpy(perturb_image).permute(2, 0, 1).unsqueeze(0)
 
             # 保存perturb图片
-            save_path = os.path.join(opts.genImg_save_dir, txt_name.split('.')[0], label, img_name)
+            save_path = os.path.join(opts.genImg_save_dir, txt_name.split('.')[0], cls_name, img_name)
             save_image_tensor(input_tensor=perturb_tensor, filename=save_path)
             print(f'save_path_perturb:{save_path}')
 
