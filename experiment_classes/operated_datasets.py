@@ -32,7 +32,6 @@ def gen_perturbation_image(opts):
     '''
 
     for txt_name in opts.txt_name_list:
-
         # dataset
         get_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key=opts.path_key, txt_name=txt_name)
         get_loader = DataLoader(get_dataset, batch_size=opts.batch_size, shuffle=False)
@@ -54,17 +53,12 @@ def gen_perturbation_image(opts):
         )
         pertub_method = FastGradientMethod(estimator=classifier, eps=0.04)
 
-        save_ped_dir = os.path.join(opts.perturb_save_dir, txt_name.split('.')[0], 'pedestrian')
-        save_noPed_dir = os.path.join(opts.perturb_save_dir, txt_name.split('.')[0], 'nonPedestrian')
-        if not os.path.exists(save_ped_dir):
-            os.makedirs(save_ped_dir)
-            print(f'Make dir:{save_ped_dir}')
-        if not os.path.exists(save_noPed_dir):
-            os.makedirs(save_noPed_dir)
-            print(f'Make dir:{save_noPed_dir}')
+        # ---------- create saving dir ----------
+        save_ped_dir = os.path.join(opts.genImg_save_dir, 'onlyPerturb', txt_name.split('.')[0], 'pedestrian')
+        save_noPed_dir = os.path.join(opts.genImg_save_dir, 'onlyPerturb', txt_name.split('.')[0], 'nonPedestrian')
 
-
-        print('-' * 10, f'Finished {txt_name}', '-' * 10)
+        os.makedirs(save_ped_dir, exist_ok=True)
+        os.makedirs(save_noPed_dir, exist_ok=True)
 
         # 循环遍历
         for data_dict in tqdm(get_loader):
@@ -83,8 +77,11 @@ def gen_perturbation_image(opts):
             # 保存perturb图片
             save_path = os.path.join(opts.perturb_save_dir, txt_name.split('.')[0], label, img_name)
             save_image_tensor(input_tensor=perturb_tensor, filename=save_path)
+            print(f'save_path_perturb:{save_path}')
 
-            # break
+            break
+
+        print('-' * 10, f'Finished {txt_name}', '-' * 10)
 
         # # 结果对比
         # org_out = dataset_classifier(image)

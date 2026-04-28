@@ -13,7 +13,7 @@ def get_opts():
     parser = argparse.ArgumentParser()
 
     # 用于云端
-    # parser.add_argument('--task', type=str, choices=['onlyPerturb', 'combined'], required=True, default=None)
+    # parser.add_argument('--group_folder_list', nargs='+', default=['CAM', 'onlyPerturb'])
     parser.add_argument('--ds_name_list', nargs='+')
     parser.add_argument('--txt_name_list', nargs='+', required=True)
     parser.add_argument('--num_classes', type=int, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
@@ -66,7 +66,8 @@ def get_opts():
 
 if __name__ == '__main__':
     opts = get_opts()
-    # gen_perturbation_image(opts)
+
+    gen_perturbation_image(opts)
     gen_CAM_mask(opts)
 
 
