@@ -6,14 +6,14 @@ sys.path.append(root_path)
 
 import argparse, torch, random
 
-from experiment_classes.operated_datasets import gen_perturbation_image, gen_CAM_mask
+from experiment_classes.operated_datasets import gen_perturbation_image, gen_CAM_mask, FUNC_REGISTRY
 
 
 def get_opts():
     parser = argparse.ArgumentParser()
 
     # 用于云端
-    # parser.add_argument('--group_folder_list', nargs='+', default=['CAM', 'onlyPerturb'])
+    parser.add_argument('--gen_task_name_list', nargs='+', default=['CAM', 'onlyPerturb'])
     parser.add_argument('--ds_name_list', nargs='+')
     parser.add_argument('--txt_name_list', nargs='+', required=True)
     parser.add_argument('--num_classes', type=int, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
@@ -67,8 +67,16 @@ def get_opts():
 if __name__ == '__main__':
     opts = get_opts()
 
-    gen_perturbation_image(opts)
-    gen_CAM_mask(opts)
+    for t_name in opts.gen_task_name_list:
+        task_func = FUNC_REGISTRY.get(t_name)
+        if task_func is None:
+            raise ValueError(f'Unknown task name:{t_name}')
+
+        print(f'Current running task:{t_name}')
+        task_func(opts)
+
+    # gen_perturbation_image(opts)
+    # gen_CAM_mask(opts)
 
 
 

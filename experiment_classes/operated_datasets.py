@@ -26,6 +26,9 @@ from data.dataset import my_dataset
 from utils.utils import load_model, DEVICE, save_image_tensor
 
 
+
+
+
 def gen_perturbation_image(opts):
     '''
         to generate perturbed images with Fast Gradient
@@ -223,10 +226,6 @@ def gen_CAM_mask(opts):
 
 
 
-
-
-
-
 def gen_operated(opts):
     '''
         生成combined images
@@ -409,7 +408,10 @@ def gen_operated(opts):
 
 
 
-
+FUNC_REGISTRY = {
+    'onlyPerturb': gen_perturbation_image,
+    'CAM': gen_CAM_mask
+}
 
 
 
