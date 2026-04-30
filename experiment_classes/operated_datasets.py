@@ -341,8 +341,10 @@ def gen_PerturbAug_AugPerturb(opts):
 
             onlyPerturb_image = Image.open(onlyPerturb_image_dir).convert('RGB')
             mask_image = Image.open(mask_image_path).convert("L")
+            mask_image = tensor_transformer(mask_image).to(DEVICE)
             mask_image = np.array(mask_image)
-            mask_image = (mask_image > 0).astype(np.uint8).to(DEVICE)
+            mask_image = (mask_image > 0).astype(np.uint8)
+
 
             for opt_idx, opt in enumerate(operation_list):
                 if opt == 'AugPerturb':
@@ -431,6 +433,8 @@ def gen_AugOrg_OrgAug(opts):
     # ---------- augmentation class ----------
     random_aug_operation = Random_Aug()
 
+    tensor_transformer = transforms.ToTensor()
+
     # 读取onlyPerturb和mask
     for txt_name in opts.txt_name_list:
         # ---------- create saving dirs ----------
@@ -452,8 +456,9 @@ def gen_AugOrg_OrgAug(opts):
 
             mask_image_path = os.path.join(mask_dir, cls_name, img_name)
             mask_image = Image.open(mask_image_path).convert("L")
+            mask_image = tensor_transformer(mask_image).to(DEVICE)
             mask_image = np.array(mask_image)
-            mask_image = (mask_image > 0).astype(np.uint8).to(DEVICE)
+            mask_image = (mask_image > 0).astype(np.uint8)
 
             for opt_idx, opt in enumerate(operation_list):
                 if opt == 'OrgAug':
