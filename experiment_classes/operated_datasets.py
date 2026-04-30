@@ -27,6 +27,59 @@ from utils.utils import load_model, DEVICE, save_image_tensor
 
 
 
+class Random_Aug():
+    def __init__(self):
+        self.aug_list = [self.hflip, self.rotate, self.jittor, self.gaussian]
+        self.aug_name_list = ['Hflip', 'Rotate', 'Jittor', 'Gaussian']
+        self.random_aug_id = -1
+
+    def __call__(self):
+        # 1.生成随机aug operation id
+        self.random_aug_id = random.randint(0, len(self.aug_list) - 1)
+        # self.random_aug_id = 2        # 仅用于测试
+        # 2.返回对应的augmentation操作
+        cur_aug_operation = self.aug_list[self.random_aug_id]
+
+        return cur_aug_operation
+
+    def hflip(self, img):
+        return transforms.RandomHorizontalFlip(p=1.0)(img)
+
+    def rotate(self, img):
+        # allow tensor and PIL type image
+        angle = random.randint(-10, 10)
+        return transforms.RandomRotation(degrees=(angle, angle))(img)
+
+    def jittor(self, img):
+        color_jitter = transforms.ColorJitter(
+            brightness=0.2,
+            contrast=0.2,
+            saturation=0.2,
+        )
+        return color_jitter(img)
+
+    def gaussian(self, img):
+        sigma = random.uniform(0.1, 1.0)
+        # img = F.gaussian_blur(img, kernel_size=[5, 5], sigma=[sigma, sigma])
+        return transforms.GaussianBlur(kernel_size=5, sigma=sigma)(img)
+
+def create_dirs(base_dir, task_name, txt_name, exist_ok=False):
+    '''
+        创建存储图片的文件夹
+        自动创建 行人 与 非行人 的文件夹
+    '''
+    ped_dir_path = os.path.join(base_dir, task_name, txt_name, 'pedestrian')
+    nonPed_dir_path = os.path.join(base_dir, task_name, txt_name, 'nonPedestrian')
+
+    os.makedirs(ped_dir_path, exist_ok=exist_ok)
+    os.makedirs(nonPed_dir_path, exist_ok=exist_ok)
+
+    if exist_ok is True:
+        print(f'{ped_dir_path} exists, not create.')
+        print(f'{nonPed_dir_path} exists, not create.')
+    else:
+        print(f'Create dir {ped_dir_path}')
+        print(f'Create dir {nonPed_dir_path}')
 
 
 def gen_perturbation_image(opts):
@@ -57,14 +110,14 @@ def gen_perturbation_image(opts):
         pertub_method = FastGradientMethod(estimator=classifier, eps=0.04)
 
         # ---------- create saving dir ----------
-        save_ped_dir = os.path.join(opts.genImg_save_dir, 'onlyPerturb', txt_name.split('.')[0], 'pedestrian')
-        save_noPed_dir = os.path.join(opts.genImg_save_dir, 'onlyPerturb', txt_name.split('.')[0], 'nonPedestrian')
+        save_ped_dir = os.path.join(opts.genImg_save_dir, 'OnlyPerturb', txt_name.split('.')[0], 'pedestrian')
+        save_noPed_dir = os.path.join(opts.genImg_save_dir, 'OnlyPerturb', txt_name.split('.')[0], 'nonPedestrian')
 
         os.makedirs(save_ped_dir, exist_ok=True)
         os.makedirs(save_noPed_dir, exist_ok=True)
 
         # 循环遍历
-        for data_dict in tqdm(get_loader):
+        for idx, data_dict in tqdm(enumerate(get_loader)):
             image = data_dict['image']  # tensor [n, 3, 224, 224]
             img_name = data_dict['img_name'][0]
             image_np = image.numpy()  # nparray [1, 3, 224, 224]
@@ -84,7 +137,8 @@ def gen_perturbation_image(opts):
             save_image_tensor(input_tensor=perturb_tensor, filename=save_path)
             print(f'save_path_perturb:{save_path}')
 
-            break
+            # if idx == 6:
+            #     break
 
         print('-' * 10, f'Finished {txt_name}', '-' * 10)
 
@@ -107,7 +161,7 @@ def gen_perturbation_image(opts):
         # break
 
 
-def gen_CAM_mask(opts):
+def gen_CAM_Mask(opts):
     '''
         to generate LayerCAM and 0.5 mask
     '''
@@ -135,12 +189,12 @@ def gen_CAM_mask(opts):
         grad_layer = ['features.0', 'features.1', 'features.2', 'features.3', 'features.4', 'features.5', 'features.6', 'features.7', 'features.8']
         layerCam_extractor = LayerCAM(get_classifier, target_layer=grad_layer)
 
-        # transformers
-        plt_transformer = transforms.ToPILImage()
-        tensor_transformer = transforms.ToTensor()
-        plt_resize = transforms.Resize(224, interpolation=InterpolationMode.BICUBIC)
+        # # transformers
+        # plt_transformer = transforms.ToPILImage()
+        # tensor_transformer = transforms.ToTensor()
+        # plt_resize = transforms.Resize(224, interpolation=InterpolationMode.BICUBIC)
 
-        for data_dict in tqdm(get_loader):
+        for idx, data_dict in tqdm(enumerate(get_loader)):
             image = data_dict['image'].to(DEVICE)
             img_name = data_dict['img_name'][0]
             image_path = data_dict['img_path'][0]
@@ -183,7 +237,7 @@ def gen_CAM_mask(opts):
 
             cam_save_path = os.path.join(CAM_save_dir, txt_name.split('.')[0], cls_name, img_name)
             Image.fromarray(color_cam).save(cam_save_path)
-            print(f'cam_save_path:{cam_save_path}')
+            # print(f'cam_save_path:{cam_save_path}')
 
             # ---------- gen & save mask ----------
             # plt_cam = plt_transformer(norm_cam[0])
@@ -198,7 +252,7 @@ def gen_CAM_mask(opts):
             mask_uint8 = np.uint8(plt_mask * 255)       # 转成 0/255
             mask_save_path = os.path.join(Mask_save_dir, txt_name.split('.')[0], cls_name, img_name)
             Image.fromarray(mask_uint8).save(mask_save_path)
-            print(f'mask_save_path:{mask_save_path}')
+            # print(f'mask_save_path:{mask_save_path}')
 
             # # 将不同glayer的cam合并
             # resized_hp = []
@@ -222,8 +276,227 @@ def gen_CAM_mask(opts):
             # save_path = os.path.join(save_dir, img_name)
             # Image.fromarray(color_cam).save('out.jpg')
 
-            break
+            # if idx == 6:
+            #     break
 
+
+def gen_PerturbAug_AugPerturb(opts):
+
+    # 先确定已经有onlyPerturb和mask
+    onlyPerturb_dir = os.path.join(opts.genImg_save_dir, 'onlyPerturb')
+    mask_dir = os.path.join(opts.genImg_save_dir, 'Mask')
+    if not (os.path.exists(onlyPerturb_dir) and os.path.exists(mask_dir)):
+        raise FileNotFoundError('Should generate perturb and CAM first!')
+    operation_list = ['PerturbAug', 'AugPerturb']
+    def PerturbAug_AugPerturb_operation():
+        # 仅用于测试，变为灰度图
+        cur_aug_operation = random_aug_operation()
+        cur_aug_operation = transforms.Grayscale(num_output_channels=3)
+
+        if random_aug_operation.random_aug_id == 0 or random_aug_operation.random_aug_id == 1:
+            operated_image = tensor_transformer(onlyPerturb_image).to(DEVICE) * (1 - mask_image) + image * mask_image
+            operated_image = cur_aug_operation(operated_image)
+
+            # PerturbAug_image = tensor_transformer(onlyPerturb_image).to(DEVICE) * (1 - mask_image) + image * mask_image
+            # PerturbAug_image = cur_aug_operation(PerturbAug_image)
+
+        else:
+            # 直接将perturb与org图片合并
+            # aug_image = cur_aug_operation(plt_transformer(image[0]))
+            aug_image_tensor = cur_aug_operation(image)
+            operated_image = tensor_transformer(onlyPerturb_image).to(DEVICE) * (1 - mask_image) + aug_image_tensor * mask_image
+
+        return operated_image
+
+
+    # ---------- augmentation class ----------
+    random_aug_operation = Random_Aug()
+
+    # transformers
+    plt_transformer = transforms.ToPILImage()
+    tensor_transformer = transforms.ToTensor()
+
+    # 读取onlyPerturb和mask
+    for txt_name in opts.txt_name_list:
+        # ---------- create saving dirs ----------
+        create_dirs(base_dir=opts.genImg_save_dir, task_name='PerturbAug', txt_name=txt_name.split('.')[0], exist_ok=True)
+        create_dirs(base_dir=opts.genImg_save_dir, task_name='AugPerturb', txt_name=txt_name.split('.')[0], exist_ok=True)
+
+        # dataset
+        get_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key=opts.path_key, txt_name=txt_name)
+        get_loader = DataLoader(get_dataset, batch_size=opts.batch_size, shuffle=False)
+
+        # perturb and masks
+        onlyPerturb_dir = os.path.join(opts.genImg_save_dir, 'OnlyPerturb', txt_name.split('.')[0])
+        mask_dir = os.path.join(opts.genImg_save_dir, 'Mask', txt_name.split('.')[0])
+
+        for idx, data_dict in tqdm(enumerate(get_loader)):
+            image = data_dict['image'].to(DEVICE)[0]
+            img_name = data_dict['img_name'][0]
+            image_path = data_dict['img_path'][0]
+            cls_name = image_path.split(os.sep)[-2]
+
+            onlyPerturb_image_dir = os.path.join(onlyPerturb_dir, cls_name, img_name)
+            mask_image_path = os.path.join(mask_dir, cls_name, img_name)
+
+            onlyPerturb_image = Image.open(onlyPerturb_image_dir).convert('RGB')
+            mask_image = Image.open(mask_image_path).convert("L")
+            mask_image = np.array(mask_image)
+            mask_image = (mask_image > 0).astype(np.uint8)
+
+            for opt_idx, opt in enumerate(operation_list):
+                if opt == 'AugPerturb':
+                    mask_image = 1 - mask_image
+                operated_image = PerturbAug_AugPerturb_operation()
+                save_path = os.path.join(opts.genImg_save_dir, operation_list[opt_idx], txt_name.split('.')[0], cls_name, img_name)
+                save_image_tensor(input_tensor=operated_image, filename=save_path)
+
+            # ---------- generate PerturbAug ----------
+
+            # # 进行的图片扩增
+            # # 这里要注意，如果是flip和rotate，需要先将perturbation与org image结合，然后再进行aug操作，否则，CAM对应的位置会变
+            # random_aug_id = random.randint(0, len(aug_list) - 1)
+            # cur_aug_operation = aug_list[random_aug_id]
+
+            # # 仅用于测试，变为灰度图
+            # cur_aug_operation = random_aug_operation()
+            # cur_aug_operation = transforms.Grayscale(num_output_channels=3)
+            #
+            # if random_aug_operation.random_aug_id == 0 or random_aug_operation.random_aug_id == 1:
+            #     PerturbAug_image = tensor_transformer(onlyPerturb_image).to(DEVICE) * (1 - mask_image) + image * mask_image
+            #     PerturbAug_image = cur_aug_operation(PerturbAug_image)
+            #
+            # else:
+            #     # 直接将perturb与org图片合并
+            #     # aug_image = cur_aug_operation(plt_transformer(image[0]))
+            #     aug_image_tensor = cur_aug_operation(image)
+            #
+            #     # aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
+            #     PerturbAug_image = tensor_transformer(onlyPerturb_image).to(DEVICE) * (1 - mask_image) + aug_image_tensor * mask_image
+
+
+            # ---------- generate AugPerturb ----------
+
+            # # 进行的图片扩增
+            # # 这里要注意，如果是flip和rotate，需要先将perturbation与org image结合，然后再进行aug操作，否则，CAM对应的位置会变
+            # random_aug_id = random.randint(0, len(aug_list) - 1)
+            # cur_aug_operation = aug_list[random_aug_id]
+
+            # 仅用于测试，变为灰度图
+            # random_aug_id = 3
+            # cur_aug_operation = transforms.Grayscale(num_output_channels=3)
+
+            # cur_aug_operation = random_aug_operation()
+            #
+            # mask_image = 1 - mask_image
+            # if random_aug_operation.random_aug_id == 0 or random_aug_operation.random_aug_id == 1:
+            #     AugPerturb_image = tensor_transformer(onlyPerturb_image).to(DEVICE) * (1 - mask_image) + image * mask_image
+            #     AugPerturb_image = cur_aug_operation(AugPerturb_image)
+            # else:
+            #     # 直接将perturb与org图片合并
+            #     aug_image_tensor = cur_aug_operation(image)
+            #     # aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
+            #     AugPerturb_image = tensor_transformer(onlyPerturb_image).to(DEVICE) * (1 - mask_image) + aug_image_tensor * mask_image
+            #
+            # save_path = os.path.join(opts.genImg_save_dir, 'AugPerturb', txt_name.split('.')[0], cls_name, img_name)
+            # save_image_tensor(input_tensor=AugPerturb_image, filename=save_path)
+            # print(f'save_path:{save_path}')
+
+            # if idx == 6:
+            #     break
+
+
+def gen_AugOrg_OrgAug(opts):
+    # 先确定已经有mask
+    mask_dir = os.path.join(opts.genImg_save_dir, 'Mask')
+    if not os.path.exists(mask_dir):
+        raise FileNotFoundError('Should generate CAM mask first!')
+
+    operation_list = ['AugOrg', 'OrgAug']
+
+    def AugOrg_OrgAug_operation():
+        cur_aug_operation = random_aug_operation()
+        # cur_aug_operation = transforms.Grayscale(num_output_channels=3)  # 仅用于测试
+
+        if random_aug_operation.random_aug_id == 0 or random_aug_operation.random_aug_id == 1:
+            operated_image = cur_aug_operation(image)
+
+        else:
+            # 直接将Aug与org图片合并
+            aug_image_tensor = cur_aug_operation(image).to(DEVICE)
+            operated_image = aug_image_tensor * (1 - mask_image) + image * mask_image
+
+        return operated_image
+
+    # ---------- augmentation class ----------
+    random_aug_operation = Random_Aug()
+
+    # 读取onlyPerturb和mask
+    for txt_name in opts.txt_name_list:
+        # ---------- create saving dirs ----------
+        create_dirs(base_dir=opts.genImg_save_dir, task_name='AugOrg', txt_name=txt_name.split('.')[0], exist_ok=True)
+        create_dirs(base_dir=opts.genImg_save_dir, task_name='OrgAug', txt_name=txt_name.split('.')[0], exist_ok=True)
+
+        # ---------- dataset ----------
+        get_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key=opts.path_key, txt_name=txt_name)
+        get_loader = DataLoader(get_dataset, batch_size=opts.batch_size, shuffle=False)
+
+        # ---------- mask dir ----------
+        mask_dir = os.path.join(opts.genImg_save_dir, 'Mask', txt_name.split('.')[0])
+
+        for idx, data_dict in tqdm(enumerate(get_loader)):
+            image = data_dict['image'].to(DEVICE)[0]
+            img_name = data_dict['img_name'][0]
+            image_path = data_dict['img_path'][0]
+            cls_name = image_path.split(os.sep)[-2]
+
+            mask_image_path = os.path.join(mask_dir, cls_name, img_name)
+            mask_image = Image.open(mask_image_path).convert("L")
+            mask_image = np.array(mask_image)
+            mask_image = (mask_image > 0).astype(np.uint8)
+
+            for opt_idx, opt in enumerate(operation_list):
+                if opt == 'OrgAug':
+                    mask_image = 1 - mask_image
+                operated_img = AugOrg_OrgAug_operation()
+                save_path = os.path.join(opts.genImg_save_dir, str(opt), txt_name.split('.')[0], cls_name, img_name)
+                save_image_tensor(input_tensor=operated_img, filename=save_path)
+
+
+            # ---------- generate AugOrg ----------
+            # cur_aug_operation = random_aug_operation()
+            # # cur_aug_operation = transforms.Grayscale(num_output_channels=3)  # 仅用于测试
+            #
+            # if random_aug_operation.random_aug_id == 0 or random_aug_operation.random_aug_id == 1:
+            #     AugOrg_image = cur_aug_operation(image)
+            #
+            # else:
+            #     # 直接将Aug与org图片合并
+            #     # aug_image = cur_aug_operation(plt_transformer(image)).to(DEVICE)
+            #     aug_image_tensor = cur_aug_operation(image).to(DEVICE)
+            #     # aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
+            #     AugOrg_image = aug_image_tensor * (1 - mask_image) + image * mask_image
+
+
+            # # # ---------- generate OrgAug ----------
+            # mask_image = 1 - mask_image
+            # cur_aug_operation = random_aug_operation()
+            # # cur_aug_operation = transforms.Grayscale(num_output_channels=3)  # 仅用于测试
+            #
+            # if random_aug_operation.random_aug_id == 0 or random_aug_operation.random_aug_id == 1:
+            #     OrgAug_image = cur_aug_operation(image)
+            # else:
+            #     # 直接将Aug与org图片合并
+            #     aug_image_tensor = cur_aug_operation(image).to(DEVICE)
+            #     # aug_image_tensor = tensor_transformer(aug_image).to(DEVICE)
+            #     OrgAug_image = aug_image_tensor * (1 - mask_image) + image * mask_image
+            #
+            # save_path = os.path.join(opts.genImg_save_dir, 'OrgAug', txt_name.split('.')[0], cls_name, img_name)
+            # save_image_tensor(input_tensor=OrgAug_image, filename=save_path)
+
+
+            # if idx == 6:
+            #     break
 
 
 def gen_operated(opts):
@@ -409,8 +682,10 @@ def gen_operated(opts):
 
 
 FUNC_REGISTRY = {
-    'onlyPerturb': gen_perturbation_image,
-    'CAM': gen_CAM_mask
+    'OnlyPerturb': gen_perturbation_image,
+    'CAM_Mask': gen_CAM_Mask,
+    'Aug_Perturb': gen_PerturbAug_AugPerturb,
+    'Aug_Org': gen_AugOrg_OrgAug,
 }
 
 
