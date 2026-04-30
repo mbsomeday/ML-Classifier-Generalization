@@ -59,7 +59,7 @@ def save_image_tensor(input_tensor: torch.Tensor, filename):
     :param filename: 保存的文件名
     """
     if len(input_tensor.shape) == 3:
-        input_tensor.unsqueeze(0)
+        input_tensor = input_tensor.unsqueeze(0)
 
     assert (len(input_tensor.shape) == 4 and input_tensor.shape[0] == 1)
     # 复制一份
