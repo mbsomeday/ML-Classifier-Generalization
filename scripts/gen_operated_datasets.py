@@ -16,23 +16,15 @@ def get_opts():
     parser.add_argument('--gen_task_name_list', nargs='+', default=['CAM', 'onlyPerturb', 'Aug_Perturb'])
     parser.add_argument('--ds_name_list', nargs='+')
     parser.add_argument('--txt_name_list', nargs='+', required=True)
-    parser.add_argument('--num_classes', type=int,
-                        help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
+    parser.add_argument('--num_classes', type=int, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
     parser.add_argument('--model_weights', type=str)
 
     parser.add_argument('--path_key', type=str, default='Stage6_org')
     parser.add_argument('--batch_size', type=int, default=1)
 
-    # # 生成perturbation图片
-    # parser.add_argument('--perturb_save_dir', type=str, required=False)
-
     # 生成图片的保存dir
-    parser.add_argument('--genImg_save_dir', type=str, required=False,
-                        help='base dir path, no need to add the txt name')
+    parser.add_argument('--genImg_save_dir', type=str, required=False, help='base dir path, no need to add the txt name')
 
-    # 生成perturbation+aug图片
-    parser.add_argument('--perturb_dir', type=str, required=False)
-    parser.add_argument('--compondImg_save_dir', type=str, required=False)
 
     # # 用于本地测试
     # # parser.add_argument('--gen_task_name_list', nargs='+', default=['Aug_Perturb'])
