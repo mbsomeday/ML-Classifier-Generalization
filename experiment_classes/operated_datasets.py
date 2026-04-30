@@ -133,7 +133,7 @@ def gen_perturbation_image(opts):
             perturb_tensor = torch.from_numpy(perturb_image).permute(2, 0, 1).unsqueeze(0)
 
             # 保存perturb图片
-            save_path = os.path.join(opts.genImg_save_dir, 'onlyPerturb', txt_name.split('.')[0], cls_name, img_name)
+            save_path = os.path.join(opts.genImg_save_dir, 'OnlyPerturb', txt_name.split('.')[0], cls_name, img_name)
             save_image_tensor(input_tensor=perturb_tensor, filename=save_path)
             # print(f'save_path_perturb:{save_path}')
 
@@ -283,7 +283,7 @@ def gen_CAM_Mask(opts):
 def gen_PerturbAug_AugPerturb(opts):
 
     # 先确定已经有onlyPerturb和mask
-    onlyPerturb_dir = os.path.join(opts.genImg_save_dir, 'onlyPerturb')
+    onlyPerturb_dir = os.path.join(opts.genImg_save_dir, 'OnlyPerturb')
     mask_dir = os.path.join(opts.genImg_save_dir, 'Mask')
     if not (os.path.exists(onlyPerturb_dir) and os.path.exists(mask_dir)):
         raise FileNotFoundError('Should generate perturb and CAM first!')
