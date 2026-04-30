@@ -13,7 +13,7 @@ def get_opts():
     parser = argparse.ArgumentParser()
 
     # 用于云端
-    parser.add_argument('--gen_task_name_list', nargs='+', default=['CAM', 'onlyPerturb', 'Aug_Perturb'])
+    parser.add_argument('--gen_task_name_list', nargs='+', default=['CAM_Mask', 'onlyPerturb', 'Aug_Perturb', 'Aug_Org'])
     parser.add_argument('--ds_name_list', nargs='+')
     parser.add_argument('--txt_name_list', nargs='+', required=True)
     parser.add_argument('--num_classes', type=int, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
