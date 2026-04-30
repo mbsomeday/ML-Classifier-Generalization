@@ -291,7 +291,7 @@ def gen_PerturbAug_AugPerturb(opts):
     def PerturbAug_AugPerturb_operation():
         # 仅用于测试，变为灰度图
         cur_aug_operation = random_aug_operation()
-        cur_aug_operation = transforms.Grayscale(num_output_channels=3)
+        # cur_aug_operation = transforms.Grayscale(num_output_channels=3)
 
         if random_aug_operation.random_aug_id == 0 or random_aug_operation.random_aug_id == 1:
             operated_image = tensor_transformer(onlyPerturb_image).to(DEVICE) * (1 - mask_image) + image * mask_image
