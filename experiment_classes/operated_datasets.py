@@ -135,7 +135,7 @@ def gen_perturbation_image(opts):
             # 保存perturb图片
             save_path = os.path.join(opts.genImg_save_dir, 'onlyPerturb', txt_name.split('.')[0], cls_name, img_name)
             save_image_tensor(input_tensor=perturb_tensor, filename=save_path)
-            print(f'save_path_perturb:{save_path}')
+            # print(f'save_path_perturb:{save_path}')
 
             # if idx == 6:
             #     break
