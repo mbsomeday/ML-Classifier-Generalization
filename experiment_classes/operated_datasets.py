@@ -70,7 +70,7 @@ def create_dirs(base_dir, task_name, txt_name, exist_ok=False):
     ped_dir_path = os.path.join(base_dir, task_name, txt_name, 'pedestrian')
     nonPed_dir_path = os.path.join(base_dir, task_name, txt_name, 'nonPedestrian')
 
-    if exist_ok is True and not (os.path.exists(ped_dir_path) and os.path.exists(nonPed_dir_path)):
+    if exist_ok is True and (os.path.exists(ped_dir_path) and os.path.exists(nonPed_dir_path)):
         print(f'{ped_dir_path} exists, not create.')
         print(f'{nonPed_dir_path} exists, not create.')
     else:
