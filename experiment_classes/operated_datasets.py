@@ -123,7 +123,7 @@ def gen_perturbation_image(opts):
         # os.makedirs(save_noPed_dir, exist_ok=True)
 
         # 循环遍历
-        for idx, data_dict in tqdm(enumerate(get_loader)):
+        for idx, data_dict in enumerate(tqdm(get_loader)):
             image = data_dict['image']  # tensor [n, 3, 224, 224]
             img_name = data_dict['img_name'][0]
             image_np = image.numpy()  # nparray [1, 3, 224, 224]
@@ -200,7 +200,7 @@ def gen_CAM_Mask(opts):
         # tensor_transformer = transforms.ToTensor()
         # plt_resize = transforms.Resize(224, interpolation=InterpolationMode.BICUBIC)
 
-        for idx, data_dict in tqdm(enumerate(get_loader)):
+        for idx, data_dict in enumerate(tqdm(get_loader)):
             image = data_dict['image'].to(DEVICE)
             img_name = data_dict['img_name'][0]
             image_path = data_dict['img_path'][0]
@@ -336,7 +336,7 @@ def gen_PerturbAug_AugPerturb(opts):
         onlyPerturb_dir = os.path.join(opts.genImg_save_dir, 'OnlyPerturb', txt_name.split('.')[0])
         mask_dir = os.path.join(opts.genImg_save_dir, 'Mask', txt_name.split('.')[0])
 
-        for idx, data_dict in tqdm(enumerate(get_loader)):
+        for idx, data_dict in enumerate(tqdm(get_loader)):
             image = data_dict['image'].to(DEVICE)[0]
             img_name = data_dict['img_name'][0]
             image_path = data_dict['img_path'][0]
@@ -456,7 +456,7 @@ def gen_AugOrg_OrgAug(opts):
         # ---------- mask dir ----------
         mask_dir = os.path.join(opts.genImg_save_dir, 'Mask', txt_name.split('.')[0])
 
-        for idx, data_dict in tqdm(enumerate(get_loader)):
+        for idx, data_dict in enumerate(tqdm(get_loader)):
             image = data_dict['image'].to(DEVICE)[0]
             img_name = data_dict['img_name'][0]
             image_path = data_dict['img_path'][0]
