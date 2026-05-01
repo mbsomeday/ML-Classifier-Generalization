@@ -70,7 +70,7 @@ def create_dirs(base_dir, task_name, txt_name, exist_ok=False):
     ped_dir_path = os.path.join(base_dir, task_name, txt_name, 'pedestrian')
     nonPed_dir_path = os.path.join(base_dir, task_name, txt_name, 'nonPedestrian')
 
-    if exist_ok is True:
+    if exist_ok is True and not (os.path.exists(ped_dir_path) and os.path.exists(nonPed_dir_path)):
         print(f'{ped_dir_path} exists, not create.')
         print(f'{nonPed_dir_path} exists, not create.')
     else:
@@ -172,15 +172,18 @@ def gen_CAM_Mask(opts):
         to generate LayerCAM and 0.5 mask
     '''
 
-    CAM_save_dir = os.path.join(opts.genImg_save_dir, 'CAM')
-    Mask_save_dir = os.path.join(opts.genImg_save_dir, 'Mask')
+    # CAM_save_dir = os.path.join(opts.genImg_save_dir, 'CAM')
+    # Mask_save_dir = os.path.join(opts.genImg_save_dir, 'Mask')
 
     for txt_name in opts.txt_name_list:
         # ---------- create saving dir ----------
-        os.makedirs(os.path.join(CAM_save_dir, txt_name.split('.')[0], 'pedestrian'), exist_ok=True)
-        os.makedirs(os.path.join(CAM_save_dir, txt_name.split('.')[0], 'nonPedestrian'), exist_ok=True)
-        os.makedirs(os.path.join(Mask_save_dir, txt_name.split('.')[0], 'pedestrian'), exist_ok=True)
-        os.makedirs(os.path.join(Mask_save_dir, txt_name.split('.')[0], 'nonPedestrian'), exist_ok=True)
+        create_dirs(opts.genImg_save_dir, task_name='CAM', txt_name=txt_name.split('.')[0], exist_ok=False)
+        create_dirs(opts.genImg_save_dir, task_name='Mask', txt_name=txt_name.split('.')[0], exist_ok=False)
+
+        # os.makedirs(os.path.join(CAM_save_dir, txt_name.split('.')[0], 'pedestrian'), exist_ok=True)
+        # os.makedirs(os.path.join(CAM_save_dir, txt_name.split('.')[0], 'nonPedestrian'), exist_ok=True)
+        # os.makedirs(os.path.join(Mask_save_dir, txt_name.split('.')[0], 'pedestrian'), exist_ok=True)
+        # os.makedirs(os.path.join(Mask_save_dir, txt_name.split('.')[0], 'nonPedestrian'), exist_ok=True)
 
         # dataset
         get_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key=opts.path_key, txt_name=txt_name)
@@ -325,8 +328,8 @@ def gen_PerturbAug_AugPerturb(opts):
     # 读取onlyPerturb和mask
     for txt_name in opts.txt_name_list:
         # ---------- create saving dirs ----------
-        create_dirs(base_dir=opts.genImg_save_dir, task_name='PerturbAug', txt_name=txt_name.split('.')[0], exist_ok=True)
-        create_dirs(base_dir=opts.genImg_save_dir, task_name='AugPerturb', txt_name=txt_name.split('.')[0], exist_ok=True)
+        create_dirs(base_dir=opts.genImg_save_dir, task_name='PerturbAug', txt_name=txt_name.split('.')[0], exist_ok=False)
+        create_dirs(base_dir=opts.genImg_save_dir, task_name='AugPerturb', txt_name=txt_name.split('.')[0], exist_ok=False)
 
         # dataset
         get_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key=opts.path_key, txt_name=txt_name)
