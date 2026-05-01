@@ -60,7 +60,6 @@ class Random_Aug():
 
     def gaussian(self, img):
         sigma = random.uniform(0.1, 1.0)
-        # img = F.gaussian_blur(img, kernel_size=[5, 5], sigma=[sigma, sigma])
         return transforms.GaussianBlur(kernel_size=5, sigma=sigma)(img)
 
 def create_dirs(base_dir, task_name, txt_name, exist_ok=False):
@@ -71,13 +70,17 @@ def create_dirs(base_dir, task_name, txt_name, exist_ok=False):
     ped_dir_path = os.path.join(base_dir, task_name, txt_name, 'pedestrian')
     nonPed_dir_path = os.path.join(base_dir, task_name, txt_name, 'nonPedestrian')
 
-    os.makedirs(ped_dir_path, exist_ok=exist_ok)
-    os.makedirs(nonPed_dir_path, exist_ok=exist_ok)
-
     if exist_ok is True:
         print(f'{ped_dir_path} exists, not create.')
         print(f'{nonPed_dir_path} exists, not create.')
     else:
+        try:
+            os.makedirs(ped_dir_path, exist_ok=exist_ok)
+            os.makedirs(nonPed_dir_path, exist_ok=exist_ok)
+
+        except FileExistsError:
+            raise FileExistsError(f'File already exists. {ped_dir_path} and {nonPed_dir_path}')
+
         print(f'Create dir {ped_dir_path}')
         print(f'Create dir {nonPed_dir_path}')
 
@@ -110,11 +113,14 @@ def gen_perturbation_image(opts):
         pertub_method = FastGradientMethod(estimator=classifier, eps=0.04)
 
         # ---------- create saving dir ----------
-        save_ped_dir = os.path.join(opts.genImg_save_dir, 'OnlyPerturb', txt_name.split('.')[0], 'pedestrian')
-        save_noPed_dir = os.path.join(opts.genImg_save_dir, 'OnlyPerturb', txt_name.split('.')[0], 'nonPedestrian')
+        create_dirs(opts.genImg_save_dir, task_name='OnlyPerturb', txt_name=txt_name.split('.')[0], exist_ok=False)
 
-        os.makedirs(save_ped_dir, exist_ok=True)
-        os.makedirs(save_noPed_dir, exist_ok=True)
+
+        # save_ped_dir = os.path.join(opts.genImg_save_dir, 'OnlyPerturb', txt_name.split('.')[0], 'pedestrian')
+        # save_noPed_dir = os.path.join(opts.genImg_save_dir, 'OnlyPerturb', txt_name.split('.')[0], 'nonPedestrian')
+        #
+        # os.makedirs(save_ped_dir, exist_ok=True)
+        # os.makedirs(save_noPed_dir, exist_ok=True)
 
         # 循环遍历
         for idx, data_dict in tqdm(enumerate(get_loader)):
