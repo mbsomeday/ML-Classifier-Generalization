@@ -172,8 +172,8 @@ def gen_CAM_Mask(opts):
         to generate LayerCAM and 0.5 mask
     '''
 
-    # CAM_save_dir = os.path.join(opts.genImg_save_dir, 'CAM')
-    # Mask_save_dir = os.path.join(opts.genImg_save_dir, 'Mask')
+    CAM_save_dir = os.path.join(opts.genImg_save_dir, 'CAM')
+    Mask_save_dir = os.path.join(opts.genImg_save_dir, 'Mask')
 
     for txt_name in opts.txt_name_list:
         # ---------- create saving dir ----------
