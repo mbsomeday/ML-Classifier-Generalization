@@ -95,7 +95,7 @@ KAGGLE = {
     'Stage6_experiment': {
         # 'D1': r'/kaggle/input/datasets/jiaweiwang802/stage6-temp-dsperturb/D1_perturb',
         'D2': r'/kaggle/input/datasets/jiaweiwang802/stage6-dataset-citypersons-experiment',
-        # 'D3': r'/kaggle/input/datasets/jiaweiwang802/stage6-temp-dsperturb/D3_perturb',
+        'D3': r'/kaggle/input/datasets/jiaweiwang802/stage6-bdd100k-exp',
 
     },
 
