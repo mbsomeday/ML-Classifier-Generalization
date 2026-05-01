@@ -56,6 +56,8 @@ def get_opts():
 if __name__ == '__main__':
     opts = get_opts()
 
+
+
     for t_name in opts.gen_task_name_list:
         task_func = FUNC_REGISTRY.get(t_name)
         if task_func is None:
@@ -64,11 +66,7 @@ if __name__ == '__main__':
         print('-' * 10, f'Current running task:{t_name}', '-' * 10)
         task_func(opts)
 
-
-    # gen_perturbation_image(opts)
-    # gen_CAM_mask(opts)
-
-
+    print('Finished Generation!')
 
 
 
