@@ -30,9 +30,13 @@ LCA = {
 LOCAL = {
     'Stage6_org': {
         'D1': r'D:\my_phd\dataset\Stage6\stage6_ecp',
-        'D2': R'D:\my_phd\dataset\Stage6\stage6_citypersons',
-        'D3': r'D:\my_phd\dataset\D4_BDD100K\bdd100k'
+        'D2': r'D:\my_phd\dataset\Stage6\stage6_citypersons',
+        'D3': r'D:\my_phd\dataset\Stage6\stage6_bdd100k'
     },
+    #
+    # 'Stage6_exp': {
+    #     'D3': r''
+    # },
 
     'org_dataset': {
         'D1': r'D:\my_phd\dataset\Stage3\D1_ECPDaytime',
