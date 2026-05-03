@@ -5,6 +5,7 @@ root_path = os.path.split(curPath)[0]
 sys.path.append(root_path)
 
 import argparse
+from datetime import datetime
 
 from experiment_classes.operated_datasets import GEN_FUNC_REGISTRY
 
@@ -54,6 +55,9 @@ def get_opts():
 if __name__ == '__main__':
     opts = get_opts()
 
+    start_time = datetime.now()
+    print(f'Task starts at: {start_time}')
+
     for t_name in opts.gen_task_name_list:
         task_func = GEN_FUNC_REGISTRY.get(t_name)
         if task_func is None:
@@ -62,7 +66,8 @@ if __name__ == '__main__':
         print('-' * 10, f'Current running task:{t_name}', '-' * 10)
         task_func(opts)
 
-    print('Finished Generation!')
+    end_time = datetime.now()
+    print(f'Task ends at:{end_time}\nDuration:{end_time-start_time}')
 
 
 

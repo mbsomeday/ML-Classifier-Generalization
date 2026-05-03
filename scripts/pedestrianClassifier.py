@@ -10,8 +10,8 @@ curPath = os.path.abspath(os.path.dirname(__file__))
 root_path = os.path.split(curPath)[0]
 sys.path.append(root_path)
 
-import argparse, random, time
-import datetime
+import argparse, random
+from datetime import datetime
 
 from experiment_classes.pedestrian_classification import Ped_Classifier
 
@@ -93,7 +93,7 @@ def get_args():
 args = get_args()
 
 # 开始时间
-start_time = datetime.datetime.now()
+start_time = datetime.now()
 print(f'Started at {str(start_time.strftime("%Y-%m-%d %H:%M:%S"))}')
 
 if args.isTrain:
@@ -113,7 +113,7 @@ else:
 
 
 # 结束时间
-end_time = datetime.datetime.now()
+end_time = datetime.now()
 duration = end_time - start_time
 print(f'Ended at {str(end_time.strftime("%Y-%m-%d %H:%M:%S"))}')
 print(f'Duration: {str(duration)}')
