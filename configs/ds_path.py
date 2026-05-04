@@ -186,6 +186,10 @@ deucalion = {
         'D2': r'/projects/F202407660IACDCF2/jiawei_deu_data/datasets/Stage6_CityPersons',
         'D3': r'/projects/F202407660IACDCF2/jiawei_deu_data/datasets/Stage6_BDD100K',
     },
+    'Stage6_experiment': {
+        'D3': r'/projects/F202407660IACDCF2/jiawei_deu_data/datasets/exp_Stage6_BDD100K',
+
+    },
 }
 
 CISUC_Cluster = {
