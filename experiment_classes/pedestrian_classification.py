@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader
 from torch import nn
 from sklearn.metrics import confusion_matrix, balanced_accuracy_score
 from tqdm import tqdm
+import timm
 
 from data.dataset import my_dataset, read_from_dir
 from utils.utils import DEVICE, get_obj_from_str, DotDict, load_model
@@ -23,7 +24,8 @@ class Ped_Classifier():
                 print(f'Running on {torch.cuda.get_device_name(0)} GPU')
 
         self.opts = opts
-        self.ped_model = get_obj_from_str(self.opts.ped_model_obj)(num_classes=2).to(DEVICE)
+        # self.ped_model = get_obj_from_str(self.opts.ped_model_obj)(num_classes=2).to(DEVICE)
+        self.ped_model = timm.create_model("deit_small_patch16_224", pretrained=False, num_classes=2)
 
         if self.opts.isTrain:
             self.training_setup()
