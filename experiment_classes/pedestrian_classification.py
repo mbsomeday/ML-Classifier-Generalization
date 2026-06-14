@@ -25,7 +25,7 @@ class Ped_Classifier():
 
         self.opts = opts
         # self.ped_model = get_obj_from_str(self.opts.ped_model_obj)(num_classes=2).to(DEVICE)
-        self.ped_model = timm.create_model("deit_small_patch16_224", pretrained=False, num_classes=2)
+        self.ped_model = timm.create_model("deit_small_patch16_224", pretrained=False, num_classes=2).to(DEVICE)
 
         if self.opts.isTrain:
             self.training_setup()
