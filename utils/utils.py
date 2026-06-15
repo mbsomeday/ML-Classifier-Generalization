@@ -1,7 +1,6 @@
 import importlib, torch
 from torchvision import utils as vutils
 
-# TODO: 增加测试的时候对每个样本的追踪，可以得到不同model在同一个数据集上的测试结果的交集对比
 
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
