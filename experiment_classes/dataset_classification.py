@@ -8,7 +8,7 @@ from sklearn.metrics import confusion_matrix
 from data.dataset import my_dataset, read_from_dirs
 from training_func.callbacks import EarlyStopping
 from utils.utils import get_obj_from_str, DEVICE, DotDict, load_model
-from utils.plt_func import plot_cm
+# from utils.plt_func import plot_cm
 
 
 class DS_Classifier():
@@ -221,7 +221,7 @@ class DS_Classifier():
 
         print(f'Test accuracy:{test_accuracy:.6f}\nTest CM:{test_cm}')
 
-        plot_cm(y_true, y_pred, classes=['D1', 'D2', 'D3'], title=self.opts.cm_title, normalize=True, cm_save_dir=self.opts.cm_save_dir)
+        # plot_cm(y_true, y_pred, classes=['D1', 'D2', 'D3'], title=self.opts.cm_title, normalize=True, cm_save_dir=self.opts.cm_save_dir)
 
 
 def ds_cls_from_dirs(opts):
@@ -265,7 +265,7 @@ def ds_cls_from_dirs(opts):
         cur_item = 'D' + str(int(item) + 1)
         ds_label_list.append(cur_item)
 
-    plot_cm(y_true, y_pred, classes=ds_label_list, title=opts.cm_title, normalize=True, cm_save_dir=opts.cm_save_dir)
+    # plot_cm(y_true, y_pred, classes=ds_label_list, title=opts.cm_title, normalize=True, cm_save_dir=opts.cm_save_dir)
 
 
 
