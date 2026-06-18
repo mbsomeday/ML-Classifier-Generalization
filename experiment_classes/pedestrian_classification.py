@@ -4,7 +4,6 @@ from torch.utils.data import DataLoader
 from torch import nn
 from sklearn.metrics import confusion_matrix, balanced_accuracy_score
 from tqdm import tqdm
-import timm
 
 from data.dataset import my_dataset, read_from_dir
 from utils.utils import DEVICE, get_obj_from_str, DotDict, load_model
