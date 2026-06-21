@@ -246,7 +246,7 @@ def gen_CAM_Mask(opts):
             # cam_array = np.array(plt_cam)
 
             cam_array = np.array(cam_np)
-            threshold = 0.4
+            threshold = 0.5
             cam_mask = cam_array < threshold  # 这里直接跟threshold比，因为cam_array已经归一化了，其max为1.0，值高的部分为黑色
             # cam_mask = cam_array >= (threshold * cam_array.max())         # 值低的部分为黑色
             plt_mask = cam_mask * 1.0
