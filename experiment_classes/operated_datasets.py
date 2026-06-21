@@ -182,7 +182,13 @@ def gen_CAM_Mask(opts):
         get_classifier = get_classifier.to(DEVICE).eval()
 
         # 选择CAM算法
-        grad_layer = ['features.0', 'features.1', 'features.2', 'features.3', 'features.4', 'features.5', 'features.6', 'features.7', 'features.8']
+        model_name = opts.model_obj.split('.')[-1]
+        if model_name == 'efficientnet_b0':
+            grad_layer = ['features.0', 'features.1', 'features.2', 'features.3', 'features.4', 'features.5', 'features.6', 'features.7', 'features.8']
+        elif model_name == 'resnet18':
+            grad_layer = ['layer1', 'layer2', 'layer3', 'layer4']
+        else:
+            raise ValueError(f'{opts.model_obj} can not find matched cam layer!')
         layerCam_extractor = LayerCAM(get_classifier, target_layer=grad_layer)
 
         # # transformers
