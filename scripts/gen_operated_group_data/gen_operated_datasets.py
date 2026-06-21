@@ -3,15 +3,12 @@ import os, sys
 curPath = os.path.abspath(os.path.dirname(__file__))
 root_path = os.path.split(curPath)[0]
 sys.path.append(root_path)
+from experiment_classes.operated_datasets import GEN_FUNC_REGISTRY
 
-curPath = os.path.abspath(os.path.dirname(__file__))
-root_path = os.path.split(curPath)[0]
-sys.path.append(root_path)
 
 import argparse
 from datetime import datetime
 
-from experiment_classes.operated_datasets import GEN_FUNC_REGISTRY
 
 
 def get_opts():
