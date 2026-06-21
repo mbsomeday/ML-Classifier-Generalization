@@ -20,8 +20,10 @@ from torchvision.transforms.functional import InterpolationMode
 import numpy as np
 from art.estimators.classification import PyTorchClassifier
 from art.attacks.evasion import FastGradientMethod
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import torch.nn.functional as nnF
+from utils.utils import DEVICE, get_obj_from_str
+
 
 from data.dataset import my_dataset
 from utils.utils import load_model, DEVICE, save_image_tensor
@@ -94,7 +96,9 @@ def gen_perturbation_image(opts):
         get_loader = DataLoader(get_dataset, batch_size=opts.batch_size, shuffle=False)
 
         # model
-        get_classifier = models.efficientnet_b0(weights=None, num_classes=opts.num_classes)
+        get_classifier = get_obj_from_str(opts.model_obj)(weights=None, num_classes=opts.num_classes).to(DEVICE)
+        # get_classifier = models.efficientnet_b0(weights=None, num_classes=opts.num_classes)
+
         get_classifier = load_model(get_classifier, opts.model_weights)
         get_classifier = get_classifier.to(DEVICE).eval()
 
@@ -112,7 +116,6 @@ def gen_perturbation_image(opts):
 
         # ---------- create saving dir ----------
         create_dirs(opts.genImg_save_dir, task_name='OnlyPerturb', txt_name=txt_name.split('.')[0], exist_ok=opts.dir_exist_ok)
-
 
         # 循环遍历
         for idx, data_dict in enumerate(tqdm(get_loader)):
@@ -168,11 +171,11 @@ def gen_CAM_Mask(opts):
         create_dirs(opts.genImg_save_dir, task_name='CAM', txt_name=txt_name.split('.')[0], exist_ok=opts.dir_exist_ok)
         create_dirs(opts.genImg_save_dir, task_name='Mask', txt_name=txt_name.split('.')[0], exist_ok=opts.dir_exist_ok)
 
-        # dataset
+        # ---------- load dataset ----------
         get_dataset = my_dataset(ds_name_list=opts.ds_name_list, path_key=opts.path_key, txt_name=txt_name)
         get_loader = DataLoader(get_dataset, batch_size=opts.batch_size, shuffle=False)
 
-        # model
+        # ---------- load model ----------
         get_classifier = models.efficientnet_b0(weights=None, num_classes=opts.num_classes)
         get_classifier = load_model(get_classifier, opts.model_weights)
         get_classifier = get_classifier.to(DEVICE).eval()
@@ -194,7 +197,7 @@ def gen_CAM_Mask(opts):
 
             out = get_classifier(image)
             cam_list = layerCam_extractor(out.squeeze(0).argmax().item(), out)
-            print(f'cam_list:{len(cam_list)}')
+            # print(f'cam_list:{len(cam_list)}')
 
             # # 将不同glayer的cam合并
             # resized_hp = []
@@ -222,7 +225,7 @@ def gen_CAM_Mask(opts):
 
             cam_min, cam_max = sum_cam.min(), sum_cam.max()
             norm_cam = (sum_cam - cam_min) / (((cam_max - cam_min) + 1e-08))
-            cam_np = norm_cam.squeeze().detach().cpu().numpy()  # [224, 224]
+            cam_np = norm_cam.squeeze().detach().cpu().numpy()  # float32
             cam_uint8 = np.uint8(255 * cam_np) # 转成 0-255 uint8
             color_cam = cv2.applyColorMap(cam_uint8, cv2.COLORMAP_JET)
             color_cam = cv2.cvtColor(color_cam, cv2.COLOR_BGR2RGB)  # OpenCV 是 BGR，需要转成 RGB

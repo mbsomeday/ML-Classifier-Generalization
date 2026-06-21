@@ -14,7 +14,8 @@ def get_opts():
     parser = argparse.ArgumentParser()
 
     # # 用于云端
-    # parser.add_argument('--gen_task_name_list', nargs='+', default=['CAM_Mask', 'onlyPerturb', 'Aug_Perturb', 'Aug_Org'])
+    # parser.add_argument('--model_obj', type=str, default='torchvision.models.efficientnet_b0')
+    # parser.add_argument('--gen_task_name_list', nargs='+')
     # parser.add_argument('--ds_name_list', nargs='+')
     # parser.add_argument('--txt_name_list', nargs='+', required=True)
     # parser.add_argument('--num_classes', type=int, help='the number is 3 when using dataset classifier, and is 2 when using pedestrian classifier')
@@ -30,6 +31,7 @@ def get_opts():
 
 
     # 用于本地测试
+    parser.add_argument('--model_obj', type=str, default='torchvision.models.efficientnet_b0')
     parser.add_argument('--gen_task_name_list', nargs='+', default=['CAM_Mask'])
     # parser.add_argument('--gen_task_name_list', nargs='+', default=['CAM_Mask', 'OnlyPerturb', 'Aug_Perturb', 'Aug_Org'])
     parser.add_argument('--ds_name_list', nargs='+', default=['D3'])
