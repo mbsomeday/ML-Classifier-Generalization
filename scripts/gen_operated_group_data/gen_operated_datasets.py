@@ -1,8 +1,9 @@
 # 将上级目录加入 sys.path， 防止命令行运行时找不到包
-import os, sys
-curPath = os.path.abspath(os.path.dirname(__file__))
-root_path = os.path.split(curPath)[2]
-sys.path.append(root_path)
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.append(str(PROJECT_ROOT))
 
 from experiment_classes.operated_datasets import GEN_FUNC_REGISTRY
 
