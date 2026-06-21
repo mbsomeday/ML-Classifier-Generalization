@@ -176,7 +176,8 @@ def gen_CAM_Mask(opts):
         get_loader = DataLoader(get_dataset, batch_size=opts.batch_size, shuffle=False)
 
         # ---------- load model ----------
-        get_classifier = models.efficientnet_b0(weights=None, num_classes=opts.num_classes)
+        # get_classifier = models.efficientnet_b0(weights=None, num_classes=opts.num_classes)
+        get_classifier = get_obj_from_str(opts.model_obj)(weights=None, num_classes=opts.num_classes).to(DEVICE)
         get_classifier = load_model(get_classifier, opts.model_weights)
         get_classifier = get_classifier.to(DEVICE).eval()
 
