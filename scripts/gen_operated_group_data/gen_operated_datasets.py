@@ -1,4 +1,4 @@
-# 将上级目录加入 sys.path， 防止命令行运行时找不到包
+# 将上级目录加入 sys.path， 防止命令行运行时找不到包，适用于当前这种包下还有包的情况
 import sys
 from pathlib import Path
 
