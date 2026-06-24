@@ -38,7 +38,7 @@ class DS_Classifier():
         '''
         print('-' * 40 + ' Args ' + '-' * 40)
 
-        self.callback_dir = 'dsCls' + '_' + ''.join(self.opts.ds_name_list) + '_' + ''.join(self.opts.ds_labels)
+        self.callback_dir = 'dsCls' + '_' + ''.join(self.opts.ds_name_list) + '_' + ''.join(self.opts.ds_labels) + self.opts.exp_name
         self.callback_path = os.path.join(os.getcwd(), self.callback_dir)
         if not os.path.exists(self.callback_path):
             os.mkdir(self.callback_path)
