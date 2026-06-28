@@ -110,7 +110,7 @@ def gen_perturbation_image(opts):
             loss=criterion,
             optimizer=optimizer,
             input_shape=(3, 224, 224),
-            nb_classes=3,
+            nb_classes=opts.num_classes,
         )
         pertub_method = FastGradientMethod(estimator=classifier, eps=0.04)
 
@@ -431,6 +431,8 @@ def gen_txt(opts):
         生成相应的txt文件
     '''
     txt_save_path = os.path.join(opts.txt_save_dir, opts.txt_save_name)
+    print(txt_save_path)
+
     # 先保存org txt中的信息
     with open(opts.add_org_txt, 'r') as f:
         org_txt_info = f.readlines()
@@ -441,7 +443,8 @@ def gen_txt(opts):
 
     # 再保存operated data info
 
-    operated_image_path = os.path.join(opts.image_base_dir, opts.imgae_group_path)
+    # operated_image_path = os.path.join(opts.image_base_dir, opts.imgae_group_path)
+    operated_image_path = opts.image_base_dir
     msg_list = []
 
     for cls_name in os.listdir(operated_image_path):
