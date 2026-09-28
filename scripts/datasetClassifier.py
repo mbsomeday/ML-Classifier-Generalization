@@ -17,8 +17,8 @@ def get_opts():
     parser.add_argument('--data_key', default='Stage6_org')
     parser.add_argument('--ds_labels', nargs='+', default=['0', '1', '2'])
     parser.add_argument('--train_txt', type=str, default='augmentation_train.txt')
-    parser.add_argument('--val_txt', type=str, default='augmentation_val.txt')
-    parser.add_argument('--exp_name', type=str, default='')
+    parser.add_argument('--val_txt', nargs='+', default=['augmentation_val.txt'])
+    parser.add_argument('--exp_name', nargs='+', default=[''])
 
     # train
     parser.add_argument('--isTrain', action='store_true')
