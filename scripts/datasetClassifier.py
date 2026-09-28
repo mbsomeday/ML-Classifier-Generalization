@@ -10,7 +10,7 @@ from experiment_classes.dataset_classification import DS_Classifier
 
 def get_opts():
     parser = argparse.ArgumentParser()
-
+    #云端
     parser.add_argument('--ds_model_obj', type=str, default='torchvision.models.efficientnet_b0')
     parser.add_argument('--num_cls', type=int, default=3)
     parser.add_argument('--ds_name_list', nargs='+', default=['D1', 'D2', 'D3'])
@@ -43,6 +43,38 @@ def get_opts():
     # callback
     parser.add_argument('--top_k', type=int, default=1)
     parser.add_argument('--patience', type=int, default=5)
+
+    # # 本地
+    # # parser.add_argument('--ds_model_obj', type=str, default='torchvision.models.efficientnet_b0')
+    # parser.add_argument('--ds_model_obj', type=str, default='torchvision.models.resnet18')
+    #
+    # parser.add_argument('--num_cls', type=int, default=3)
+    # parser.add_argument('--ds_name_list', nargs='+', default=['D3'])
+    # parser.add_argument('--data_key', default='Stage6_org')
+    # parser.add_argument('--ds_labels', nargs='+', default=['2'])
+    # parser.add_argument('--train_txt', type=str, default='augmentation_train.txt')
+    # parser.add_argument('--val_txt', type=str, default='augmentation_val.txt')
+    # parser.add_argument('--exp_name', type=str, default='')
+    #
+    # # train
+    # parser.add_argument('--isTrain', default=True)
+    # # parser.add_argument('--train_batch_size', type=int, default=64)
+    # # parser.add_argument('--base_lr', type=float, default=0.001)
+    # # parser.add_argument('--monitored_metric', type=str, default='loss')
+    # # parser.add_argument('--max_epochs', type=int, default=60)
+    # # parser.add_argument('--min_epochs', type=int, default=10)
+    # # parser.add_argument('--warmup_epochs', type=int, default=3)
+    #
+    # # # val
+    # # parser.add_argument('--val_batch_size', default=64)
+    #
+    # # test
+    # parser.add_argument('--ds_weights_path', type=str, default=r'E:\Bias_Reduction_Summary\Backbone_EfficientNetb0\Baselines\Dataset_Classifier\dsCls_D1D2D3_012v2\dsCls_D1D2D3_012v2-18-0.0100.pth')
+    # parser.add_argument('--test_txt_name', default='augmentation_test.txt')
+    # parser.add_argument('--test_batch_size', type=int, default=4)
+    # # parser.add_argument('--save_plt', action='store_true', help='not save CM by default')
+    # # parser.add_argument('--cm_save_dir', type=str, default=None)
+    # # parser.add_argument('--cm_title', type=str, default=None)
 
     opts = parser.parse_args()
 

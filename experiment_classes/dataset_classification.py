@@ -64,7 +64,7 @@ class DS_Classifier():
         self.val_loader = DataLoader(self.val_dataset, batch_size=self.opts.val_batch_size, shuffle=False)
 
         # ********** loss & scheduler **********
-        self.optimizer = torch.optim.RMSprop(self.ds_model.parameters(), lr=self.opts.base_lr, weight_decay=1e-5, eps=0.001)
+        self.optimizer = torch.optim.RMSprop(self.ds_model.parameters(), lr=self.opts.base_lr, weight_decay=1e-5, eps=0.001, momentum=0.9)
         self.loss_fn = torch.nn.CrossEntropyLoss()
 
         # ********** callbacks **********
@@ -225,7 +225,7 @@ class DS_Classifier():
 
 
 def ds_cls_from_dirs(opts):
-    print(f'Machine: {torch.cuda.get_device_name(0)}')
+    # print(f'Machine: {torch.cuda.get_device_name(0)}')
 
     # model
     ds_model = get_obj_from_str(opts.ds_model_obj)(weights=None, progress=True, num_classes=3).to(DEVICE)
