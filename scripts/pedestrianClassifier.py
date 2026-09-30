@@ -34,6 +34,7 @@ def get_args():
     parser.add_argument('--min_train_epoch', type=int, default=10)
     parser.add_argument('--max_train_epoch', type=int, default=200)
     parser.add_argument('--seed_num', type=int, default=1, help='set the number of training_func times for getting the average value')
+    parser.add_argument('--seed_list', nargs='+', default=[])
 
     parser.add_argument('--top_k', type=int, default=1)
     parser.add_argument('--patience', type=int, default=10)
@@ -98,8 +99,12 @@ print(f'Started at {str(start_time.strftime("%Y-%m-%d %H:%M:%S"))}')
 
 if args.isTrain:
     print('Current Mode: 【Training】')
-    # 生成程度为n的seed_list
-    seed_list = random.sample(range(0, 100), args.seed_num)
+    if len(args.seed_list) == 0:
+        # 若设置的seed list为空，则随机生成seed
+        seed_list = random.sample(range(0, 100), args.seed_num)
+    else:
+        seed_list = args.seed_list
+
     for cur_seed in seed_list:
         # 先调节seed再创建ped实例
         setattr(args, 'rand_seed', cur_seed)    # 向args中添加rand seed
