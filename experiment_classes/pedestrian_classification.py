@@ -105,6 +105,7 @@ class Ped_Classifier():
         if os.path.exists(write_to_txt):
             os.remove(write_to_txt)
         with open(write_to_txt, 'a') as f:
+            f.write('Task: Pedestrian Classification\n')
             for item in info:
                 f.write(item+'\n')
 
