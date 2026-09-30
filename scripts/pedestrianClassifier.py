@@ -34,7 +34,7 @@ def get_args():
     parser.add_argument('--min_train_epoch', type=int, default=10)
     parser.add_argument('--max_train_epoch', type=int, default=200)
     parser.add_argument('--seed_num', type=int, default=1, help='set the number of training_func times for getting the average value')
-    parser.add_argument('--seed_list', nargs='+', default=[])
+    parser.add_argument('--seed_list', nargs='+', type=int, default=[])
 
     parser.add_argument('--top_k', type=int, default=1)
     parser.add_argument('--patience', type=int, default=10)
