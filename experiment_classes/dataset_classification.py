@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 from tqdm import tqdm
 from sklearn.metrics import confusion_matrix
+from datetime import datetime
 
 from data.dataset import my_dataset, read_from_dirs
 from training_func.callbacks import EarlyStopping
@@ -33,18 +34,28 @@ class DS_Classifier():
 
     def print_args(self):
         '''
-            Printing args to the console & Saing args to .txt file
-
+            Printing args to the console & Saing args to Args.txt file
+            If Args.txt already exists, then del existed one.
         '''
         print('-' * 40 + ' Args ' + '-' * 40)
 
         self.callback_dir = 'dsCls' + '_' + ''.join(self.opts.ds_name_list) + '_' + ''.join(self.opts.ds_labels) + self.opts.exp_name
         self.callback_path = os.path.join(os.getcwd(), self.callback_dir)
+
         if not os.path.exists(self.callback_path):
             os.mkdir(self.callback_path)
         print(f'Callback dir: {self.callback_path}')
 
-        with open(os.path.join(self.callback_path, 'Args.txt'), 'a') as f:
+        arg_txt_path = os.path.join(self.callback_path, 'Args.txt')
+        if os.path.exists(arg_txt_path):
+            os.remove(arg_txt_path)
+            print('Del existed Args.txt and Created a new one.')
+
+        with open(arg_txt_path, 'a') as f:
+            # 先保存一下时间
+            current_time = datetime.now()
+            f.write(current_time.strftime("%Y-%m-%d %H:%M:%S"))
+
             for k, v in vars(self.opts).items():
                 msg = f'{k}: {v}'
                 print(msg)
@@ -56,13 +67,13 @@ class DS_Classifier():
         # ********** 模型初始化 **********
         self.init_model(self.ds_model)
 
-        # ********** 数据准备 **********    augmentation_train
-        # self.train_dataset = my_dataset(ds_name_list=self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.train_txt, ds_labels=self.opts.ds_labels)
-        self.train_dataset = read_from_dirs(ds_dir_list=self.opts.train_txt, ds_label_list=self.opts.ds_labels)
+        # ********** 数据准备 **********
+        self.train_dataset = my_dataset(ds_name_list=self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.train_txt, ds_labels=self.opts.ds_labels)
+        # self.train_dataset = read_from_dirs(ds_dir_list=self.opts.train_txt, ds_label_list=self.opts.ds_labels)
         self.train_loader = DataLoader(self.train_dataset, batch_size=self.opts.train_batch_size, shuffle=True)
 
-        # self.val_dataset = my_dataset(ds_name_list=self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.val_txt, ds_labels=self.opts.ds_labels)
-        self.val_dataset = read_from_dirs(ds_dir_list=self.opts.val_txt, ds_label_list=self.opts.ds_labels)
+        self.val_dataset = my_dataset(ds_name_list=self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.val_txt, ds_labels=self.opts.ds_labels)
+        # self.val_dataset = read_from_dirs(ds_dir_list=self.opts.val_txt, ds_label_list=self.opts.ds_labels)
         self.val_loader = DataLoader(self.val_dataset, batch_size=self.opts.val_batch_size, shuffle=False)
 
         # ********** loss & scheduler **********
