@@ -32,15 +32,15 @@ def get_opts():
     # parser.add_argument('--cm_save_dir', type=str, default=None)
     # parser.add_argument('--cm_title', type=str, default=None)
 
-    parser.add_argument('--ds_dir_list', nargs='+', default=[r'E:\Bias_Reduction_Summary\Backbone_EfficientNetb0\D2_Testbed\Datasets\DS_CAM\AugOrg\test'])
-    parser.add_argument('--ds_label_list', nargs='+', default=[1])
+    parser.add_argument('--ds_dir_list', nargs='+', default=[r'D:\my_phd\dataset\Stage6\1001Temp\D1\Test', r'D:\my_phd\dataset\Stage6\1001Temp\D2\Test', R'D:\my_phd\dataset\Stage6\1001Temp\D3\Test'])
+    parser.add_argument('--ds_label_list', nargs='+', default=[0, 1, 2])
 
-    parser.add_argument('--ds_model_obj', default='torchvision.models.efficientnet_b0')
-    # parser.add_argument('--ds_model_obj', default='torchvision.models.resnet18')
+    # parser.add_argument('--ds_model_obj', default='torchvision.models.efficientnet_b0')
+    parser.add_argument('--ds_model_obj', default='torchvision.models.resnet18')
 
 
     # test
-    parser.add_argument('--ds_weights_path', type=str, default=r'E:\Bias_Reduction_Summary\Backbone_EfficientNetb0\Baselines\Dataset_Classifier\dsCls_D1D2D3_012v2\dsCls_D1D2D3_012v2-18-0.0100.pth')
+    parser.add_argument('--ds_weights_path', type=str, default=r'D:\my_phd\dataset\Stage6\1001Temp\dsCls_D1D2D3_012-20-0.0596.pth')
     # parser.add_argument('--ds_weights_path', type=str, default=r'E:\Bias_Reduction_Summary\Backbone_ResNet18\Baselines\Dataset_Classifier\dsCls_D1D2D3_17\dsCls_D1D2D3_012-17-0.0315.pth')
 
     parser.add_argument('--test_batch_size', type=int, default=2)
