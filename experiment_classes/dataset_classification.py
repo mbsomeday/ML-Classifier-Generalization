@@ -54,7 +54,8 @@ class DS_Classifier():
         with open(arg_txt_path, 'a') as f:
             # 先保存一下时间
             current_time = datetime.now()
-            f.write(current_time.strftime("%Y-%m-%d %H:%M:%S"))
+            time_msg = f'Experiment time: {current_time.strftime("%Y-%m-%d %H:%M:%S")} \n'
+            f.write(time_msg)
 
             for k, v in vars(self.opts).items():
                 msg = f'{k}: {v}'
