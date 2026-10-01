@@ -10,21 +10,19 @@ from experiment_classes.dataset_classification import DS_Classifier
 
 def get_opts():
     parser = argparse.ArgumentParser()
-    #云端
-    parser.add_argument('--ds_model_obj', type=str, default='torchvision.models.efficientnet_b0')
-    parser.add_argument('--num_cls', type=int, default=3)
-    parser.add_argument('--ds_name_list', nargs='+', default=['D1', 'D2', 'D3'])
-    parser.add_argument('--data_key', default='Stage6_org')
-    parser.add_argument('--ds_labels', nargs='+', default=['0', '1', '2'])
-    parser.add_argument('--train_txt', type=str, default='train.txt')
-    parser.add_argument('--val_txt', type=str, default='val.txt')
-    # parser.add_argument('--train_txt', nargs='+', default=['augmentation_train.txt'])
-    # parser.add_argument('--val_txt', nargs='+', default=['augmentation_val.txt'])
-    parser.add_argument('--exp_name', type=str, default='')
+    # 云端
+    parser.add_argument('--ds_model_obj', type=str, default=None)
+    parser.add_argument('--num_cls', type=int, default=None)
+    parser.add_argument('--ds_name_list', nargs='+', default=None)
+    parser.add_argument('--data_key', default=None)
+    parser.add_argument('--ds_labels', nargs='+', default=None)
+    parser.add_argument('--train_txt', type=str, default=None)
+    parser.add_argument('--val_txt', type=str, default=None)
+    parser.add_argument('--exp_name', type=str, default=None)
 
     # train
     parser.add_argument('--isTrain', action='store_true')
-    parser.add_argument('--train_batch_size', type=int, default=64)
+    parser.add_argument('--train_batch_size', type=int, default=None)
     parser.add_argument('--base_lr', type=float, default=0.001)
     parser.add_argument('--monitored_metric', type=str, default='loss')
     parser.add_argument('--max_epochs', type=int, default=60)
