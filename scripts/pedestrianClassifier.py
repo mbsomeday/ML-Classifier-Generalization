@@ -26,7 +26,7 @@ def get_args():
     parser.add_argument('--data_key', type=str, default='Stage6_org')
     parser.add_argument('--train_batch_size', type=int, default=64)   # 将train, val和test的batch size分开，方便loss的计算
     parser.add_argument('--val_batch_size', type=int, default=128)
-    parser.add_argument('--train_txt', type=str, default='augmentation_train.txt')
+    parser.add_argument('--train_txt', type=str, default=None)
 
     # train
     parser.add_argument('--base_lr', type=float, default=0.01)
