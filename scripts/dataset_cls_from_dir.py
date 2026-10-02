@@ -40,7 +40,7 @@ def get_opts():
 
 
     # test
-    parser.add_argument('--ds_weights_path', type=str, default=r'D:\my_phd\dataset\Stage6\1001Temp\dsCls_D1D2D3_012-20-0.0596.pth')
+    parser.add_argument('--ds_weights_path', type=str, default=r'E:\Bias_Reduction_Summary\Backbone_ResNet18\Baselines\Dataset_Classifier\On_TrainSet\dsCls_D1D2D3_012\dsCls_D1D2D3_012-24-0.0365.pth')
     # parser.add_argument('--ds_weights_path', type=str, default=r'E:\Bias_Reduction_Summary\Backbone_ResNet18\Baselines\Dataset_Classifier\dsCls_D1D2D3_17\dsCls_D1D2D3_012-17-0.0315.pth')
 
     parser.add_argument('--test_batch_size', type=int, default=2)
