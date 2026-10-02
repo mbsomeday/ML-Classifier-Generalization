@@ -56,7 +56,7 @@ class EarlyStopping():
                 self.counter += 1
                 improved_flag = False
         elif self.monitored_metric == 'loss':
-            if val_epoch_info[self.monitored_metric] > self.monitored_metric_value + self.delta:    # 表现没有提升的情况
+            if val_epoch_info[self.monitored_metric] >= self.monitored_metric_value - self.delta:    # 表现没有提升的情况
                 self.counter += 1
                 improved_flag = False
         else:

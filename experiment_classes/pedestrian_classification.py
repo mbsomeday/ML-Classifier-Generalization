@@ -183,7 +183,8 @@ class Ped_Classifier():
             ped_idx = (ped_labels == 1)
 
             # 便于最终计算每个样本的loss
-            batch_loss_sum = loss_value.item() * self.opts.train_batch_size
+            # batch_loss_sum = loss_value.item() * self.opts.train_batch_size
+            batch_loss_sum = loss_value.item() * images.size(0)
             total_loss_sum += batch_loss_sum
 
             # org_dict['loss'] += loss_value.item()
@@ -219,7 +220,8 @@ class Ped_Classifier():
                 preds = torch.argmax(logits, dim=1)
                 loss_val = self.loss_fn(logits, ped_labels)
 
-                batch_loss_sum = loss_val.item() * self.opts.val_batch_size
+                # batch_loss_sum = loss_val.item() * self.opts.val_batch_size
+                batch_loss_sum = loss_val.item() * images.size(0)
                 total_loss_sum += batch_loss_sum
 
                 # val_loss += self.loss_fn(logits, ped_labels).item()       # 原代码
@@ -346,6 +348,8 @@ class Ped_Classifier():
         print('Total Val Samples:', len(self.val_dataset))
 
         for EPOCH in range(self.opts.max_train_epoch):
+            # ------------------------ 学习率调整 ------------------------
+            self.update_learning_rate(EPOCH + 1)
 
             print('=' * 30 + ' Begin EPOCH ' + str(EPOCH + 1) + '=' * 30)
             train_epoch_info = self.train_one_epoch()
@@ -354,8 +358,6 @@ class Ped_Classifier():
             # ------------------------ 调用callbacks ------------------------
             self.epoch_logger(epoch=EPOCH + 1, training_info=train_epoch_info, val_info=val_epoch_info)
 
-            # ------------------------ 学习率调整 ------------------------
-            self.update_learning_rate(EPOCH+1)
 
             # 当训练次数超过最低epoch时，其中early_stop策略
             if (EPOCH + 1) > self.opts.min_train_epoch:
