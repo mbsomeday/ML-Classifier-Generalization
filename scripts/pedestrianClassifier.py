@@ -21,8 +21,8 @@ def get_args():
 
     # 云端
     # model & data
-    parser.add_argument('--ped_model_obj', type=str, default='torchvision.models.efficientnet_b0')
-    parser.add_argument('--ds_name_list', nargs='+', default=['D1'], help='the list means training_func on all of these datasets')
+    parser.add_argument('--ped_model_obj', type=str, default=None)
+    parser.add_argument('--ds_name_list', nargs='+', type=str, default=None, help='the list means training_func on all of these datasets')
     parser.add_argument('--data_key', type=str, default='Stage6_org')
     parser.add_argument('--train_batch_size', type=int, default=64)   # 将train, val和test的batch size分开，方便loss的计算
     parser.add_argument('--val_batch_size', type=int, default=128)
