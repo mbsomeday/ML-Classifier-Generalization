@@ -2,6 +2,7 @@ import torch, os
 from torch import nn
 from torch.utils.data import DataLoader
 import numpy as np
+import pandas as pd
 from tqdm import tqdm
 from sklearn.metrics import confusion_matrix
 from datetime import datetime
@@ -231,11 +232,19 @@ class DS_Classifier():
                 y_pred.extend(preds.cpu().numpy())
 
         test_accuracy = test_correct_num / len(test_dataset)
-        test_cm = confusion_matrix(y_true, y_pred)
+        test_cm = confusion_matrix(y_true, y_pred, labels=self.opts.ds_labels)
 
-        print(f'Test accuracy:{test_accuracy:.6f}\nTest CM:{test_cm}')
+        # print CM with labels
+        cm_df = pd.DataFrame(
+            test_cm,
+            index=self.opts.ds_name_list,
+            columns=self.opts.ds_name_list,
+        )
+        cm_df.index.name = 'True'
+        cm_df.columns.name = 'Predicted'
 
-        # plot_cm(y_true, y_pred, classes=['D1', 'D2', 'D3'], title=self.opts.cm_title, normalize=True, cm_save_dir=self.opts.cm_save_dir)
+        print(f'Test accuracy:{test_accuracy:.6f}\nTest CM:\n{cm_df.to_string()}')
+
 
 
 def ds_cls_from_dirs(opts):
