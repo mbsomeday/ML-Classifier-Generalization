@@ -282,8 +282,8 @@ def ds_cls_from_dirs(opts):
     # print CM with labels
     cm_df = pd.DataFrame(
         test_cm,
-        index=opts.ds_name_list,
-        columns=opts.ds_name_list,
+        index=['D1', 'D2', 'D3'],
+        columns=['D1', 'D2', 'D3'],
     )
     cm_df.index.name = 'True'
     cm_df.columns.name = 'Predicted'
