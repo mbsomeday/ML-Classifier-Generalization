@@ -277,16 +277,27 @@ def ds_cls_from_dirs(opts):
             y_pred.extend(preds.cpu().numpy())
 
     test_accuracy = test_correct_num / len(test_dataset)
-    cm = confusion_matrix(y_true, y_pred)
+    test_cm = confusion_matrix(y_true, y_pred)
 
-    print(f'test_correct_num/all_samples:{test_correct_num} / {len(test_dataset)}')
-    print(f'Test accuracy:{test_accuracy:.6f}\n')
-    print(f'cm:{cm}')
+    # print CM with labels
+    cm_df = pd.DataFrame(
+        test_cm,
+        index=opts.ds_name_list,
+        columns=opts.ds_name_list,
+    )
+    cm_df.index.name = 'True'
+    cm_df.columns.name = 'Predicted'
 
-    ds_label_list = []
-    for item in opts.ds_label_list:
-        cur_item = 'D' + str(int(item) + 1)
-        ds_label_list.append(cur_item)
+    print(f'Test accuracy:{test_accuracy:.6f}\nTest CM:\n{cm_df.to_string()}')
+
+    # print(f'test_correct_num/all_samples:{test_correct_num} / {len(test_dataset)}')
+    # print(f'Test accuracy:{test_accuracy:.6f}\n')
+    # print(f'cm:{cm}')
+
+    # ds_label_list = []
+    # for item in opts.ds_label_list:
+    #     cur_item = 'D' + str(int(item) + 1)
+    #     ds_label_list.append(cur_item)
 
     # plot_cm(y_true, y_pred, classes=ds_label_list, title=opts.cm_title, normalize=True, cm_save_dir=opts.cm_save_dir)
 
