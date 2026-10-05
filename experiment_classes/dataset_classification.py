@@ -26,7 +26,7 @@ class DS_Classifier():
                 print(f'Runing on {torch.cuda.get_device_name(0)} GPU')
 
         self.opts = opts
-        # self.print_args()
+        self.print_args()
 
         self.ds_model = get_obj_from_str(self.opts.ds_model_obj)(weights=None, progress=True, num_classes=opts.num_cls).to(DEVICE)
 
