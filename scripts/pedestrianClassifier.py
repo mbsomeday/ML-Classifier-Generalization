@@ -48,8 +48,8 @@ def get_args():
     # test
     parser.add_argument('--ped_weights_path', type=str, default=None)
     parser.add_argument('--test_ds_list', nargs='+', default=None)
-    parser.add_argument('--test_txt', type=str, default=None)
-    parser.add_argument('--test_batch_size', type=int, default=128)
+    parser.add_argument('--test_txt', type=str, default='test.txt')
+    parser.add_argument('--test_batch_size', type=int, default=256)
     parser.add_argument('--save_plt', action='store_true', help='not save CM by default')
     parser.add_argument('--cm_save_dir', type=str, default=None)
     parser.add_argument('--cm_title', type=str, default=None)
