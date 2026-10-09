@@ -232,7 +232,7 @@ class DS_Classifier():
                 y_pred.extend(preds.cpu().numpy())
 
         test_accuracy = test_correct_num / len(test_dataset)
-        test_cm = confusion_matrix(y_true, y_pred, labels=self.opts.ds_labels)
+        test_cm = confusion_matrix(y_true, y_pred)
 
         # print CM with labels
         cm_df = pd.DataFrame(
