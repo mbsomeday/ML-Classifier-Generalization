@@ -71,12 +71,12 @@ class DS_Classifier():
 
         # ********** 数据准备 **********
         self.train_dataset = my_dataset(ds_name_list=self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.train_txt, ds_labels=self.opts.ds_labels)
-        # self.train_dataset = read_from_dirs(ds_dir_list=self.opts.train_txt_list, ds_label_list=self.opts.ds_labels)
-        self.train_loader = DataLoader(self.train_dataset, batch_size=self.opts.train_batch_size, shuffle=True)
+        self.train_dataset = read_from_dirs(ds_dir_list=self.opts.train_txt_list, ds_label_list=self.opts.ds_labels)
+        # self.train_loader = DataLoader(self.train_dataset, batch_size=self.opts.train_batch_size, shuffle=True)
 
         self.val_dataset = my_dataset(ds_name_list=self.opts.ds_name_list, path_key=self.opts.data_key, txt_name=self.opts.val_txt, ds_labels=self.opts.ds_labels)
-        # self.val_dataset = read_from_dirs(ds_dir_list=self.opts.val_txt_list, ds_label_list=self.opts.ds_labels)
-        self.val_loader = DataLoader(self.val_dataset, batch_size=self.opts.val_batch_size, shuffle=False)
+        self.val_dataset = read_from_dirs(ds_dir_list=self.opts.val_txt_list, ds_label_list=self.opts.ds_labels)
+        # self.val_loader = DataLoader(self.val_dataset, batch_size=self.opts.val_batch_size, shuffle=False)
 
         # ********** loss & scheduler **********
         self.optimizer = torch.optim.RMSprop(self.ds_model.parameters(), lr=self.opts.base_lr, weight_decay=1e-5, eps=0.001, momentum=0.9)
@@ -128,6 +128,7 @@ class DS_Classifier():
         for batch_idx, data in enumerate(tqdm(self.train_loader)):
             images = data['image'].to(DEVICE)
             ds_labels = data['ds_label'].to(DEVICE)
+            cur_batch_size = ds_labels.size(0)
 
             logits = self.ds_model(images)
             pred = torch.argmax(logits, 1)
@@ -140,7 +141,7 @@ class DS_Classifier():
             loss_value.backward()
             self.optimizer.step()
 
-            batch_loss_sum = loss_value.item() * self.opts.train_batch_size
+            batch_loss_sum = loss_value.item() * cur_batch_size
             total_loss_sum += batch_loss_sum
 
         average_loss = total_loss_sum / len(self.train_dataset)
